@@ -5,6 +5,7 @@ import CampaignsSection from "../dashboard/sections/CampaignsSection";
 import LeadsSection from "../dashboard/sections/LeadsSection";
 import CallsSection from "../dashboard/sections/CallsSection";
 import CreateCampaignModal from "../dashboard/modals/CreateCampaignModal";
+import KnowledgeBaseSection from "./sections/KnowledgeBaseSection";
 import { C } from "../../components/utils";
 export default function DashboardMain() {
     const [tab, setTab] = useState("dashboard");
@@ -23,6 +24,7 @@ export default function DashboardMain() {
                 {tab === "campaigns" && <CampaignsSection onShowCreate={() => setShowModal(true)} />}
                 {tab === "leads" && <LeadsSection selectedLead={selLead} onLeadClick={setSelLead} />}
                 {tab === "calls" && <CallsSection />}
+                {tab === "kb" && <KnowledgeBaseSection />}
             </main>
         </div>
     );
