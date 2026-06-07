@@ -2,13 +2,36 @@ import React from "react";
 import { Card, C, Avatar } from "../../../components/utils";
 import { HOT_LEADS, initCampaigns, CALLS, CallTypeBadge, ScoreBadge } from "../utils";
 
-function DashboardSection({ onLeadClick, openCampaign }) {
+function DashboardSection({ data, onLeadClick, openCampaign }) {
+  const callsToday = data?.calls?.length || 0;
+
+  const hot = data?.globalHot || 0;
+  const warm = data?.globalWarm || 0;
+  const cold = data?.globalCold || 0;
+
+  const hot_leads = (data?.hotEnriched || [])
+    .slice()
+    .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+  const campaigns = data?.campaigns || [];
+  const stats = data?.campaignStats || {};
   return (
     <div style={{ padding: 26, minHeight: "100vh", background: C.bg }}>
       {/* Minutes Balance Banner */}
       {(() => {
-        const totalMins = 1200, usedMins = 347, remaining = totalMins - usedMins;
-        const pct = Math.round((remaining / totalMins) * 100);
+        const billing = data?.billing || {};
+
+        const totalMins = billing.total_minutes_purchased || 0;
+        const usedMins = billing.total_minutes_used || 0;
+        const remaining = billing.minutes_left || 0;
+        const rate = billing.price_per_minute || 0;
+        const balanceValue = billing.balance_value || 0;
+
+        const pct =
+          totalMins > 0
+            ? Math.round((remaining / totalMins) * 100)
+            : 0;
+
         const low = remaining < 200;
         const barColor = remaining < 200 ? C.hot : remaining < 500 ? C.warm : C.green;
         return (
@@ -31,7 +54,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
             <div style={{ width: 1, height: 44, background: C.border, flexShrink: 0 }} />
             <div style={{ textAlign: "center", flexShrink: 0 }}>
               <div style={{ fontSize: 10, color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 2 }}>Rate</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: C.text, letterSpacing: "-.5px" }}>₹7<span style={{ fontSize: 11, fontWeight: 500, color: C.muted }}>/min</span></div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: C.text, letterSpacing: "-.5px" }}>₹ {rate.toLocaleString()}<span style={{ fontSize: 11, fontWeight: 500, color: C.muted }}>/min</span></div>
             </div>
             <div style={{ width: 1, height: 44, background: C.border, flexShrink: 0 }} />
             <div style={{ textAlign: "center", flexShrink: 0 }}>
@@ -44,17 +67,22 @@ function DashboardSection({ onLeadClick, openCampaign }) {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: C.text, letterSpacing: "-.4px" }}>Good morning, Himanshu 👋</div>
-          <div style={{ fontSize: 12, color: C.muted, marginTop: 3 }}>Wednesday, 20 Dec 2024  ·  2 campaigns active</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: C.text, letterSpacing: "-.4px" }}>Good morning, {data?.company?.name || "User"} 👋</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 3 }}>{new Date().toLocaleDateString("en-IN", {
+            weekday: "long",
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+          })}
+            {" · "}
+            {data?.campaigns?.length || 0} campaigns active</div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.card, border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 13px", fontSize: 12, color: C.muted }}>
-          <span style={{ width: 5, height: 5, borderRadius: "50%", background: C.green, display: "inline-block" }} />3 calls active now
-        </div>
+
       </div>
 
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 22 }}>
-        {[["Calls Today", "94", "↑ 23% vs yesterday", C.accent, "📞"], ["Hot Leads", "2", "Immediate action needed", C.hot, "🔥"], ["Qualified", "4", "Ready for sales handoff", C.green, "✓"], ["Warm Leads", "1", "Follow-up required", C.warm, "⚡"], ["Junk", "1", "Wrong no. / not interested", "#9CA3AF", "✕"]].map(([l, v, s, c, ic], i) => (
+        {[["Calls Today", callsToday, "real-time data", C.accent, "📞"], ["Hot Leads", hot, "Immediate action needed", C.hot, "🔥"], , ["Warm Leads", warm, "Follow-up required", C.warm, "⚡"], ["Cold", cold, "Wrong no. / not interested", "#9CA3AF", "✕"]].map(([l, v, s, c, ic], i) => (
           <Card key={i} style={{ padding: "15px 17px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div>
@@ -76,28 +104,105 @@ function DashboardSection({ onLeadClick, openCampaign }) {
               <span style={{ fontSize: 18 }}>🔥</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: C.text }}>Hot leads — act now</span>
             </div>
-            <span style={{ background: C.hotBg, color: C.hot, border: `1px solid ${C.hotBdr}`, borderRadius: 10, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{HOT_LEADS.length} leads</span>
+            <span style={{ background: C.hotBg, color: C.hot, border: `1px solid ${C.hotBdr}`, borderRadius: 10, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{hot_leads.length} leads</span>
           </div>
-          {HOT_LEADS.map(lead => (
-            <div key={lead.id} onClick={() => onLeadClick(lead)}
-              style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, cursor: "pointer", transition: "background .1s" }}
-              onMouseEnter={e => e.currentTarget.style.background = C.hotBg} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+          {hot_leads.map((lead, i) => (
+            <div
+              key={i}
+              onClick={() => onLeadClick(lead)}
+              style={{
+                padding: "14px 18px",
+                borderBottom: `1px solid ${C.border}`,
+                cursor: "pointer",
+                transition: "background .1s"
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = C.hotBg)
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "transparent")
+              }
+            >
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <Avatar name={lead.name} size={36} />
+
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                    <span style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{lead.name}</span>
-                    <span style={{ fontSize: 10, color: C.muted, flexShrink: 0, marginLeft: 8 }}>{lead.ago}</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: 3
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 13,
+                        color: C.text
+                      }}
+                    >
+                      {lead.name}
+                    </span>
+
+                    <span
+                      style={{
+                        fontSize: 10,
+                        color: C.muted,
+                        flexShrink: 0,
+                        marginLeft: 8
+                      }}
+                    >
+                      {lead.timestamp
+                        ? new Date(lead.timestamp).toLocaleString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })
+                        : ""}
+                    </span>
                   </div>
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 5 }}>
-                    <CallTypeBadge type={lead.callType} />
-                    <span style={{ fontSize: 11, color: C.muted }}>{lead.budget} · {lead.config} · {lead.timeline}</span>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 6,
+                      flexWrap: "wrap",
+                      marginBottom: 5
+                    }}
+                  >
+                    <CallTypeBadge type={lead.script_type} />
+
+                    <span style={{ fontSize: 11, color: C.muted }}>
+                      {lead.budget || "—"} ·{" "}
+                      {lead.preferred_configuration || "—"} ·{" "}
+                      {lead.purchase_timeline || "—"}
+                    </span>
                   </div>
-                  <div style={{ fontSize: 11, color: C.text, background: "#FAFBFC", borderRadius: 6, padding: "5px 8px", lineHeight: 1.5, borderLeft: `2px solid ${C.accent}` }}>
-                    {lead.aiSummary}
+
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: C.text,
+                      background: "#FAFBFC",
+                      borderRadius: 6,
+                      padding: "5px 8px",
+                      lineHeight: 1.5,
+                      borderLeft: `2px solid ${C.accent}`
+                    }}
+                  >
+                    {lead.ai_summary}
                   </div>
-                  <div style={{ marginTop: 6, fontSize: 10, color: C.accent, fontWeight: 600 }}>
-                    ➜ Next: {lead.nextAction}
+
+                  <div
+                    style={{
+                      marginTop: 6,
+                      fontSize: 10,
+                      color: C.accent,
+                      fontWeight: 600
+                    }}
+                  >
+                    ➜ Next: {lead.next_action || "No action set"}
                   </div>
                 </div>
               </div>
@@ -111,22 +216,156 @@ function DashboardSection({ onLeadClick, openCampaign }) {
             <span style={{ fontWeight: 600, fontSize: 13, color: C.text }}>Active campaigns</span>
             <span onClick={openCampaign} style={{ fontSize: 11, color: C.accent, cursor: "pointer", fontWeight: 500 }}>View all →</span>
           </div>
-          {[
-            { name: "Prestige Lakeside — Live", type: "crm", called: 47, hot: 2, qualified: 4 },
-            { name: "Prestige Dec Batch", type: "cold", total: 320, called: 187, hot: 8, qualified: 32 },
-          ].map((cp, i) => (
-            <div key={i} style={{ padding: "13px 18px", borderBottom: `1px solid ${C.border}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <div style={{ fontWeight: 600, fontSize: 12, color: C.text, flex: 1, paddingRight: 8, lineHeight: 1.3 }}>{cp.name}</div>
-                <span style={{ background: cp.type === "crm" ? C.greenBg : C.accentLt, color: cp.type === "crm" ? C.green : C.accent, borderRadius: 8, padding: "1px 7px", fontSize: 9, fontWeight: 600, flexShrink: 0 }}>{cp.type === "crm" ? "Live" : "Running"}</span>
+          {campaigns.map((cp) => {
+            const stat = stats[cp.id] || {};
+
+            const total = stat.total_calls || 0;
+            const hot = stat.hot || 0;
+            const warm = stat.warm || 0;
+            const cold = stat.cold || 0;
+
+            const progress =
+              cp.totalLeads ? Math.round((stat.called || 0) / cp.totalLeads * 100) : 0;
+
+            return (
+              <div
+                key={cp.id}
+                style={{
+                  padding: "13px 18px",
+                  borderBottom: `1px solid ${C.border}`
+                }}
+              >
+                {/* Header */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: 6
+                  }}
+                >
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: 12,
+                      color: C.text,
+                      flex: 1,
+                      paddingRight: 8,
+                      lineHeight: 1.3
+                    }}
+                  >
+                    {cp.name}
+                  </div>
+
+                  <span
+                    style={{
+                      background:
+                        cp.type === "crm" ? C.greenBg : C.accentLt,
+                      color: cp.type === "crm" ? C.green : C.accent,
+                      borderRadius: 8,
+                      padding: "1px 7px",
+                      fontSize: 9,
+                      fontWeight: 600,
+                      flexShrink: 0
+                    }}
+                  >
+                    {cp.type === "crm" ? "Live" : "Running"}
+                  </span>
+                </div>
+
+                {/* Progress */}
+                {cp.totalLeads && (
+                  <div
+                    style={{
+                      background: C.bg,
+                      borderRadius: 3,
+                      height: 4,
+                      overflow: "hidden",
+                      marginBottom: 8
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        background: C.accent,
+                        width: `${progress}%`,
+                        borderRadius: 3
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Stats */}
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div
+                    style={{
+                      background: C.hotBg,
+                      borderRadius: 5,
+                      padding: "4px 8px",
+                      flex: 1,
+                      textAlign: "center"
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: C.hot
+                      }}
+                    >
+                      {hot}
+                    </div>
+                    <div style={{ fontSize: 9, color: C.hot }}>Hot</div>
+                  </div>
+
+                  <div
+                    style={{
+                      background: C.accentLt,
+                      borderRadius: 5,
+                      padding: "4px 8px",
+                      flex: 1,
+                      textAlign: "center"
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: C.accent
+                      }}
+                    >
+                      {warm}
+                    </div>
+                    <div style={{ fontSize: 9, color: C.accent }}>
+                      Warm
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      background: "#F3F4F6",
+                      borderRadius: 5,
+                      padding: "4px 8px",
+                      flex: 1,
+                      textAlign: "center"
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#6B7280"
+                      }}
+                    >
+                      {cold}
+                    </div>
+                    <div style={{ fontSize: 9, color: "#6B7280" }}>
+                      Cold
+                    </div>
+                  </div>
+                </div>
               </div>
-              {cp.total && <div style={{ background: C.bg, borderRadius: 3, height: 4, overflow: "hidden", marginBottom: 8 }}><div style={{ height: "100%", background: C.accent, width: `${Math.round(cp.called / cp.total * 100)}%`, borderRadius: 3 }} /></div>}
-              <div style={{ display: "flex", gap: 8 }}>
-                <div style={{ background: C.hotBg, borderRadius: 5, padding: "4px 8px", flex: 1, textAlign: "center" }}><div style={{ fontSize: 13, fontWeight: 700, color: C.hot }}>{cp.hot}</div><div style={{ fontSize: 9, color: C.hot }}>Hot</div></div>
-                <div style={{ background: C.accentLt, borderRadius: 5, padding: "4px 8px", flex: 1, textAlign: "center" }}><div style={{ fontSize: 13, fontWeight: 700, color: C.accent }}>{cp.qualified}</div><div style={{ fontSize: 9, color: C.accent }}>Qualified</div></div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </Card>
       </div>
     </div>

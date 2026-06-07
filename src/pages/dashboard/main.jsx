@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../dashboard/components/NavBar";
 import DashboardSection from "../dashboard/sections/DashboardSection";
 import CampaignsSection from "../dashboard/sections/CampaignsSection";
@@ -12,6 +12,40 @@ export default function DashboardMain() {
     const [showModal, setShowModal] = useState(false);
     const [selLead, setSelLead] = useState(null);
 
+    const [summaryData, setSummaryData] = useState(null);
+    const [activityData, setActivityData] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+
+                if (tab === "dashboard" || tab === "campaigns") {
+                    if (!summaryData) {
+                        const res = await fetch("/api/dashboard/summary");
+                        const data = await res.json();
+                        setSummaryData(data);
+                    }
+                }
+
+                if (tab === "leads" || tab === "calls") {
+                    if (!activityData) {
+                        const res = await fetch("/api/dashboard/activity");
+                        const data = await res.json();
+                        setActivityData(data);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [tab]);
+
     const handleLead = lead => { setSelLead(lead); setTab("leads"); };
     const handleLaunch = () => { setShowModal(false); };
 
@@ -20,10 +54,10 @@ export default function DashboardMain() {
             {showModal && <CreateCampaignModal onClose={() => setShowModal(false)} onLaunch={handleLaunch} />}
             <Sidebar tab={tab} setTab={setTab} />
             <main style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
-                {tab === "dashboard" && <DashboardSection onLeadClick={handleLead} openCampaign={() => setTab("campaigns")} />}
-                {tab === "campaigns" && <CampaignsSection onShowCreate={() => setShowModal(true)} />}
-                {tab === "leads" && <LeadsSection selectedLead={selLead} onLeadClick={setSelLead} />}
-                {tab === "calls" && <CallsSection />}
+                {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => setTab("campaigns")} />}
+                {tab === "campaigns" && <CampaignsSection data={summaryData} onShowCreate={() => setShowModal(true)} />}
+                {tab === "leads" && <LeadsSection data={activityData} selectedLead={selLead} onLeadClick={setSelLead} />}
+                {tab === "calls" && <CallsSection data={activityData} />}
                 {tab === "kb" && <KnowledgeBaseSection />}
             </main>
         </div>
