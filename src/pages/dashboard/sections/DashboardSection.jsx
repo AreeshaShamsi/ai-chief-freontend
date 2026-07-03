@@ -81,7 +81,7 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 22 }}>
         {[["Calls Today", callsToday, "real-time data", C.accent, "📞"], ["Hot Leads", hot, "Immediate action needed", C.hot, "🔥"], , ["Warm Leads", warm, "Follow-up required", C.warm, "⚡"], ["Cold", cold, "Wrong no. / not interested", "#9CA3AF", "✕"]].map(([l, v, s, c, ic], i) => (
           <Card key={i} style={{ padding: "15px 17px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -211,13 +211,13 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
         </Card>
 
         {/* Campaigns snapshot */}
-        <Card style={{ padding: 0, overflow: "hidden" }}>
+        <Card key={"campaigns"} style={{ padding: 0, overflow: "hidden" }}>
           <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 600, fontSize: 13, color: C.text }}>Active campaigns</span>
             <span onClick={openCampaign} style={{ fontSize: 11, color: C.accent, cursor: "pointer", fontWeight: 500 }}>View all →</span>
           </div>
           {campaigns.map((cp) => {
-            const stat = stats[cp.id] || {};
+            const stat = stats[cp.campaign_id] || {};
 
             const total = stat.total_calls || 0;
             const hot = stat.hot || 0;
@@ -229,7 +229,7 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
 
             return (
               <div
-                key={cp.id}
+                key={cp.campaign_id}
                 style={{
                   padding: "13px 18px",
                   borderBottom: `1px solid ${C.border}`
@@ -248,19 +248,28 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
                       fontWeight: 600,
                       fontSize: 12,
                       color: C.text,
-                      flex: 1,
-                      paddingRight: 8,
                       lineHeight: 1.3
                     }}
                   >
-                    {cp.name}
+                    {cp.campaign_name}
                   </div>
+
+                  {cp.campaign_type === "crm_connected" && <div
+                    style={{
+                      fontWeight: 300,
+                      fontSize: 10,
+                      color: C.text,
+                      lineHeight: 1.3
+                    }}
+                  >
+                    {cp.script_type == "real_estate_enquiry" ? "Enquiry" : "Requirement"}
+                  </div>}
 
                   <span
                     style={{
                       background:
-                        cp.type === "crm" ? C.greenBg : C.accentLt,
-                      color: cp.type === "crm" ? C.green : C.accent,
+                        cp.campaign_type === "crm_connected" ? C.greenBg : C.accentLt,
+                      color: cp.campaign_type === "crm_connected" ? C.green : C.accent,
                       borderRadius: 8,
                       padding: "1px 7px",
                       fontSize: 9,

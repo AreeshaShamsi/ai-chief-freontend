@@ -19,11 +19,11 @@ function CrmCampaignCard({ cp, stat = {} }) {
 
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>
-            {cp.name}
+            {cp.campaign_name}
           </div>
 
           <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>
-            Script: {cp.script_type}
+            Script: {cp.script_type === "real_estate_enquiry" ? "Property Enquiry" : "Property Requirement Gathering"}
           </div>
         </div>
 

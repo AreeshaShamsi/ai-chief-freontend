@@ -1,46 +1,164 @@
-import React, { useState }  from "react";
+import React, { useState } from "react";
 import { Btn, Card, C, Avatar } from "../../../components/utils";
 import { HOT_LEADS, initCampaigns, CALLS, ScoreBadge } from "../utils";
-import  InventorySection  from "../components/InventorySection";
+import InventorySection from "../components/InventorySection";
+import { API_URL } from "../../../config/main";
 
 const FILE_ICONS = { "pdf": "📄", "xlsx": "📊", "xls": "📊", "doc": "📝", "docx": "📝" };
-const initInventory = [
-  { id: 1, name: "Prestige Lakeside", location: "Sarjapur Road, Bengaluru", bhk: ["2BHK", "3BHK", "4BHK"], priceRange: "₹85L – ₹1.8 Cr", possession: "Ready to move", units: 24, facing: ["East", "North"], amenities: "Clubhouse, Pool, Gym, Jogging Track", highlight: "Last few units left. RERA approved.", status: "active" },
-  { id: 2, name: "Sobha Hartland", location: "Whitefield, Bengaluru", bhk: ["2BHK", "3BHK"], priceRange: "₹72L – ₹1.2 Cr", possession: "Dec 2025", units: 58, facing: ["East", "West", "North"], amenities: "Rooftop Garden, EV Charging, Kids Play Area", highlight: "Pre-launch pricing available for limited period.", status: "active" },
-  { id: 3, name: "Brigade Lakefront", location: "Mysuru Road, Bengaluru", bhk: ["1BHK", "2BHK", "3BHK"], priceRange: "₹45L – ₹95L", possession: "Jun 2026", units: 112, facing: ["East", "South"], amenities: "Lake View, Co-working Space, Gym", highlight: "Investment-friendly. Rental yield ~4.2% p.a.", status: "active" },
-];
-const initFaqs = [
-  { id: 1, q: "What documents are required for booking?", a: "Aadhar, PAN, 3 months bank statement, and 2 passport photos. For loan cases, salary slips of last 3 months." },
-  { id: 2, q: "Is home loan available?", a: "Yes, we have tie-ups with SBI, HDFC, ICICI, and Axis Bank. Our team can assist with pre-approval within 48 hours." },
-  { id: 3, q: "What is the booking amount?", a: "Booking amount is ₹1 lakh for all projects. Fully adjustable against the final cost." },
-  { id: 4, q: "Can NRIs invest?", a: "Yes, all projects are NRI-eligible. Payment via NRE/NRO account. POA assistance available." },
-];
-const initUploadedFiles = [
-  { id: 1, name: "Prestige_Inventory_Dec24.pdf", type: "pdf", size: "2.4 MB", uploaded: "Dec 15", status: "processed", properties: 2 },
-  { id: 2, name: "Brigade_Units_Nov24.xlsx", type: "xlsx", size: "540 KB", uploaded: "Nov 30", status: "processed", properties: 1 },
-];
 
-
-function KnowledgeBaseSection() {
-  const [inventory, setInventory] = useState(initInventory);
-  const [faqs, setFaqs] = useState(initFaqs);
+function KnowledgeBaseSection({ data }) {
+  const [inventory, setInventory] = useState(data?.inventory ?? []);
+  const [faqs, setFaqs] = useState(data?.faqs ?? []);
   const [activeSection, setActiveSection] = useState("inventory");
   const [showAddProp, setShowAddProp] = useState(false);
   const [showAddFaq, setShowAddFaq] = useState(false);
   const [editProp, setEditProp] = useState(null);
   const [editFaq, setEditFaq] = useState(null);
-  const emptyProp = { name: "", location: "", bhk: "2BHK, 3BHK", priceRange: "", possession: "", units: "", facing: "", amenities: "", highlight: "", status: "active" };
+  const emptyProp = { name: "", location: "", bhk: "2BHK, 3BHK", price_range: "", possession: "", units: "", carpet_area: "", facing: "", amenities: "", highlight: "", status: "active" };
   const [propForm, setPropForm] = useState(emptyProp);
-  const emptyFaq = { q: "", a: "" };
+  const emptyFaq = { question: "", answer: "", id: "" };
   const [faqForm, setFaqForm] = useState(emptyFaq);
   const openAddProp = () => { setPropForm(emptyProp); setEditProp(null); setShowAddProp(true); };
-  const openEditProp = p => { setPropForm({ ...p, bhk: p.bhk.join(", "), facing: p.facing.join(", ") }); setEditProp(p.id); setShowAddProp(true); };
-  const saveProp = () => { const parsed = { ...propForm, bhk: propForm.bhk.split(",").map(s => s.trim()).filter(Boolean), facing: propForm.facing.split(",").map(s => s.trim()).filter(Boolean), units: parseInt(propForm.units) || 0 }; if (editProp) setInventory(inv => inv.map(p => p.id === editProp ? { ...parsed, id: editProp } : p)); else setInventory(inv => [...inv, { ...parsed, id: Date.now() }]); setShowAddProp(false); };
-  const delProp = id => setInventory(inv => inv.filter(p => p.id !== id));
+  const openEditProp = p => { setPropForm({ ...p, bhk: p.bhk, facing: p.facing }); setEditProp(p.id); setShowAddProp(true); };
+  const saveProp = async () => {
+    try {
+      const companyId = localStorage.getItem("company_id");
+      const parsed = {
+        company_id: companyId,
+        code: propForm.code,
+        name: propForm.name,
+        location: propForm.location,
+        bhk: propForm.bhk,
+        carpet_area: propForm.carpet_area,
+        price_range: propForm.price_range,
+        possession: propForm.possession,
+        units: parseInt(propForm.units) || null,
+        facing: propForm.facing,
+        amenities: propForm.amenities,
+        highlight: propForm.highlight,
+        status: propForm.status || "active",
+      };
+
+      const response = await fetch(`${API_URL}/inventory/${editProp}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(parsed),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to update property');
+      }
+
+      setInventory((inv) =>
+        inv.map((p) =>
+          p.id === editProp ? result.data : p
+        )
+      );
+
+      setShowAddProp(false);
+      setEditProp(null);
+
+    } catch (error) {
+      console.error("Update property error:", error);
+    }
+  };
+  const delProp = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/inventory/${id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Delete failed');
+      }
+
+      // remove from UI after successful delete
+      setInventory((inv) => inv.filter((p) => p.id !== id));
+
+    } catch (error) {
+      console.error('Delete inventory error:', error);
+    }
+  };
   const openAddFaq = () => { setFaqForm(emptyFaq); setEditFaq(null); setShowAddFaq(true); };
-  const openEditFaq = f => { setFaqForm({ q: f.q, a: f.a }); setEditFaq(f.id); setShowAddFaq(true); };
-  const saveFaq = () => { if (editFaq) setFaqs(fs => fs.map(f => f.id === editFaq ? { ...faqForm, id: editFaq } : f)); else setFaqs(fs => [...fs, { ...faqForm, id: Date.now() }]); setShowAddFaq(false); };
-  const delFaq = id => setFaqs(fs => fs.filter(f => f.id !== id));
+  const openEditFaq = f => { setFaqForm({ question: f.question, answer: f.answer }); setEditFaq(f.id); setShowAddFaq(true); };
+  const saveFaq = async () => {
+    try {
+      const companyId = localStorage.getItem("company_id");
+      const payload = {
+        company_id: companyId,
+        question: faqForm.question,
+        answer: faqForm.answer,
+      };
+      let response;
+      if (editFaq != null && editFaq !== "") {
+
+        response = await fetch(`${API_URL}/faq/${editFaq}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        response = await fetch(`${API_URL}/faq/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+      }
+
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to create FAQ');
+      }
+
+      if (editFaq != null && editFaq !== "") {
+        setFaqs(fs => fs.map(f => f.id === editFaq ? { ...f, question: faqForm.question, answer: faqForm.answer } : f));
+
+      } else {
+        setFaqs((fs) => [...fs, result.data]);
+      }
+      setShowAddFaq(false);
+
+      setFaqForm({
+        question: '',
+        answer: '',
+      });
+    } catch (error) {
+      console.error('Error creating FAQ:', error);
+    }
+  };
+
+
+  const delFaq = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/faq/${id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to delete FAQ');
+      }
+
+      // update UI after successful delete
+      setFaqs((fs) => fs.filter((f) => f.id !== id));
+
+    } catch (error) {
+      console.error('Delete FAQ error:', error);
+    }
+  };
   const inputStyle = { width: "100%", padding: "9px 11px", border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12, outline: "none", boxSizing: "border-box", background: "#FAFBFC", color: C.text };
   const labelStyle = { display: "block", fontSize: 11, fontWeight: 600, color: C.text, marginBottom: 5 };
   return (
@@ -64,7 +182,7 @@ function KnowledgeBaseSection() {
           </button>
         ))}
       </div>
-      {activeSection === "inventory" && <InventorySection inventory={inventory} setInventory={setInventory} openEditProp={openEditProp} delProp={delProp} />}
+      {activeSection === "inventory" && <InventorySection inventory={inventory} setInventory={setInventory} openEditProp={openEditProp} delProp={delProp} uploadedFiles={data?.files ?? []} />}
       {activeSection === "faqs" && (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -77,8 +195,8 @@ function KnowledgeBaseSection() {
                 <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                   <div style={{ width: 24, height: 24, borderRadius: "50%", background: C.accentLt, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.accent, flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: C.text, marginBottom: 5 }}>Q: {f.q}</div>
-                    <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6, background: C.bg, borderRadius: 7, padding: "8px 11px", borderLeft: `3px solid ${C.accent}` }}>A: {f.a}</div>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: C.text, marginBottom: 5 }}>Q: {f.question}</div>
+                    <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6, background: C.bg, borderRadius: 7, padding: "8px 11px", borderLeft: `3px solid ${C.accent}` }}>A: {f.answer}</div>
                   </div>
                   <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                     <button onClick={() => openEditFaq(f)} style={{ background: C.accentLt, color: C.accent, border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Edit</button>
@@ -98,7 +216,7 @@ function KnowledgeBaseSection() {
               <button onClick={() => setShowAddProp(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, fontSize: 18 }}>✕</button>
             </div>
             <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
-              {[["name", "Project Name", "e.g. Prestige Lakeside", "text"], ["location", "Location", "e.g. Sarjapur Road, Bengaluru", "text"], ["priceRange", "Price Range", "e.g. ₹85L – ₹1.8 Cr", "text"], ["possession", "Possession", "e.g. Ready to move / Dec 2025", "text"], ["units", "Units Available", "e.g. 24", "number"], ["bhk", "BHK Types (comma separated)", "e.g. 2BHK, 3BHK, 4BHK", "text"], ["facing", "Facing Options (comma separated)", "e.g. East, North, West", "text"], ["amenities", "Amenities", "e.g. Pool, Gym, Clubhouse", "text"], ["highlight", "Agent Highlight", "Key selling point the agent should mention on calls", "text"]].map(([k, l, ph, t]) => (
+              {[["name", "Project Name", "e.g. Prestige Lakeside", "text"], ["location", "Location", "e.g. Sarjapur Road, Bengaluru", "text"], ["price_range", "Price Range", "e.g. ₹85L – ₹1.8 Cr", "text"], ["possession", "Possession", "e.g. Ready to move / Dec 2025", "text"], ["units", "Units Available", "e.g. 24", "number"], ["carpet_area", "Carpet Area", "e.g. 500 sqft", "text"], ["bhk", "BHK Types", "e.g. 2BHK, 3BHK, 4BHK", "text"], ["facing", "Facing Options", "e.g. East, North, West", "text"], ["amenities", "Amenities", "e.g. Pool, Gym, Clubhouse", "text"], ["highlight", "Agent Highlight", "Key selling point the agent should mention on calls", "text"]].map(([k, l, ph, t]) => (
                 <div key={k}><label style={labelStyle}>{l}</label>
                   {k === "highlight" ? <textarea value={propForm[k]} onChange={e => setPropForm(f => ({ ...f, [k]: e.target.value }))} placeholder={ph} rows={2} style={{ ...inputStyle, resize: "vertical" }} />
                     : <input type={t} value={propForm[k]} onChange={e => setPropForm(f => ({ ...f, [k]: e.target.value }))} placeholder={ph} style={inputStyle} />}
@@ -120,11 +238,11 @@ function KnowledgeBaseSection() {
               <button onClick={() => setShowAddFaq(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, fontSize: 18 }}>✕</button>
             </div>
             <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
-              <div><label style={labelStyle}>Question</label><input value={faqForm.q} onChange={e => setFaqForm(f => ({ ...f, q: e.target.value }))} placeholder="e.g. Is home loan available?" style={inputStyle} /></div>
-              <div><label style={labelStyle}>Answer <span style={{ fontWeight: 400, color: C.muted }}>(the agent will speak this)</span></label><textarea value={faqForm.a} onChange={e => setFaqForm(f => ({ ...f, a: e.target.value }))} placeholder="Write the exact answer the AI agent should give..." rows={4} style={{ ...inputStyle, resize: "vertical" }} /></div>
+              <div><label style={labelStyle}>Question</label><input value={faqForm.question} onChange={e => setFaqForm(f => ({ ...f, question: e.target.value }))} placeholder="e.g. Is home loan available?" style={inputStyle} /></div>
+              <div><label style={labelStyle}>Answer <span style={{ fontWeight: 400, color: C.muted }}>(the agent will speak this)</span></label><textarea value={faqForm.answer} onChange={e => setFaqForm(f => ({ ...f, answer: e.target.value }))} placeholder="Write the exact answer the AI agent should give..." rows={4} style={{ ...inputStyle, resize: "vertical" }} /></div>
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 4 }}>
                 <Btn onClick={() => setShowAddFaq(false)}>Cancel</Btn>
-                <Btn primary disabled={!faqForm.q.trim() || !faqForm.a.trim()} onClick={saveFaq}>{editFaq ? "Save Changes" : "Add FAQ"}</Btn>
+                <Btn primary disabled={!faqForm.question.trim() || !faqForm.answer.trim()} onClick={saveFaq}>{editFaq ? "Save Changes" : "Add FAQ"}</Btn>
               </div>
             </div>
           </div>

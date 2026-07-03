@@ -1,8 +1,9 @@
 import React from "react";
 import { C, Avatar } from "../../../components/utils";
 
-const NAV = [{ id: "dashboard", e: "◼", l: "Dashboard" }, { id: "campaigns", e: "📢", l: "Campaigns", b: 3 }, { id: "leads", e: "👥", l: "Leads", b: 7 }, { id: "calls", e: "📞", l: "Call Log" }, { id: "kb", e: "📚", l: "Knowledge Base" }];
+const NAV = [{ id: "dashboard", e: "◼", l: "Dashboard" }, { id: "campaigns", e: "📢", l: "Campaigns" }, { id: "leads", e: "👥", l: "Leads" }, { id: "calls", e: "📞", l: "Call Log" }, { id: "kb", e: "📚", l: "Knowledge Base" }];
 function Sidebar({ tab, setTab }) {
+  const user_name = (localStorage.getItem("user_name") || "").trim().replace(/^./, c => c.toUpperCase());
   return (
     <div style={{ width: 210, background: C.sidebar, display: "flex", flexDirection: "column", flexShrink: 0, borderRight: "1px solid #1A2540" }}>
       <style>{`@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.35}}.pls{animation:pulse2 2s ease-in-out infinite;}`}</style>
@@ -10,10 +11,7 @@ function Sidebar({ tab, setTab }) {
         <div style={{ width: 32, height: 32, borderRadius: 8, background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>📞</div>
         <div><div style={{ color: "#F8FAFC", fontWeight: 700, fontSize: 14, letterSpacing: "-.3px" }}>VoiceIQ</div><div style={{ color: "#475569", fontSize: 10, marginTop: 1 }}>MVP · Real Estate</div></div>
       </div>
-      <div style={{ margin: "8px 10px", background: "#0F2A1A", borderRadius: 7, padding: "7px 12px", display: "flex", alignItems: "center", gap: 7 }}>
-        <span className="pls" style={{ width: 6, height: 6, borderRadius: "50%", background: C.green, display: "inline-block", flexShrink: 0 }} />
-        <span style={{ fontSize: 11, color: "#34D399", fontWeight: 500 }}>2 active campaigns</span>
-      </div>
+
       <nav style={{ flex: 1, padding: "6px 0" }}>
         {NAV.map(n => {
           const a = tab === n.id;
@@ -25,8 +23,8 @@ function Sidebar({ tab, setTab }) {
         })}
       </nav>
       <div style={{ padding: "12px 18px", borderBottom: "1px solid #1A2540", display: "flex", alignItems: "center", gap: 9 }}>
-        <Avatar name="Himanshu S" size={28} color={C.accent} />
-        <div><div style={{ color: "#F8FAFC", fontSize: 11, fontWeight: 600 }}>Himanshu S.</div><div style={{ color: "#475569", fontSize: 10 }}>Admin</div></div>
+        <Avatar name={user_name} size={28} color={C.accent} />
+        <div style={{ display: "flex", flexDirection: "column", marginLeft: 8 }}><div style={{ color: "#F8FAFC", fontSize: 11, fontWeight: 600, letterSpacing: "-.3px", }}>{user_name}</div><div style={{ color: "#475569", fontSize: 10 }}>Admin</div></div>
       </div>
     </div>
   );

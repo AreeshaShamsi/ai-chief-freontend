@@ -6,7 +6,7 @@ import ColdCampaignCard from "../components/ColdCampaignCard";
 
 function CampaignsSection({ data, onShowCreate }) {
   const campaigns = data?.campaigns || [];
-  const stats = data?.campaignStats || {};
+  const stats = data?.campaigns || {};
 
   const crmCampaigns = campaigns.filter(
     (c) => c.campaign_type === "crm_connected"
@@ -91,9 +91,9 @@ function CampaignsSection({ data, onShowCreate }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {crmCampaigns.map((cp) => (
             <CrmCampaignCard
-              key={cp.id}
+              key={cp.campaign_id}
               cp={cp}
-              stat={stats[cp.id] || {}}
+              stat={stats[cp.campaign_id] || {}}
             />
           ))}
         </div>
@@ -160,9 +160,9 @@ function CampaignsSection({ data, onShowCreate }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {coldCampaigns.map((cp) => (
             <ColdCampaignCard
-              key={cp.id}
+              key={cp.campaign_id}
               cp={cp}
-              stat={stats[cp.id] || {}}
+              stat={stats[cp.campaign_id] || {}}
             />
           ))}
         </div>
