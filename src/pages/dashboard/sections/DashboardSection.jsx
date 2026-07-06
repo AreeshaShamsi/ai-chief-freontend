@@ -1,381 +1,614 @@
 import React from "react";
-import { Card, C, Avatar } from "../../../components/utils";
-import { HOT_LEADS, initCampaigns, CALLS, CallTypeBadge, ScoreBadge } from "../utils";
+import {
+  FiActivity,
+  FiArrowUpRight,
+  FiCheck,
+  FiMic,
+  FiPhoneCall,
+  FiX,
+  FiZap,
+} from "react-icons/fi";
+import { FaFire } from "react-icons/fa";
+import { LeadFollowUpCard } from "../../../components/cards";
+import { Card, C } from "../../../components/utils";
 
-function DashboardSection({ data, onLeadClick, openCampaign }) {
-  const callsToday = data?.calls?.length || 0;
+const topMetrics = [
+  {
+    key: "minutes",
+    label: "347 min remaining",
+    subtitle: "853 min used, 71% remaining of 1,200 purchased",
+    icon: <FiMic size={14} />,
+    progress: 58,
+  },
+  {
+    key: "rate",
+    label: "base rate",
+    icon: <span style={{ fontSize: 14, fontWeight: 800 }}>₹</span>,
+    valueNode: (
+      <>
+        <span style={{ fontSize: 24, fontWeight: 800 }}>₹7</span>
+        <span style={{ fontSize: 10, fontWeight: 700 }}>/min</span>
+      </>
+    ),
+  },
+  {
+    key: "balance",
+    label: "Balance value",
+    value: "₹16.4K",
+    icon: <span style={{ fontSize: 14, fontWeight: 800, color: "#5B45F4" }}>₹</span>,
+    featured: true,
+  },
+];
 
-  const hot = data?.globalHot || 0;
-  const warm = data?.globalWarm || 0;
-  const cold = data?.globalCold || 0;
+const middleMetrics = [
+  {
+    label: "call today",
+    value: "94",
+    icon: <FiPhoneCall size={14} />,
+    badge: "23%",
+    badgeTone: "green",
+  },
+  {
+    label: "Hot leads",
+    subtitle: "action needed",
+    value: "8%",
+    icon: <FaFire size={13} />,
+    iconColor: "#EF4444",
+    badge: "2",
+    badgeTone: "green",
+  },
+];
 
-  const hot_leads = (data?.hotEnriched || [])
-    .slice()
-    .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+const bottomMetrics = [
+  {
+    label: "Qualified",
+    subtitle: "ready for sales",
+    value: "4",
+    icon: <FiCheck size={15} />,
+    iconColor: "#16A34A",
+  },
+  {
+    label: "Warm leads",
+    subtitle: "needs follow up",
+    value: "2",
+    icon: <FiZap size={15} />,
+    iconColor: "#F59E0B",
+    badge: "2",
+    badgeTone: "red",
+  },
+  {
+    label: "Junk",
+    subtitle: "not interested",
+    value: "2",
+    icon: <FiX size={15} />,
+    iconColor: "#64748B",
+    background: "#F3F4F6",
+  },
+];
 
-  const campaigns = data?.campaigns || [];
-  const stats = data?.campaignStats || {};
+const hotLeads = [
+  {
+    name: "Arjun Mehta",
+    initials: "AM",
+    nextAction: "Confirm site visit",
+    nextTime: "Saturday 11AM",
+    tags: ["Property Enquiry", "12 cr", "33bhk", "2 months"],
+    timeAgo: "6 min ago",
+    message: "Budget ₹1-1.3 Cr confirmed. Site visit Saturday 11AM arranged Sarjapur preferred.",
+  },
+  {
+    name: "Sunita Pillai",
+    initials: "SP",
+    nextAction: "Confirm site visit",
+    nextTime: "Saturday 11AM",
+    tags: ["Property Enquiry", "1.2 cr", "4bhk", "3 months"],
+    timeAgo: "6 min ago",
+    message: "high-budget buyer . open to spacious 4bhk. spouse saturday call",
+  },
+];
+
+const campaigns = [
+  { title: "Hot leads act now", status: "live", hot: 2, qualified: 4 },
+  { title: "prestige decbatch", status: "running", hot: 8, qualified: 32, progress: 68 },
+];
+
+const pageStyle = {
+  width: "100%",
+  maxWidth: "none",
+  margin: 0,
+  padding: 24,
+  boxSizing: "border-box",
+  background: "#F7F8FC",
+  color: C.text,
+};
+
+const topCardStyle = {
+  borderRadius: 16,
+  border: "1px solid rgba(226,232,240,0.8)",
+  boxShadow: "none",
+  background: "#EEF2FF",
+  minHeight: 96,
+  padding: 14,
+};
+
+const sectionCardStyle = {
+  borderRadius: 18,
+  border: `1px solid ${C.borderLt}`,
+  boxShadow: "none",
+};
+
+function ActiveCallsPill() {
   return (
-    <div style={{ padding: 26, minHeight: "100vh", background: C.bg }}>
-      {/* Minutes Balance Banner */}
-      {(() => {
-        const billing = data?.billing || {};
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 7,
+        height: 24,
+        borderRadius: 999,
+        border: `1px solid ${C.border}`,
+        background: C.card,
+        color: C.text,
+        fontSize: 9,
+        fontWeight: 700,
+        padding: "0 10px",
+        whiteSpace: "nowrap",
+      }}
+    >
+      <span
+        aria-hidden="true"
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: "#22C55E",
+        }}
+      />
+      3 calls active now
+    </span>
+  );
+}
 
-        const totalMins = billing.total_minutes_purchased || 0;
-        const usedMins = billing.total_minutes_used || 0;
-        const remaining = billing.minutes_left || 0;
-        const rate = billing.price_per_minute || 0;
-        const balanceValue = billing.balance_value || 0;
+function IconCircle({ children, color = "#5B45F4" }) {
+  return (
+    <span
+      style={{
+        width: 28,
+        height: 28,
+        borderRadius: "50%",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: C.card,
+        color,
+        flexShrink: 0,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
 
-        const pct =
-          totalMins > 0
-            ? Math.round((remaining / totalMins) * 100)
-            : 0;
+function MetricBadge({ children, tone = "green" }) {
+  const isGreen = tone === "green";
 
-        const low = remaining < 200;
-        const barColor = remaining < 200 ? C.hot : remaining < 500 ? C.warm : C.green;
-        return (
-          <div style={{ background: C.card, border: `1px solid ${low ? C.hotBdr : C.border}`, borderRadius: 12, padding: "14px 20px", marginBottom: 18, display: "flex", alignItems: "center", gap: 20, boxShadow: low ? "0 0 0 3px #FEE2E2" : "none", transition: "box-shadow .3s" }}>
-            <div style={{ width: 42, height: 42, borderRadius: 10, background: low ? "#FEF2F2" : "#EEF2FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{low ? "⚠️" : "🎙️"}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-                <span style={{ fontSize: 24, fontWeight: 800, color: low ? C.hot : C.text, letterSpacing: "-1px", lineHeight: 1 }}>{remaining.toLocaleString()}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: C.muted }}>minutes remaining</span>
-                {low && <span style={{ fontSize: 10, fontWeight: 700, background: C.hotBg, color: C.hot, border: `1px solid ${C.hotBdr}`, borderRadius: 8, padding: "2px 8px" }}>Low balance</span>}
-              </div>
-              <div style={{ background: C.bg, borderRadius: 4, height: 5, overflow: "hidden" }}>
-                <div style={{ height: "100%", background: barColor, width: `${pct}%`, borderRadius: 4, transition: "width .4s" }} />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 10, color: C.muted }}>
-                <span>{usedMins.toLocaleString()} mins used</span>
-                <span>{pct}% remaining of {totalMins.toLocaleString()} purchased</span>
-              </div>
-            </div>
-            <div style={{ width: 1, height: 44, background: C.border, flexShrink: 0 }} />
-            <div style={{ textAlign: "center", flexShrink: 0 }}>
-              <div style={{ fontSize: 10, color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 2 }}>Rate</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: C.text, letterSpacing: "-.5px" }}>₹ {rate.toLocaleString()}<span style={{ fontSize: 11, fontWeight: 500, color: C.muted }}>/min</span></div>
-            </div>
-            <div style={{ width: 1, height: 44, background: C.border, flexShrink: 0 }} />
-            <div style={{ textAlign: "center", flexShrink: 0 }}>
-              <div style={{ fontSize: 10, color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 2 }}>Balance value</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: C.green, letterSpacing: "-.5px" }}>₹{(remaining * 7).toLocaleString()}</div>
-            </div>
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: 18,
+        borderRadius: 999,
+        padding: "0 8px",
+        background: isGreen ? "#DCFCE7" : "#FEE2E2",
+        color: isGreen ? "#16A34A" : "#EF4444",
+        fontSize: 8,
+        fontWeight: 800,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function MetricCard({
+  label,
+  subtitle,
+  value,
+  valueNode,
+  icon,
+  iconColor,
+  badge,
+  badgeTone,
+  progress,
+  featured = false,
+  background,
+}) {
+  const isFeatured = featured;
+  const labelColor = isFeatured ? C.card : C.text;
+  const subtitleColor = isFeatured ? "rgba(255,255,255,.76)" : C.muted;
+
+  return (
+    <Card
+      style={{
+        ...topCardStyle,
+        position: "relative",
+        background: isFeatured ? "#5B45F4" : background || "#EEF2FF",
+        color: isFeatured ? C.card : C.text,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: progress ? 14 : 12,
+              fontWeight: progress ? 700 : 600,
+              color: labelColor,
+              lineHeight: 1.2,
+            }}
+          >
+            {label}
           </div>
-        );
-      })()}
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: C.text, letterSpacing: "-.4px" }}>Good morning, {data?.company?.name || "User"} 👋</div>
-          <div style={{ fontSize: 12, color: C.muted, marginTop: 3 }}>{new Date().toLocaleDateString("en-IN", {
-            weekday: "long",
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-          })}
-            {" · "}
-            {data?.campaigns?.length || 0} campaigns active</div>
+          {subtitle ? (
+            <div style={{ marginTop: 4, fontSize: 9, color: subtitleColor, lineHeight: 1.25 }}>
+              {subtitle}
+            </div>
+          ) : null}
         </div>
-
+        <IconCircle color={iconColor || (isFeatured ? "#5B45F4" : "#5B45F4")}>{icon}</IconCircle>
       </div>
 
-      {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 22 }}>
-        {[["Calls Today", callsToday, "real-time data", C.accent, "📞"], ["Hot Leads", hot, "Immediate action needed", C.hot, "🔥"], , ["Warm Leads", warm, "Follow-up required", C.warm, "⚡"], ["Cold", cold, "Wrong no. / not interested", "#9CA3AF", "✕"]].map(([l, v, s, c, ic], i) => (
-          <Card key={i} style={{ padding: "15px 17px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div>
-                <div style={{ fontSize: 9, color: C.muted, textTransform: "uppercase", letterSpacing: ".5px", fontWeight: 600, marginBottom: 5 }}>{l}</div>
-                <div style={{ fontSize: 28, fontWeight: 700, color: c, letterSpacing: "-1.2px", lineHeight: 1 }}>{v}</div>
-                <div style={{ fontSize: 10, color: C.muted, marginTop: 4 }}>{s}</div>
-              </div>
-              <span style={{ fontSize: 18, opacity: .7 }}>{ic}</span>
-            </div>
-          </Card>
-        ))}
+      {progress ? (
+        <div
+          style={{
+            width: "100%",
+            height: 20,
+            marginTop: 24,
+            borderRadius: 5,
+            overflow: "hidden",
+            background: "#C7D2FE",
+          }}
+        >
+          <div
+            style={{
+              width: `${progress}%`,
+              height: "100%",
+              borderRadius: 5,
+              background: "#5B45F4",
+            }}
+          />
+        </div>
+      ) : (
+        <div style={{ marginTop: 24, fontSize: 28, fontWeight: 800, lineHeight: 1, color: labelColor }}>
+          {valueNode || value}
+        </div>
+      )}
+
+      {badge ? (
+        <div style={{ position: "absolute", right: 14, bottom: 14 }}>
+          <MetricBadge tone={badgeTone}>{badge}</MetricBadge>
+        </div>
+      ) : null}
+    </Card>
+  );
+}
+
+function CampaignMetric({ label, value, tone }) {
+  const isHot = tone === "hot";
+
+  return (
+    <div
+      style={{
+        flex: 1,
+        minWidth: 0,
+        height: 95,
+        borderRadius: 12,
+        background: isHot ? C.hotBg : C.accentLt,
+        border: `1px solid ${isHot ? C.hotBdr : "#DDD6FE"}`,
+        padding: "18px 12px",
+        textAlign: "center",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 28,
+          fontWeight: 850,
+          lineHeight: 1,
+          color: isHot ? C.hot : "#5B45F4",
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          marginTop: 10,
+          fontSize: 10,
+          fontWeight: 700,
+          color: isHot ? C.hot : "#5B45F4",
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function CampaignCard({ campaign }) {
+  return (
+    <div
+      style={{
+        borderRadius: 16,
+        border: `1px solid ${C.borderLt}`,
+        background: C.card,
+        padding: 16,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+        <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: "lowercase" }}>
+          {campaign.title}
+        </div>
+        <span
+          style={{
+            borderRadius: 999,
+            background: C.greenBg,
+            color: C.green,
+            border: `1px solid ${C.greenBdr}`,
+            padding: "3px 9px",
+            fontSize: 10,
+            fontWeight: 800,
+            textTransform: "lowercase",
+          }}
+        >
+          {campaign.status}
+        </span>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 14, marginBottom: 14 }}>
-        {/* Hot leads */}
-        <Card style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#FFFBFB" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 18 }}>🔥</span>
-              <span style={{ fontWeight: 700, fontSize: 14, color: C.text }}>Hot leads — act now</span>
-            </div>
-            <span style={{ background: C.hotBg, color: C.hot, border: `1px solid ${C.hotBdr}`, borderRadius: 10, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{hot_leads.length} leads</span>
-          </div>
-          {hot_leads.map((lead, i) => (
-            <div
-              key={i}
-              onClick={() => onLeadClick(lead)}
+      {campaign.progress ? (
+        <div
+          style={{
+            height: 5,
+            marginTop: 12,
+            marginBottom: 2,
+            borderRadius: 999,
+            overflow: "hidden",
+            background: "#E8ECF7",
+          }}
+        >
+          <div
+            style={{
+              width: `${campaign.progress}%`,
+              height: "100%",
+              borderRadius: 999,
+              background: "#5B45F4",
+            }}
+          />
+        </div>
+      ) : null}
+
+      <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+        <CampaignMetric label="Hot" value={campaign.hot} tone="hot" />
+        <CampaignMetric label="Qualified" value={campaign.qualified} tone="qualified" />
+      </div>
+    </div>
+  );
+}
+
+function DashboardSection({ onLeadClick, openCampaign }) {
+  return (
+    <div style={{ minHeight: "100%", width: "100%", minWidth: 0, background: "#F7F8FC" }}>
+      <div style={pageStyle}>
+        <header
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 10,
+          }}
+        >
+          <div>
+            <h1
               style={{
-                padding: "14px 18px",
-                borderBottom: `1px solid ${C.border}`,
-                cursor: "pointer",
-                transition: "background .1s"
+                margin: 0,
+                fontSize: 18,
+                lineHeight: 1.15,
+                fontWeight: 700,
+                color: C.text,
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = C.hotBg)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "transparent")
-              }
             >
-              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <Avatar name={lead.name} size={36} />
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: 3
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 13,
-                        color: C.text
-                      }}
-                    >
-                      {lead.name}
-                    </span>
-
-                    <span
-                      style={{
-                        fontSize: 10,
-                        color: C.muted,
-                        flexShrink: 0,
-                        marginLeft: 8
-                      }}
-                    >
-                      {lead.timestamp
-                        ? new Date(lead.timestamp).toLocaleString("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        })
-                        : ""}
-                    </span>
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 6,
-                      flexWrap: "wrap",
-                      marginBottom: 5
-                    }}
-                  >
-                    <CallTypeBadge type={lead.script_type} />
-
-                    <span style={{ fontSize: 11, color: C.muted }}>
-                      {lead.budget || "—"} ·{" "}
-                      {lead.preferred_configuration || "—"} ·{" "}
-                      {lead.purchase_timeline || "—"}
-                    </span>
-                  </div>
-
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: C.text,
-                      background: "#FAFBFC",
-                      borderRadius: 6,
-                      padding: "5px 8px",
-                      lineHeight: 1.5,
-                      borderLeft: `2px solid ${C.accent}`
-                    }}
-                  >
-                    {lead.ai_summary}
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: 6,
-                      fontSize: 10,
-                      color: C.accent,
-                      fontWeight: 600
-                    }}
-                  >
-                    ➜ Next: {lead.next_action || "No action set"}
-                  </div>
-                </div>
-              </div>
+              Good morning, Himanshu
+            </h1>
+            <div style={{ marginTop: 4, fontSize: 9, fontWeight: 500, color: C.muted }}>
+              Wednesday, 20 Dec 2024&nbsp;&nbsp; 2 campaigns active
             </div>
-          ))}
-        </Card>
-
-        {/* Campaigns snapshot */}
-        <Card key={"campaigns"} style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: 600, fontSize: 13, color: C.text }}>Active campaigns</span>
-            <span onClick={openCampaign} style={{ fontSize: 11, color: C.accent, cursor: "pointer", fontWeight: 500 }}>View all →</span>
           </div>
-          {campaigns.map((cp) => {
-            const stat = stats[cp.campaign_id] || {};
 
-            const total = stat.total_calls || 0;
-            const hot = stat.hot || 0;
-            const warm = stat.warm || 0;
-            const cold = stat.cold || 0;
+          <ActiveCallsPill />
+        </header>
 
-            const progress =
-              cp.totalLeads ? Math.round((stat.called || 0) / cp.totalLeads * 100) : 0;
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "2.2fr .95fr .95fr",
+            columnGap: 10,
+            rowGap: 10,
+            marginTop: 24,
+            minWidth: 0,
+          }}
+        >
+          {topMetrics.map((metric) => (
+            <MetricCard key={metric.key} {...metric} />
+          ))}
+        </section>
 
-            return (
-              <div
-                key={cp.campaign_id}
-                style={{
-                  padding: "13px 18px",
-                  borderBottom: `1px solid ${C.border}`
-                }}
-              >
-                {/* Header */}
-                <div
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "2fr 1fr",
+            columnGap: 10,
+            rowGap: 10,
+            marginTop: 10,
+            minWidth: 0,
+          }}
+        >
+          {middleMetrics.map((metric) => (
+            <MetricCard key={metric.label} {...metric} />
+          ))}
+        </section>
+
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            columnGap: 10,
+            rowGap: 10,
+            marginTop: 10,
+            marginBottom: 16,
+            minWidth: 0,
+          }}
+        >
+          {bottomMetrics.map((metric) => (
+            <MetricCard key={metric.label} {...metric} />
+          ))}
+        </section>
+
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.1fr .9fr",
+            gap: 16,
+            alignItems: "start",
+            minWidth: 0,
+          }}
+        >
+          <Card
+            style={{
+              ...sectionCardStyle,
+              padding: 16,
+              background: C.accentLt,
+              minWidth: 0,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 10,
+                marginBottom: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: 6
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: C.card,
+                    color: "#5B45F4",
                   }}
                 >
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 12,
-                      color: C.text,
-                      lineHeight: 1.3
-                    }}
-                  >
-                    {cp.campaign_name}
-                  </div>
-
-                  {cp.campaign_type === "crm_connected" && <div
-                    style={{
-                      fontWeight: 300,
-                      fontSize: 10,
-                      color: C.text,
-                      lineHeight: 1.3
-                    }}
-                  >
-                    {cp.script_type == "real_estate_enquiry" ? "Enquiry" : "Requirement"}
-                  </div>}
-
-                  <span
-                    style={{
-                      background:
-                        cp.campaign_type === "crm_connected" ? C.greenBg : C.accentLt,
-                      color: cp.campaign_type === "crm_connected" ? C.green : C.accent,
-                      borderRadius: 8,
-                      padding: "1px 7px",
-                      fontSize: 9,
-                      fontWeight: 600,
-                      flexShrink: 0
-                    }}
-                  >
-                    {cp.type === "crm" ? "Live" : "Running"}
-                  </span>
-                </div>
-
-                {/* Progress */}
-                {cp.totalLeads && (
-                  <div
-                    style={{
-                      background: C.bg,
-                      borderRadius: 3,
-                      height: 4,
-                      overflow: "hidden",
-                      marginBottom: 8
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: "100%",
-                        background: C.accent,
-                        width: `${progress}%`,
-                        borderRadius: 3
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Stats */}
-                <div style={{ display: "flex", gap: 8 }}>
-                  <div
-                    style={{
-                      background: C.hotBg,
-                      borderRadius: 5,
-                      padding: "4px 8px",
-                      flex: 1,
-                      textAlign: "center"
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: C.hot
-                      }}
-                    >
-                      {hot}
-                    </div>
-                    <div style={{ fontSize: 9, color: C.hot }}>Hot</div>
-                  </div>
-
-                  <div
-                    style={{
-                      background: C.accentLt,
-                      borderRadius: 5,
-                      padding: "4px 8px",
-                      flex: 1,
-                      textAlign: "center"
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: C.accent
-                      }}
-                    >
-                      {warm}
-                    </div>
-                    <div style={{ fontSize: 9, color: C.accent }}>
-                      Warm
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      background: "#F3F4F6",
-                      borderRadius: 5,
-                      padding: "4px 8px",
-                      flex: 1,
-                      textAlign: "center"
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "#6B7280"
-                      }}
-                    >
-                      {cold}
-                    </div>
-                    <div style={{ fontSize: 9, color: "#6B7280" }}>
-                      Cold
-                    </div>
-                  </div>
-                </div>
+                  <FiZap size={14} />
+                </span>
+                <h2 style={{ margin: 0, fontSize: 14, fontWeight: 850, color: C.text }}>
+                  Hot leads act now
+                </h2>
               </div>
-            );
-          })}
-        </Card>
+              <span
+                style={{
+                  borderRadius: 999,
+                  background: C.card,
+                  color: "#5B45F4",
+                  border: `1px solid ${C.border}`,
+                  padding: "5px 9px",
+                  fontSize: 10,
+                  fontWeight: 800,
+                }}
+              >
+                2 leads
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {hotLeads.map((lead) => (
+                <div
+                  key={lead.name}
+                  onClick={() => onLeadClick?.(lead)}
+                  style={{ cursor: onLeadClick ? "pointer" : "default", width: "100%" }}
+                >
+                  <LeadFollowUpCard {...lead} compact />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card
+            style={{
+              ...sectionCardStyle,
+              padding: 16,
+              background: C.accentLt,
+              minWidth: 0,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 10,
+                marginBottom: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: C.card,
+                    color: "#5B45F4",
+                  }}
+                >
+                  <FiActivity size={14} />
+                </span>
+                <h2 style={{ margin: 0, fontSize: 14, fontWeight: 850, color: C.text }}>
+                  active campaigns
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={openCampaign}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  borderRadius: 999,
+                  border: `1px solid ${C.border}`,
+                  background: C.card,
+                  color: "#5B45F4",
+                  padding: "5px 9px",
+                  fontSize: 10,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                }}
+              >
+                view all <FiArrowUpRight size={11} />
+              </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {campaigns.map((campaign) => (
+                <CampaignCard key={campaign.title} campaign={campaign} />
+              ))}
+            </div>
+          </Card>
+        </section>
       </div>
     </div>
   );

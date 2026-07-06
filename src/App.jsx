@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import LoginPage from './pages/login/main.jsx'
 import DashboardMain from './pages/dashboard/main.jsx'
+import AppLayout from './layouts/AppLayout.jsx'
 import './App.css'
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
 
@@ -10,7 +10,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardMain />} />
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<DashboardMain />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

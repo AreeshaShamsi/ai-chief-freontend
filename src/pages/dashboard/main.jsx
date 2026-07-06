@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../dashboard/components/NavBar";
+import { useOutletContext } from "react-router-dom";
 import DashboardSection from "../dashboard/sections/DashboardSection";
 import CampaignsSection from "../dashboard/sections/CampaignsSection";
 import LeadsSection from "../dashboard/sections/LeadsSection";
 import CallsSection from "../dashboard/sections/CallsSection";
 import CreateCampaignModal from "../dashboard/modals/CreateCampaignModal";
 import KnowledgeBaseSection from "./sections/KnowledgeBaseSection";
-import { C } from "../../components/utils";
 import { API_URL } from "../../config/main";
 import Loader from "../../components/Loader";
 
 export default function DashboardMain() {
-    const [tab, setTab] = useState("dashboard");
+    const { activeItem = "dashboard", setActiveItem = () => { } } = useOutletContext() || {};
+    const tab = activeItem;
     const [showModal, setShowModal] = useState(false);
     const [selLead, setSelLead] = useState(null);
 
@@ -61,17 +61,16 @@ export default function DashboardMain() {
         fetchData();
     }, [tab]);
 
-    const handleLead = lead => { setSelLead(lead); setTab("leads"); };
+    const handleLead = lead => { setSelLead(lead); setActiveItem("leads"); };
     const handleLaunch = () => { setShowModal(false); };
 
     if (loading) return <Loader />;
     return (
-        <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden", fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif", background: C.bg }}>
+        <div style={{ width: "100%", minWidth: 0, fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif", background: "#F7F8FC" }}>
             {showModal && <CreateCampaignModal onClose={() => setShowModal(false)} onLaunch={handleLaunch} />}
-            <Sidebar tab={tab} setTab={setTab} />
 
-            <main style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
-                {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => setTab("campaigns")} />}
+            <main style={{ width: "100%", minWidth: 0 }}>
+                {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => setActiveItem("campaigns")} />}
                 {tab === "campaigns" && <CampaignsSection data={summaryData} onShowCreate={() => setShowModal(true)} />}
                 {tab === "leads" && <LeadsSection data={activityData} selectedLead={selLead} onLeadClick={setSelLead} />}
                 {tab === "calls" && <CallsSection data={activityData} />}

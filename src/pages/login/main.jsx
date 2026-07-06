@@ -10,6 +10,8 @@ function LoginPage() {
   const [err, setErr] = useState("");
   const navigate = useNavigate();
   const handle = async () => {
+
+    
     if (!email.trim() || !pass.trim()) {
       setErr("Please enter both email and password.");
       return;

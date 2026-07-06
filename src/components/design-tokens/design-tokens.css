@@ -1,0 +1,136 @@
+.dt-token-collection,
+.dt-token-collection *,
+.dt-token-collection *::before,
+.dt-token-collection *::after,
+.dt-token-group,
+.dt-token-group *,
+.dt-token-group *::before,
+.dt-token-group *::after,
+.dt-token-card,
+.dt-token-card *::before,
+.dt-token-card *::after {
+  box-sizing: border-box;
+}
+
+.dt-token-collection {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  font-family: Inter, system-ui, sans-serif;
+  text-align: left;
+}
+
+.dt-token-collection__title {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.dt-token-collection__content {
+  display: grid;
+  gap: 10px;
+}
+
+.dt-token-group {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  color: #111827;
+  font-family: Inter, system-ui, sans-serif;
+  text-align: left;
+}
+
+.dt-token-group__title {
+  margin: 0;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  text-transform: capitalize;
+}
+
+.dt-token-group__box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.dt-token-card {
+  display: grid;
+  gap: 7px;
+  width: 132px;
+  min-height: 86px;
+  padding: 9px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  font-family: Inter, system-ui, sans-serif;
+  overflow: hidden;
+}
+
+.dt-token-card__name {
+  color: #111827;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dt-token-card__body {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.dt-token-card__swatch {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+}
+
+.dt-token-card__details {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.dt-token-card__value {
+  color: #111827;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 13px;
+  text-transform: uppercase;
+}
+
+.dt-token-card__css-var,
+.dt-token-card__mode {
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .dt-token-card {
+    width: calc(50% - 4px);
+    min-width: 124px;
+  }
+}

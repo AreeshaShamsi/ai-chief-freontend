@@ -1,0 +1,78 @@
+export const tokens = {
+  success: [
+    { name: "success/100", value: "#dcfce7", cssVar: "--success-100", mode: "Mode 1" },
+    { name: "success/200", value: "#bbf7d0", cssVar: "--success-200", mode: "Mode 1" },
+    { name: "success/300", value: "#86efac", cssVar: "--success-300", mode: "Mode 1" },
+    { name: "success/400", value: "#4ade80", cssVar: "--success-400", mode: "Mode 1" },
+    { name: "success/500", value: "#22c55e", cssVar: "--success-500", mode: "Mode 1" },
+    { name: "success/600", value: "#16a34a", cssVar: "--success-600", mode: "Mode 1" },
+  ],
+  destructive: [
+    { name: "destructive/100", value: "#fee2e2", cssVar: "--destructive-100", mode: "Mode 1" },
+    { name: "destructive/200", value: "#fecaca", cssVar: "--destructive-200", mode: "Mode 1" },
+    { name: "destructive/300", value: "#fca5a5", cssVar: "--destructive-300", mode: "Mode 1" },
+    { name: "destructive/400", value: "#f87171", cssVar: "--destructive-400", mode: "Mode 1" },
+    { name: "destructive/500", value: "#ef4444", cssVar: "--destructive-500", mode: "Mode 1" },
+    { name: "destructive/600", value: "#dc2626", cssVar: "--destructive-600", mode: "Mode 1" },
+  ],
+  generic: [
+    { name: "generic/white", value: "#ffffff", cssVar: "--generic-white", mode: "Mode 1" },
+    { name: "generic/black", value: "#000000", cssVar: "--generic-black", mode: "Mode 1" },
+    { name: "generic/background", value: "#ffffff", cssVar: "--generic-background", mode: "Mode 1" },
+    { name: "generic/foreground", value: "#111827", cssVar: "--generic-foreground", mode: "Mode 1" },
+  ],
+  primary: [
+    { name: "primary/100", value: "#dbeafe", cssVar: "--primary-100", mode: "Mode 1" },
+    { name: "primary/200", value: "#bfdbfe", cssVar: "--primary-200", mode: "Mode 1" },
+    { name: "primary/300", value: "#93c5fd", cssVar: "--primary-300", mode: "Mode 1" },
+    { name: "primary/400", value: "#60a5fa", cssVar: "--primary-400", mode: "Mode 1" },
+    { name: "primary/500", value: "#3b82f6", cssVar: "--primary-500", mode: "Mode 1" },
+    { name: "primary/600", value: "#2563eb", cssVar: "--primary-600", mode: "Mode 1" },
+  ],
+  secondary: [
+    { name: "secondary/100", value: "#f3e8ff", cssVar: "--secondary-100", mode: "Mode 1" },
+    { name: "secondary/200", value: "#e9d5ff", cssVar: "--secondary-200", mode: "Mode 1" },
+    { name: "secondary/300", value: "#d8b4fe", cssVar: "--secondary-300", mode: "Mode 1" },
+    { name: "secondary/400", value: "#c084fc", cssVar: "--secondary-400", mode: "Mode 1" },
+    { name: "secondary/500", value: "#a855f7", cssVar: "--secondary-500", mode: "Mode 1" },
+    { name: "secondary/600", value: "#9333ea", cssVar: "--secondary-600", mode: "Mode 1" },
+  ],
+  warning: [
+    { name: "warning/100", value: "#fef3c7", cssVar: "--warning-100", mode: "Mode 1" },
+    { name: "warning/200", value: "#fde68a", cssVar: "--warning-200", mode: "Mode 1" },
+    { name: "warning/300", value: "#fcd34d", cssVar: "--warning-300", mode: "Mode 1" },
+    { name: "warning/400", value: "#fbbf24", cssVar: "--warning-400", mode: "Mode 1" },
+    { name: "warning/500", value: "#f59e0b", cssVar: "--warning-500", mode: "Mode 1" },
+    { name: "warning/600", value: "#d97706", cssVar: "--warning-600", mode: "Mode 1" },
+  ],
+  neutral: [
+    { name: "neutral/100", value: "#f5f5f4", cssVar: "--neutral-100", mode: "Mode 1" },
+    { name: "neutral/200", value: "#e7e5e4", cssVar: "--neutral-200", mode: "Mode 1" },
+    { name: "neutral/300", value: "#d6d3d1", cssVar: "--neutral-300", mode: "Mode 1" },
+    { name: "neutral/400", value: "#a8a29e", cssVar: "--neutral-400", mode: "Mode 1" },
+    { name: "neutral/500", value: "#78716c", cssVar: "--neutral-500", mode: "Mode 1" },
+    { name: "neutral/600", value: "#57534e", cssVar: "--neutral-600", mode: "Mode 1" },
+  ],
+  gray: [
+    { name: "gray/100", value: "#f3f4f6", cssVar: "--gray-100", mode: "Mode 1" },
+    { name: "gray/200", value: "#e5e7eb", cssVar: "--gray-200", mode: "Mode 1" },
+    { name: "gray/300", value: "#d1d5db", cssVar: "--gray-300", mode: "Mode 1" },
+    { name: "gray/400", value: "#9ca3af", cssVar: "--gray-400", mode: "Mode 1" },
+    { name: "gray/500", value: "#6b7280", cssVar: "--gray-500", mode: "Mode 1" },
+    { name: "gray/600", value: "#4b5563", cssVar: "--gray-600", mode: "Mode 1" },
+  ],
+  sidebar: [
+    { name: "sidebar/background", value: "#030303", cssVar: "--sidebar-background", mode: "Mode 1" },
+    { name: "sidebar/border-blue", value: "#1D8CFF", cssVar: "--sidebar-border-blue", mode: "Mode 1" },
+    { name: "sidebar/border-dark", value: "#111827", cssVar: "--sidebar-border-dark", mode: "Mode 1" },
+    { name: "sidebar/muted", value: "#8B949E", cssVar: "--sidebar-muted", mode: "Mode 1" },
+    { name: "sidebar/purple", value: "#5B45F4", cssVar: "--sidebar-purple", mode: "Mode 1" },
+    { name: "sidebar/logo-purple", value: "#6D4CFF", cssVar: "--sidebar-logo-purple", mode: "Mode 1" },
+    { name: "sidebar/status-bg", value: "rgba(22, 163, 74, 0.08)", cssVar: "--sidebar-status-bg", mode: "Mode 1" },
+  ],
+};
+
+export const tokenGroups = Object.entries(tokens).map(([title, groupTokens]) => ({
+  title,
+  tokens: groupTokens,
+}));
