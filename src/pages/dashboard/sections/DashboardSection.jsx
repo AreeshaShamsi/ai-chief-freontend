@@ -1,7 +1,6 @@
 import React from "react";
 import {
-  FiActivity,
-  FiArrowUpRight,
+  FiBarChart2,
   FiCheck,
   FiMic,
   FiPhoneCall,
@@ -109,7 +108,7 @@ const hotLeads = [
 
 const campaigns = [
   { title: "Hot leads act now", status: "live", hot: 2, qualified: 4 },
-  { title: "prestige decbatch", status: "running", hot: 8, qualified: 32, progress: 68 },
+  { title: "presitge decbatch", status: "running", hot: 8, qualified: 32, progress: 22 },
 ];
 
 const pageStyle = {
@@ -135,6 +134,31 @@ const sectionCardStyle = {
   borderRadius: 18,
   border: `1px solid ${C.borderLt}`,
   boxShadow: "none",
+};
+
+const dashboardSectionStyle = {
+  width: "100%",
+  height: 420,
+  minHeight: 420,
+  maxHeight: 420,
+  minWidth: 0,
+  boxSizing: "border-box",
+  overflow: "hidden",
+  borderRadius: 18,
+  padding: 16,
+  background: "#F3F4F6",
+  border: "none",
+  boxShadow: "none",
+};
+
+const dashboardSectionHeaderStyle = {
+  height: 30,
+  minHeight: 30,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 10,
+  marginBottom: 12,
 };
 
 function ActiveCallsPill() {
@@ -300,66 +324,81 @@ function CampaignMetric({ label, value, tone }) {
   return (
     <div
       style={{
-        flex: 1,
         minWidth: 0,
-        height: 95,
+        height: 96,
         borderRadius: 12,
         background: isHot ? C.hotBg : C.accentLt,
-        border: `1px solid ${isHot ? C.hotBdr : "#DDD6FE"}`,
-        padding: "18px 12px",
-        textAlign: "center",
+        padding: 14,
+        textAlign: "left",
+        boxSizing: "border-box",
       }}
     >
       <div
         style={{
-          fontSize: 28,
-          fontWeight: 850,
-          lineHeight: 1,
-          color: isHot ? C.hot : "#5B45F4",
-        }}
-      >
-        {value}
-      </div>
-      <div
-        style={{
-          marginTop: 10,
           fontSize: 10,
-          fontWeight: 700,
-          color: isHot ? C.hot : "#5B45F4",
+          fontWeight: 500,
+          lineHeight: 1,
+          color: isHot ? C.hot : C.accent,
         }}
       >
         {label}
+      </div>
+      <div
+        style={{
+          marginTop: 24,
+          fontSize: 25,
+          fontWeight: 700,
+          lineHeight: 1,
+          color: isHot ? C.hot : C.accent,
+        }}
+      >
+        {value}
       </div>
     </div>
   );
 }
 
 function CampaignCard({ campaign }) {
+  const isLive = campaign.status === "live";
+
   return (
     <div
       style={{
+        marginTop: 12,
         borderRadius: 16,
-        border: `1px solid ${C.borderLt}`,
         background: C.card,
         padding: 16,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: "lowercase" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.2 }}>
           {campaign.title}
         </div>
         <span
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+            height: 22,
             borderRadius: 999,
-            background: C.greenBg,
-            color: C.green,
-            border: `1px solid ${C.greenBdr}`,
-            padding: "3px 9px",
-            fontSize: 10,
-            fontWeight: 800,
+            background: C.card,
+            color: isLive ? "#16A34A" : "#334155",
+            border: `1px solid ${isLive ? "#22C55E" : C.muted}`,
+            padding: "0 9px",
+            fontSize: 8,
+            fontWeight: 600,
             textTransform: "lowercase",
           }}
         >
+          <span
+            aria-hidden="true"
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              background: isLive ? "#22C55E" : "#334155",
+            }}
+          />
           {campaign.status}
         </span>
       </div>
@@ -367,12 +406,11 @@ function CampaignCard({ campaign }) {
       {campaign.progress ? (
         <div
           style={{
-            height: 5,
-            marginTop: 12,
-            marginBottom: 2,
+            height: 4,
+            marginTop: 10,
             borderRadius: 999,
             overflow: "hidden",
-            background: "#E8ECF7",
+            background: C.accentLt,
           }}
         >
           <div
@@ -380,17 +418,81 @@ function CampaignCard({ campaign }) {
               width: `${campaign.progress}%`,
               height: "100%",
               borderRadius: 999,
-              background: "#5B45F4",
+              background: C.accent,
             }}
           />
         </div>
       ) : null}
 
-      <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: 10,
+          marginTop: 14,
+        }}
+      >
         <CampaignMetric label="Hot" value={campaign.hot} tone="hot" />
         <CampaignMetric label="Qualified" value={campaign.qualified} tone="qualified" />
       </div>
     </div>
+  );
+}
+
+function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }) {
+  return (
+    <Card
+      style={{
+        ...dashboardSectionStyle,
+        border: "none",
+        boxShadow: "none",
+      }}
+    >
+      <div style={dashboardSectionHeaderStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+          <span
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: "50%",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: C.card,
+              color: C.accent,
+              flexShrink: 0,
+            }}
+          >
+            <FiBarChart2 size={14} />
+          </span>
+          <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.text, lineHeight: 1.1 }}>
+            active campaigns
+          </h2>
+        </div>
+        <button
+          type="button"
+          onClick={onViewAll}
+          style={{
+            height: 26,
+            borderRadius: 999,
+            border: "1px solid #E5E7EB",
+            background: C.card,
+            color: C.text,
+            padding: "0 11px",
+            fontSize: 9,
+            fontWeight: 500,
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+        >
+          view all
+        </button>
+      </div>
+
+      {campaignItems.map((campaign) => (
+        <CampaignCard key={campaign.title} campaign={campaign} />
+      ))}
+    </Card>
   );
 }
 
@@ -475,28 +577,20 @@ function DashboardSection({ onLeadClick, openCampaign }) {
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "1.1fr .9fr",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
             gap: 16,
-            alignItems: "start",
+            alignItems: "stretch",
             minWidth: 0,
           }}
         >
           <Card
             style={{
               ...sectionCardStyle,
-              padding: 16,
-              background: C.accentLt,
-              minWidth: 0,
+              ...dashboardSectionStyle,
             }}
           >
             <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 10,
-                marginBottom: 12,
-              }}
+              style={dashboardSectionHeaderStyle}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span
@@ -532,7 +626,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
               </span>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {hotLeads.map((lead) => (
                 <div
                   key={lead.name}
@@ -545,69 +639,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
             </div>
           </Card>
 
-          <Card
-            style={{
-              ...sectionCardStyle,
-              padding: 16,
-              background: C.accentLt,
-              minWidth: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 10,
-                marginBottom: 12,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: C.card,
-                    color: "#5B45F4",
-                  }}
-                >
-                  <FiActivity size={14} />
-                </span>
-                <h2 style={{ margin: 0, fontSize: 14, fontWeight: 850, color: C.text }}>
-                  active campaigns
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={openCampaign}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 5,
-                  borderRadius: 999,
-                  border: `1px solid ${C.border}`,
-                  background: C.card,
-                  color: "#5B45F4",
-                  padding: "5px 9px",
-                  fontSize: 10,
-                  fontWeight: 800,
-                  lineHeight: 1,
-                }}
-              >
-                view all <FiArrowUpRight size={11} />
-              </button>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {campaigns.map((campaign) => (
-                <CampaignCard key={campaign.title} campaign={campaign} />
-              ))}
-            </div>
-          </Card>
+          <ActiveCampaignsCard campaigns={campaigns} onViewAll={openCampaign} />
         </section>
       </div>
     </div>
