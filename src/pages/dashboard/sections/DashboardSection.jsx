@@ -9,7 +9,16 @@ import {
 } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import { LeadFollowUpCard } from "../../../components/cards";
-import { Card, C } from "../../../components/utils";
+import {
+  AppButton,
+  AppCard,
+  AppIconCircle,
+  AppPill,
+  C,
+  MetricCard as AppMetricCard,
+  ProgressBar,
+  T,
+} from "../../../components/utils";
 
 const topMetrics = [
   {
@@ -34,7 +43,7 @@ const topMetrics = [
     key: "balance",
     label: "Balance value",
     value: "₹16.4K",
-    icon: <span style={{ fontSize: 14, fontWeight: 800, color: "#5B45F4" }}>₹</span>,
+    icon: <span style={{ fontSize: 14, fontWeight: 800, color: C.accentStrong }}>₹</span>,
     featured: true,
   },
 ];
@@ -52,7 +61,7 @@ const middleMetrics = [
     subtitle: "action needed",
     value: "8%",
     icon: <FaFire size={13} />,
-    iconColor: "#EF4444",
+    iconColor: C.hot,
     badge: "2",
     badgeTone: "green",
   },
@@ -64,14 +73,14 @@ const bottomMetrics = [
     subtitle: "ready for sales",
     value: "4",
     icon: <FiCheck size={15} />,
-    iconColor: "#16A34A",
+    iconColor: C.greenText,
   },
   {
     label: "Warm leads",
     subtitle: "needs follow up",
     value: "2",
     icon: <FiZap size={15} />,
-    iconColor: "#F59E0B",
+    iconColor: C.warm,
     badge: "2",
     badgeTone: "red",
   },
@@ -80,8 +89,8 @@ const bottomMetrics = [
     subtitle: "not interested",
     value: "2",
     icon: <FiX size={15} />,
-    iconColor: "#64748B",
-    background: "#F3F4F6",
+    iconColor: C.muted,
+    background: C.sectionBg,
   },
 ];
 
@@ -115,40 +124,31 @@ const pageStyle = {
   width: "100%",
   maxWidth: "none",
   margin: 0,
-  padding: 24,
+  padding: T.spacing.page,
   boxSizing: "border-box",
-  background: "#F7F8FC",
+  background: C.pageBg,
   color: C.text,
 };
 
-const topCardStyle = {
-  borderRadius: 16,
-  border: "1px solid rgba(226,232,240,0.8)",
-  boxShadow: "none",
-  background: "#EEF2FF",
-  minHeight: 96,
-  padding: 14,
-};
-
 const sectionCardStyle = {
-  borderRadius: 18,
+  borderRadius: T.radius.section,
   border: `1px solid ${C.borderLt}`,
-  boxShadow: "none",
+  boxShadow: T.shadow.none,
 };
 
 const dashboardSectionStyle = {
   width: "100%",
-  height: 420,
-  minHeight: 420,
-  maxHeight: 420,
+  height: T.layout.dashboardSectionHeight,
+  minHeight: T.layout.dashboardSectionHeight,
+  maxHeight: T.layout.dashboardSectionHeight,
   minWidth: 0,
   boxSizing: "border-box",
   overflow: "hidden",
-  borderRadius: 18,
-  padding: 16,
-  background: "#F3F4F6",
-  border: "none",
-  boxShadow: "none",
+  borderRadius: T.radius.section,
+  padding: T.spacing.card,
+  background: C.sectionBg,
+  border: T.border.none,
+  boxShadow: T.shadow.none,
 };
 
 const dashboardSectionHeaderStyle = {
@@ -163,53 +163,9 @@ const dashboardSectionHeaderStyle = {
 
 function ActiveCallsPill() {
   return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 7,
-        height: 24,
-        borderRadius: 999,
-        border: `1px solid ${C.border}`,
-        background: C.card,
-        color: C.text,
-        fontSize: 9,
-        fontWeight: 700,
-        padding: "0 10px",
-        whiteSpace: "nowrap",
-      }}
-    >
-      <span
-        aria-hidden="true"
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: "50%",
-          background: "#22C55E",
-        }}
-      />
+    <AppPill variant="neutral" dot dotColor={C.green} style={{ height: 24 }}>
       3 calls active now
-    </span>
-  );
-}
-
-function IconCircle({ children, color = "#5B45F4" }) {
-  return (
-    <span
-      style={{
-        width: 28,
-        height: 28,
-        borderRadius: "50%",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: C.card,
-        color,
-        flexShrink: 0,
-      }}
-    >
-      {children}
-    </span>
+    </AppPill>
   );
 }
 
@@ -217,26 +173,24 @@ function MetricBadge({ children, tone = "green" }) {
   const isGreen = tone === "green";
 
   return (
-    <span
+    <AppPill
+      variant={isGreen ? "neutral" : "danger"}
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
         height: 18,
-        borderRadius: 999,
         padding: "0 8px",
-        background: isGreen ? "#DCFCE7" : "#FEE2E2",
-        color: isGreen ? "#16A34A" : "#EF4444",
+        border: "none",
+        background: isGreen ? C.greenBg : C.hotSoft,
+        color: isGreen ? C.greenText : C.hot,
         fontSize: 8,
         fontWeight: 800,
       }}
     >
       {children}
-    </span>
+    </AppPill>
   );
 }
 
-function MetricCard({
+function DashboardMetricCard({
   label,
   subtitle,
   value,
@@ -254,11 +208,11 @@ function MetricCard({
   const subtitleColor = isFeatured ? "rgba(255,255,255,.76)" : C.muted;
 
   return (
-    <Card
+    <AppCard
+      variant="metric"
       style={{
-        ...topCardStyle,
         position: "relative",
-        background: isFeatured ? "#5B45F4" : background || "#EEF2FF",
+        background: isFeatured ? C.accentStrong : background || C.accentLt,
         color: isFeatured ? C.card : C.text,
       }}
     >
@@ -280,29 +234,18 @@ function MetricCard({
             </div>
           ) : null}
         </div>
-        <IconCircle color={iconColor || (isFeatured ? "#5B45F4" : "#5B45F4")}>{icon}</IconCircle>
+        <AppIconCircle color={iconColor || C.accentStrong}>{icon}</AppIconCircle>
       </div>
 
       {progress ? (
-        <div
-          style={{
-            width: "100%",
-            height: 20,
-            marginTop: 24,
-            borderRadius: 5,
-            overflow: "hidden",
-            background: "#C7D2FE",
-          }}
-        >
-          <div
-            style={{
-              width: `${progress}%`,
-              height: "100%",
-              borderRadius: 5,
-              background: "#5B45F4",
-            }}
-          />
-        </div>
+        <ProgressBar
+          value={progress}
+          height={20}
+          track={C.accentTrack}
+          fill={C.accentStrong}
+          radius={5}
+          style={{ width: "100%", marginTop: 24 }}
+        />
       ) : (
         <div style={{ marginTop: 24, fontSize: 28, fontWeight: 800, lineHeight: 1, color: labelColor }}>
           {valueNode || value}
@@ -314,47 +257,7 @@ function MetricCard({
           <MetricBadge tone={badgeTone}>{badge}</MetricBadge>
         </div>
       ) : null}
-    </Card>
-  );
-}
-
-function CampaignMetric({ label, value, tone }) {
-  const isHot = tone === "hot";
-
-  return (
-    <div
-      style={{
-        minWidth: 0,
-        height: 96,
-        borderRadius: 12,
-        background: isHot ? C.hotBg : C.accentLt,
-        padding: 14,
-        textAlign: "left",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 500,
-          lineHeight: 1,
-          color: isHot ? C.hot : C.accent,
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          marginTop: 24,
-          fontSize: 25,
-          fontWeight: 700,
-          lineHeight: 1,
-          color: isHot ? C.hot : C.accent,
-        }}
-      >
-        {value}
-      </div>
-    </div>
+    </AppCard>
   );
 }
 
@@ -374,54 +277,18 @@ function CampaignCard({ campaign }) {
         <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.2 }}>
           {campaign.title}
         </div>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-            height: 22,
-            borderRadius: 999,
-            background: C.card,
-            color: isLive ? "#16A34A" : "#334155",
-            border: `1px solid ${isLive ? "#22C55E" : C.muted}`,
-            padding: "0 9px",
-            fontSize: 8,
-            fontWeight: 600,
-            textTransform: "lowercase",
-          }}
+        <AppPill
+          variant={isLive ? "success" : "dark"}
+          size="xs"
+          dot
+          style={{ textTransform: "lowercase", fontWeight: 600 }}
         >
-          <span
-            aria-hidden="true"
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: "50%",
-              background: isLive ? "#22C55E" : "#334155",
-            }}
-          />
           {campaign.status}
-        </span>
+        </AppPill>
       </div>
 
       {campaign.progress ? (
-        <div
-          style={{
-            height: 4,
-            marginTop: 10,
-            borderRadius: 999,
-            overflow: "hidden",
-            background: C.accentLt,
-          }}
-        >
-          <div
-            style={{
-              width: `${campaign.progress}%`,
-              height: "100%",
-              borderRadius: 999,
-              background: C.accent,
-            }}
-          />
-        </div>
+        <ProgressBar value={campaign.progress} height={4} style={{ marginTop: 10 }} />
       ) : null}
 
       <div
@@ -432,8 +299,24 @@ function CampaignCard({ campaign }) {
           marginTop: 14,
         }}
       >
-        <CampaignMetric label="Hot" value={campaign.hot} tone="hot" />
-        <CampaignMetric label="Qualified" value={campaign.qualified} tone="qualified" />
+        <AppMetricCard
+          label="Hot"
+          value={campaign.hot}
+          variant="hot"
+          height={96}
+          style={{ border: "none", borderRadius: 12, padding: 14 }}
+          labelStyle={{ color: C.hot, fontSize: 10, fontWeight: 500, lineHeight: 1 }}
+          valueStyle={{ color: C.hot, marginTop: 24, fontSize: 25, fontWeight: 700, lineHeight: 1 }}
+        />
+        <AppMetricCard
+          label="Qualified"
+          value={campaign.qualified}
+          variant="qualified"
+          height={96}
+          style={{ border: "none", borderRadius: 12, padding: 14 }}
+          labelStyle={{ color: C.accent, fontSize: 10, fontWeight: 500, lineHeight: 1 }}
+          valueStyle={{ color: C.accent, marginTop: 24, fontSize: 25, fontWeight: 700, lineHeight: 1 }}
+        />
       </div>
     </div>
   );
@@ -441,64 +324,51 @@ function CampaignCard({ campaign }) {
 
 function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }) {
   return (
-    <Card
+    <AppCard
+      variant="section"
       style={{
         ...dashboardSectionStyle,
-        border: "none",
-        boxShadow: "none",
       }}
     >
       <div style={dashboardSectionHeaderStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-          <span
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: "50%",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: C.card,
-              color: C.accent,
-              flexShrink: 0,
-            }}
-          >
+          <AppIconCircle size={30} color={C.accent}>
             <FiBarChart2 size={14} />
-          </span>
+          </AppIconCircle>
           <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.text, lineHeight: 1.1 }}>
             active campaigns
           </h2>
         </div>
-        <button
+        <AppButton
           type="button"
           onClick={onViewAll}
+          compact
+          pill
           style={{
             height: 26,
-            borderRadius: 999,
-            border: "1px solid #E5E7EB",
+            border: `1px solid ${C.borderMuted}`,
             background: C.card,
             color: C.text,
             padding: "0 11px",
             fontSize: 9,
             fontWeight: 500,
-            lineHeight: 1,
             flexShrink: 0,
           }}
         >
           view all
-        </button>
+        </AppButton>
       </div>
 
       {campaignItems.map((campaign) => (
         <CampaignCard key={campaign.title} campaign={campaign} />
       ))}
-    </Card>
+    </AppCard>
   );
 }
 
 function DashboardSection({ onLeadClick, openCampaign }) {
   return (
-    <div style={{ minHeight: "100%", width: "100%", minWidth: 0, background: "#F7F8FC" }}>
+    <div style={{ minHeight: "100%", width: "100%", minWidth: 0, background: C.pageBg }}>
       <div style={pageStyle}>
         <header
           style={{
@@ -539,7 +409,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
           }}
         >
           {topMetrics.map((metric) => (
-            <MetricCard key={metric.key} {...metric} />
+            <DashboardMetricCard key={metric.key} {...metric} />
           ))}
         </section>
 
@@ -554,7 +424,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
           }}
         >
           {middleMetrics.map((metric) => (
-            <MetricCard key={metric.label} {...metric} />
+            <DashboardMetricCard key={metric.label} {...metric} />
           ))}
         </section>
 
@@ -570,7 +440,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
           }}
         >
           {bottomMetrics.map((metric) => (
-            <MetricCard key={metric.label} {...metric} />
+            <DashboardMetricCard key={metric.label} {...metric} />
           ))}
         </section>
 
@@ -583,7 +453,8 @@ function DashboardSection({ onLeadClick, openCampaign }) {
             minWidth: 0,
           }}
         >
-          <Card
+          <AppCard
+            variant="section"
             style={{
               ...sectionCardStyle,
               ...dashboardSectionStyle,
@@ -593,37 +464,16 @@ function DashboardSection({ onLeadClick, openCampaign }) {
               style={dashboardSectionHeaderStyle}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: C.card,
-                    color: "#5B45F4",
-                  }}
-                >
+                <AppIconCircle size={28} color={C.accentStrong}>
                   <FiZap size={14} />
-                </span>
+                </AppIconCircle>
                 <h2 style={{ margin: 0, fontSize: 14, fontWeight: 850, color: C.text }}>
                   Hot leads act now
                 </h2>
               </div>
-              <span
-                style={{
-                  borderRadius: 999,
-                  background: C.card,
-                  color: "#5B45F4",
-                  border: `1px solid ${C.border}`,
-                  padding: "5px 9px",
-                  fontSize: 10,
-                  fontWeight: 800,
-                }}
-              >
+              <AppPill style={{ color: C.accentStrong, fontSize: 10, fontWeight: 800, height: 24 }}>
                 2 leads
-              </span>
+              </AppPill>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -637,7 +487,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
                 </div>
               ))}
             </div>
-          </Card>
+          </AppCard>
 
           <ActiveCampaignsCard campaigns={campaigns} onViewAll={openCampaign} />
         </section>

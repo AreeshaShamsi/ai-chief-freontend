@@ -1,112 +1,134 @@
-import React, { useState } from "react";
-import { initCampaigns, scriptLabel } from "../utils";
-import { Card, Btn, C } from "../../../components/utils";
+import React from "react";
+import { FiFileText } from "react-icons/fi";
+import { scriptLabel } from "../utils";
+import { AppCard, AppPill, C, MetricCard, T } from "../../../components/utils";
 
-function CrmCampaignCard({ cp, stat = {} }) {
+function StatusPill() {
   return (
-    <Card style={{ padding: 0, overflow: "hidden" }}>
-      <div
-        style={{
-          padding: "14px 18px",
-          borderBottom: `1px solid ${C.border}`,
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          background: "#F0FDF4"
-        }}
-      >
-        <span style={{ fontSize: 15 }}>🔗</span>
-
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>
-            {cp.campaign_name}
-          </div>
-
-          <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>
-            Script: {cp.script_type === "real_estate_enquiry" ? "Property Enquiry" : "Property Requirement Gathering"}
-          </div>
-        </div>
-
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            padding: "3px 10px",
-            borderRadius: 10,
-            fontSize: 10,
-            fontWeight: 600,
-            background: C.greenBg,
-            color: C.green,
-            border: `1px solid ${C.greenBdr}`
-          }}
-        >
-          <span
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: "50%",
-              background: C.green
-            }}
-          />
-          Live
-        </span>
-      </div>
-
-      <div style={{ padding: "14px 18px" }}>
-        <div
-          style={{
-            fontSize: 10,
-            color: C.muted,
-            marginBottom: 10
-          }}
-        >
-          Leads from CRM · real-time ingestion
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3,1fr)",
-            gap: 8
-          }}
-        >
-          {[
-            ["Calls Made", stat.total_calls || 0, "📞", C.accent],
-            ["Hot", stat.hot || 0, "🔥", C.hot],
-            ["Warm", stat.warm || 0, "⚡", C.warm]
-          ].map(([l, v, ic, c]) => (
-            <div
-              key={l}
-              style={{
-                background: C.bg,
-                borderRadius: 8,
-                padding: "10px",
-                textAlign: "center"
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: c,
-                  letterSpacing: "-.5px"
-                }}
-              >
-                {v}
-              </div>
-
-              <div
-                style={{ fontSize: 9, color: C.muted, marginTop: 2 }}
-              >
-                {ic} {l}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Card>
+    <AppPill variant="success" size="xs" dot>
+      Live
+    </AppPill>
   );
 }
 
-export default CrmCampaignCard
+function ScriptInfoStrip({ children }) {
+  return (
+    <div
+      style={{
+        height: 30,
+        borderRadius: T.radius.sm,
+        background: C.surface,
+        color: C.muted,
+        fontSize: T.font.size.tiny,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "0 12px",
+        marginTop: 12,
+        overflow: "hidden"
+      }}
+    >
+      <FiFileText size={12} color={C.accent} style={{ flexShrink: 0 }} />
+      <span
+        style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap"
+        }}
+      >
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function CrmCampaignCard({ cp, stat = {} }) {
+  const scriptName =
+    scriptLabel[cp.script_type] ||
+    (cp.script_type === "real_estate_enquiry"
+      ? "Property Enquiry Call"
+      : "Property Requirement Gathering");
+  const sourceName = cp.crm_name || cp.crm || cp.source || "LeadSquared";
+  const liveSince = cp.live_since || cp.started_at || cp.created_at || "Dec 15";
+  const subtitle = `Connected to ${sourceName}  Live since ${liveSince}`;
+
+  const metrics = [
+    {
+      label: "Calls Made",
+      value: stat.total_calls || cp.total_calls || 0,
+      variant: "neutral"
+    },
+    {
+      label: "Qualified",
+      value: stat.qualified || cp.qualified || 0,
+      variant: "qualified"
+    },
+    {
+      label: "Hot",
+      value: stat.hot || cp.hot || 0,
+      variant: "hot"
+    }
+  ];
+
+  return (
+    <AppCard
+      variant="compact"
+      style={{
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 12
+        }}
+      >
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: T.font.weight.bold,
+              color: C.text,
+              lineHeight: "17px"
+            }}
+          >
+            {cp.campaign_name}
+          </div>
+          <div
+            style={{
+              fontSize: 8,
+              color: C.muted,
+              marginTop: 2,
+              lineHeight: "11px"
+            }}
+          >
+            {subtitle}
+          </div>
+        </div>
+
+        <StatusPill />
+      </div>
+
+      <ScriptInfoStrip>
+        Script: {scriptName}  Leads ingested in real-time from CRM.
+      </ScriptInfoStrip>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 10,
+          marginTop: 12
+        }}
+      >
+        {metrics.map((metric) => (
+          <MetricCard key={metric.label} {...metric} />
+        ))}
+      </div>
+    </AppCard>
+  );
+}
+
+export default CrmCampaignCard;

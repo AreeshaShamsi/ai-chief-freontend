@@ -1,12 +1,20 @@
-import React, { useState } from "react";
-import { initCampaigns } from "../utils";
-import { Card, Btn, C } from "../../../components/utils";
+import React from "react";
+import { FiPlus } from "react-icons/fi";
+import { AppButton, AppPill, C, SectionHeader, T } from "../../../components/utils";
 import CrmCampaignCard from "../components/CrmCampaignCard";
 import ColdCampaignCard from "../components/ColdCampaignCard";
 
+function ActiveCallsPill({ count = 2 }) {
+  return (
+    <AppPill variant="neutral" dot dotColor={C.green} style={{ fontWeight: T.font.weight.semibold }}>
+      {count} calls active now
+    </AppPill>
+  );
+}
+
 function CampaignsSection({ data, onShowCreate }) {
   const campaigns = data?.campaigns || [];
-  const stats = data?.campaigns || {};
+  const stats = data?.campaignStats || data?.campaigns || {};
 
   const crmCampaigns = campaigns.filter(
     (c) => c.campaign_type === "crm_connected"
@@ -17,14 +25,24 @@ function CampaignsSection({ data, onShowCreate }) {
   );
 
   return (
-    <div style={{ padding: 26, background: C.bg, minHeight: "100vh" }}>
-      {/* Header */}
+    <div
+      style={{
+        width: "100%",
+        minWidth: 0,
+        minHeight: "100%",
+        background: C.bg,
+        padding: `${T.spacing.pageCompactY}px ${T.spacing.page}px`,
+        overflowX: "hidden",
+        boxSizing: "border-box"
+      }}
+    >
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 22
+          alignItems: "flex-start",
+          gap: 16,
+          marginBottom: 18
         }}
       >
         <div>
@@ -33,7 +51,7 @@ function CampaignsSection({ data, onShowCreate }) {
               fontSize: 20,
               fontWeight: 700,
               color: C.text,
-              letterSpacing: "-.4px"
+              lineHeight: "26px"
             }}
           >
             Campaigns
@@ -41,52 +59,24 @@ function CampaignsSection({ data, onShowCreate }) {
 
           <div
             style={{
-              fontSize: 12,
+              fontSize: 9,
               color: C.muted,
-              marginTop: 3
+              marginTop: 2
             }}
           >
-            {crmCampaigns.length} CRM-connected ·{" "}
-            {coldCampaigns.length} cold campaigns
+            {crmCampaigns.length} CRM-connected&nbsp;&nbsp;
+            {coldCampaigns.length} cold calling
           </div>
         </div>
+
+        <ActiveCallsPill count={2} />
       </div>
 
-      {/* CRM Campaigns */}
-      <div style={{ marginBottom: 22 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 12
-          }}
-        >
-          <div
-            style={{
-              width: 3,
-              height: 16,
-              background: C.green,
-              borderRadius: 2
-            }}
-          />
-
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: C.text
-            }}
-          >
-            CRM Connected Campaigns
-          </span>
-
-          <span
-            style={{ fontSize: 11, color: C.muted }}
-          >
-            — Real-time leads from CRM
-          </span>
-        </div>
+      <section>
+        <SectionHeader
+          title="CRM Connected Campaigns"
+          helper="leads flow in automatically from your CRM"
+        />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {crmCampaigns.map((cp) => (
@@ -97,65 +87,34 @@ function CampaignsSection({ data, onShowCreate }) {
             />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Cold Campaigns */}
-      <div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 12
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div
+      <section style={{ marginTop: 16 }}>
+        <SectionHeader
+          title="Cold Calling Campaigns"
+          helper="upload an excel file to start"
+          action={
+            <AppButton
+              variant="primary"
+              compact
+              pill
+              onClick={onShowCreate}
               style={{
-                width: 3,
-                height: 16,
-                background: C.accent,
-                borderRadius: 2
-              }}
-            />
-
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: C.text
+                height: 28,
+                padding: "0 12px",
+                fontSize: 9,
+                fontWeight: T.font.weight.bold,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                whiteSpace: "nowrap"
               }}
             >
-              Cold Calling Campaigns
-            </span>
-
-            <span
-              style={{ fontSize: 11, color: C.muted }}
-            >
-              — Upload leads via Excel
-            </span>
-          </div>
-
-          <button
-            onClick={onShowCreate}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              background: C.accent,
-              color: "#fff",
-              border: "none",
-              borderRadius: 8,
-              padding: "8px 16px",
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: "pointer"
-            }}
-          >
-            <span style={{ fontSize: 14 }}>📊</span>
-            Upload & Launch
-          </button>
-        </div>
+              <FiPlus size={11} />
+              upload &amp; launch
+            </AppButton>
+          }
+        />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {coldCampaigns.map((cp) => (
@@ -166,10 +125,9 @@ function CampaignsSection({ data, onShowCreate }) {
             />
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
-
 
 export default CampaignsSection;

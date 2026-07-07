@@ -8,6 +8,7 @@ import CreateCampaignModal from "../dashboard/modals/CreateCampaignModal";
 import KnowledgeBaseSection from "./sections/KnowledgeBaseSection";
 import { API_URL } from "../../config/main";
 import Loader from "../../components/Loader";
+import { C, T } from "../../components/utils";
 
 export default function DashboardMain() {
     const { activeItem = "dashboard", setActiveItem = () => { } } = useOutletContext() || {};
@@ -66,7 +67,7 @@ export default function DashboardMain() {
 
     if (loading) return <Loader />;
     return (
-        <div style={{ width: "100%", minWidth: 0, fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif", background: "#F7F8FC" }}>
+        <div style={{ width: "100%", minWidth: 0, fontFamily: T.font.family, background: C.pageBg }}>
             {showModal && <CreateCampaignModal onClose={() => setShowModal(false)} onLaunch={handleLaunch} />}
 
             <main style={{ width: "100%", minWidth: 0 }}>
