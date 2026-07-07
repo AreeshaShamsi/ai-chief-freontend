@@ -1,18 +1,7 @@
-import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
 
-const dashboardItems = new Set(["dashboard", "campaigns", "leads", "calls", "kb"]);
-
 function AppLayout() {
-  const [activeItem, setActiveItem] = useState("dashboard");
-
-  const handleNavigate = (item) => {
-    if (dashboardItems.has(item)) {
-      setActiveItem(item);
-    }
-  };
-
   return (
     <div
       className="text-left"
@@ -24,7 +13,7 @@ function AppLayout() {
         background: "#F7F8FC",
       }}
     >
-      <Sidebar activeItem={activeItem} onNavigate={handleNavigate} />
+      <Sidebar />
       <main
         style={{
           flex: 1,
@@ -35,7 +24,7 @@ function AppLayout() {
           background: "#F7F8FC",
         }}
       >
-        <Outlet context={{ activeItem, setActiveItem }} />
+        <Outlet />
       </main>
     </div>
   );

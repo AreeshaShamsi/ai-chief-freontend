@@ -48,10 +48,10 @@ function CampaignsSection({ data, onShowCreate }) {
         <div>
           <div
             style={{
-              fontSize: 20,
-              fontWeight: 700,
+              fontSize: T.font.size.pageTitle,
+              fontWeight: T.font.weight.bold,
               color: C.text,
-              lineHeight: "26px"
+              lineHeight: "28px"
             }}
           >
             Campaigns
@@ -59,7 +59,7 @@ function CampaignsSection({ data, onShowCreate }) {
 
           <div
             style={{
-              fontSize: 9,
+              fontSize: T.font.size.xs,
               color: C.muted,
               marginTop: 2
             }}

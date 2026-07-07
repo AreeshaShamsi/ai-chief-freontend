@@ -12,6 +12,14 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardMain />} />
+          <Route path="/campaigns" element={<DashboardMain />} />
+          <Route path="/deals" element={<DashboardMain />} />
+          <Route path="/call-log" element={<DashboardMain />} />
+          <Route path="/knowledge-base" element={<DashboardMain />} />
+          <Route path="/tasks" element={<DashboardMain />} />
+          <Route path="/contact" element={<DashboardMain />} />
+          <Route path="/integration" element={<DashboardMain />} />
+          <Route path="/settings" element={<DashboardMain />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -106,6 +106,7 @@ export const appTheme = {
     dangerSoft: "#FEE2E2",
     dangerBorder: "#FECACA",
     warning: "#F59E0B",
+    warningText: "#92400E",
     warningBg: "#FFFBEB",
     warningBorder: "#FDE68A",
     slate: "#334155",
@@ -122,11 +123,12 @@ export const appTheme = {
       tiny: 8,
       caption: 9,
       xs: 10,
+      bodySmall: 11,
       sm: 12,
-      cardTitle: 13,
+      cardTitle: 14,
       sectionTitle: 14,
-      pageTitle: 20,
-      metric: 20,
+      pageTitle: 22,
+      metric: 22,
       dashboardValue: 28,
     },
     weight: {
@@ -167,5 +169,7 @@ export const appTheme = {
   layout: {
     dashboardSectionHeight: 420,
     sidebarWidth: 280,
+    modalWidth: 420,
+    successModalWidth: 380,
   },
 };

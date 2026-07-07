@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { FiCheck } from "react-icons/fi";
 import { appTheme as T } from "./design-tokens";
 
 const C = {
@@ -25,6 +26,7 @@ const C = {
   hotSoft: T.colors.dangerSoft,
   hotBdr: T.colors.dangerBorder,
   warm: T.colors.warning,
+  warmText: T.colors.warningText,
   warmBg: T.colors.warningBg,
   warmBdr: T.colors.warningBorder,
   green: T.colors.success,
@@ -64,6 +66,27 @@ const cardVariants = {
     padding: T.spacing.card,
     boxShadow: T.shadow.none,
   },
+  modal: {
+    background: C.card,
+    borderRadius: T.radius.cardLg,
+    border: `1px solid ${C.border}`,
+    padding: 0,
+    boxShadow: T.shadow.soft,
+  },
+  selectable: {
+    background: C.surface,
+    borderRadius: T.radius.md,
+    border: `1.5px solid ${C.border}`,
+    padding: 14,
+    boxShadow: T.shadow.none,
+  },
+  upload: {
+    background: C.surface,
+    borderRadius: T.radius.card,
+    border: `2px dashed ${C.border}`,
+    padding: 28,
+    boxShadow: T.shadow.none,
+  },
 };
 
 const pillVariants = {
@@ -86,9 +109,9 @@ const pillVariants = {
   },
   dark: {
     background: C.card,
-    color: "#334155",
+    color: T.colors.slate,
     border: `1px solid ${C.muted}`,
-    dot: "#334155",
+    dot: T.colors.slate,
   },
   danger: {
     background: C.hotSoft,
@@ -158,6 +181,51 @@ function AppCard({ children, variant = "default", style, onClick }) {
   );
 }
 
+function Modal({ children, width = T.layout.modalWidth, style, onClose }) {
+  useEffect(() => {
+    if (!onClose) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onMouseDown={(event) => {
+        if (onClose && event.target === event.currentTarget) onClose();
+      }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        background: "rgba(15, 23, 42, 0.58)",
+      }}
+    >
+      <AppCard
+        variant="modal"
+        style={{
+          width: "100%",
+          maxWidth: width,
+          overflow: "hidden",
+          ...style,
+        }}
+      >
+        {children}
+      </AppCard>
+    </div>
+  );
+}
+
 function Card(props) {
   return <AppCard {...props} />;
 }
@@ -197,6 +265,34 @@ function AppButton({
   );
 }
 
+function IconButton({ children, onClick, disabled, style, "aria-label": ariaLabel }) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        width: 28,
+        height: 28,
+        borderRadius: T.radius.pill,
+        border: T.border.none,
+        background: "transparent",
+        color: C.muted,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: disabled ? "not-allowed" : "pointer",
+        padding: 0,
+        opacity: disabled ? 0.5 : 1,
+        ...style,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function Btn({ primary, sm, ...props }) {
   return <AppButton variant={primary ? "primary" : "secondary"} compact={sm} {...props} />;
 }
@@ -220,7 +316,7 @@ function AppPill({
         background: tone.background,
         color: tone.color,
         border: tone.border,
-        fontSize: compact ? 8 : 9,
+          fontSize: compact ? T.font.size.caption : T.font.size.caption,
         fontWeight: T.font.weight.bold,
         display: "inline-flex",
         alignItems: "center",
@@ -251,8 +347,17 @@ function AppIconCircle({
   size = 28,
   color = C.accentStrong,
   background = C.card,
+  variant,
   style,
 }) {
+  const variants = {
+    neutral: { background: C.card, color: C.muted },
+    primary: { background: C.accentLt, color: C.accent },
+    warning: { background: C.warmBg, color: C.warm },
+    success: { background: C.greenSoft, color: C.greenText },
+  };
+  const tone = variant ? variants[variant] : null;
+
   return (
     <span
       style={{
@@ -262,8 +367,8 @@ function AppIconCircle({
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        background,
-        color,
+        background: tone?.background || background,
+        color: tone?.color || color,
         flexShrink: 0,
         ...style,
       }}
@@ -329,7 +434,7 @@ function MetricCard({
     >
       <div
         style={{
-          fontSize: T.font.size.caption,
+          fontSize: T.font.size.xs,
           color: tone.label,
           lineHeight: "11px",
           ...labelStyle,
@@ -348,6 +453,138 @@ function MetricCard({
         }}
       >
         {value}
+      </div>
+    </div>
+  );
+}
+
+function TextField({ value, onChange, placeholder, disabled, type = "text", style, ...props }) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      style={{
+        width: "100%",
+        height: 38,
+        padding: "0 12px",
+        border: `1px solid ${C.border}`,
+        borderRadius: T.radius.sm,
+        background: C.surface,
+        color: C.text,
+        fontSize: T.font.size.bodySmall,
+        fontFamily: T.font.family,
+        outline: "none",
+        boxSizing: "border-box",
+        opacity: disabled ? 0.7 : 1,
+        ...style,
+      }}
+      {...props}
+    />
+  );
+}
+
+function Alert({ children, variant = "warning", contentAlign = "start", style }) {
+  const tones = {
+    warning: {
+      background: C.warmBg,
+      color: C.warmText,
+      border: `1px solid ${C.warmBdr}`,
+    },
+    error: {
+      background: C.hotBg,
+      color: C.hot,
+      border: `1px solid ${C.hotBdr}`,
+    },
+    success: {
+      background: C.greenSoft,
+      color: C.greenText,
+      border: `1px solid ${C.greenBdr}`,
+    },
+  };
+  const tone = tones[variant] || tones.warning;
+
+  return (
+    <div
+      style={{
+        borderRadius: T.radius.sm,
+        padding: "10px 12px",
+        fontSize: T.font.size.bodySmall,
+        lineHeight: 1.35,
+        background: tone.background,
+        color: tone.color,
+        border: tone.border,
+        display: contentAlign === "center" ? "flex" : undefined,
+        alignItems: contentAlign === "center" ? "center" : undefined,
+        justifyContent: contentAlign === "center" ? "center" : undefined,
+        gap: contentAlign === "center" ? 6 : undefined,
+        textAlign: contentAlign === "center" ? "center" : undefined,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function AppStepper({ steps, currentStep, style }) {
+  return (
+    <div style={{ padding: "16px 20px 0", ...style }}>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        {steps.map((step, index) => {
+          const completed = step.id < currentStep;
+          const active = step.id === currentStep;
+
+          return (
+            <React.Fragment key={step.id}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 72 }}>
+                <span
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: T.radius.circle,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: completed || active ? C.accent : C.card,
+                    color: completed || active ? C.card : C.muted,
+                    border: completed || active ? `1px solid ${C.accent}` : `1px solid ${C.border}`,
+                    fontSize: T.font.size.caption,
+                    fontWeight: T.font.weight.bold,
+                    boxSizing: "border-box",
+                  }}
+                >
+                  {completed ? <FiCheck size={12} /> : step.id}
+                </span>
+                <span
+                  style={{
+                    marginTop: 5,
+                    color: completed || active ? C.text : C.muted,
+                    fontSize: T.font.size.caption,
+                    fontWeight: active ? T.font.weight.semibold : T.font.weight.medium,
+                    lineHeight: 1,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {step.label}
+                </span>
+              </div>
+              {index < steps.length - 1 ? (
+                <span
+                  style={{
+                    flex: 1,
+                    height: 2,
+                    margin: "0 4px 16px",
+                    borderRadius: T.radius.pill,
+                    background: step.id < currentStep ? C.accent : C.border,
+                  }}
+                />
+              ) : null}
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );
@@ -376,13 +613,13 @@ function SectionHeader({ title, helper, action, style }) {
             flexShrink: 0,
           }}
         />
-        <span style={{ fontSize: 13, fontWeight: T.font.weight.bold, color: C.text }}>
+        <span style={{ fontSize: T.font.size.sectionTitle, fontWeight: T.font.weight.bold, color: C.text }}>
           {title}
         </span>
         {helper ? (
           <span
             style={{
-              fontSize: 8,
+              fontSize: T.font.size.caption,
               color: C.muted,
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -436,4 +673,9 @@ export {
   ProgressBar,
   MetricCard,
   SectionHeader,
+  Modal,
+  IconButton,
+  TextField,
+  Alert,
+  AppStepper,
 };

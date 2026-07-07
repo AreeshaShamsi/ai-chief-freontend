@@ -1,19 +1,20 @@
 /* eslint-disable react/prop-types */
-import { FiClipboard, FiPhone, FiPhoneCall, FiUser, FiUsers } from "react-icons/fi";
+import { NavLink, useLocation } from "react-router-dom";
+import { FiClipboard, FiPhone, FiPhoneCall, FiSettings, FiUser, FiUsers } from "react-icons/fi";
 import { HiOutlineBookOpen, HiOutlineSpeakerphone } from "react-icons/hi";
 import { LuWorkflow } from "react-icons/lu";
 import { RiDashboardLine } from "react-icons/ri";
 
 const navItems = [
-  { label: "Dashboard", value: "dashboard", icon: RiDashboardLine },
-  { label: "Campaigns", value: "campaigns", icon: HiOutlineSpeakerphone },
-  { label: "Leads", value: "leads", icon: FiUsers },
-  { label: "Call Log", value: "calls", icon: FiPhoneCall },
-  { label: "Knowledge Base", value: "kb", icon: HiOutlineBookOpen },
-  { label: "tasks", value: "tasks", icon: FiClipboard },
-  { label: "contact", value: "contact", icon: FiUser },
-  
-  { label: "intregation", value: "intregation", icon: LuWorkflow },
+  { label: "Dashboard", path: "/dashboard", icon: RiDashboardLine },
+  { label: "Campaigns", path: "/campaigns", icon: HiOutlineSpeakerphone },
+  { label: "Deals", path: "/deals", icon: FiUsers },
+  { label: "Call Log", path: "/call-log", icon: FiPhoneCall },
+  { label: "Knowledge Base", path: "/knowledge-base", icon: HiOutlineBookOpen },
+  { label: "tasks", path: "/tasks", icon: FiClipboard },
+  { label: "contact", path: "/contact", icon: FiUser },
+  { label: "integration", path: "/integration", icon: LuWorkflow },
+  { label: "settings", path: "/settings", icon: FiSettings },
 ];
 
 const defaultUser = {
@@ -22,11 +23,8 @@ const defaultUser = {
   role: "Workspace Admin",
 };
 
-function Sidebar({
-  activeItem = "dashboard",
-  onNavigate,
-  user = defaultUser,
-}) {
+function Sidebar({ user = defaultUser }) {
+  const location = useLocation();
   const currentUser = { ...defaultUser, ...user };
 
   return (
@@ -66,14 +64,13 @@ function Sidebar({
         <nav className="mt-3 flex flex-col gap-1" aria-label="Primary">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeItem === item.value || activeItem === item.label;
+            const isActive = location.pathname === item.path;
 
             return (
-              <button
+              <NavLink
                 className="flex h-[34px] w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[12px] font-medium leading-5 transition-colors hover:bg-[#111827]"
-                key={item.value}
-                type="button"
-                onClick={() => onNavigate?.(item.value)}
+                key={item.path}
+                to={item.path}
                 style={{
                   backgroundColor: isActive ? "var(--sidebar-purple)" : "transparent",
                   color: isActive ? "#FFFFFF" : "var(--sidebar-muted)",
@@ -81,7 +78,7 @@ function Sidebar({
               >
                 <Icon size={14} className="shrink-0" aria-hidden="true" />
                 <span className="whitespace-nowrap">{item.label}</span>
-              </button>
+              </NavLink>
             );
           })}
         </nav>

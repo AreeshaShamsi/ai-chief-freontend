@@ -61,7 +61,7 @@ function ColdCampaignCard({ cp, stat = {} }) {
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: 13,
+              fontSize: T.font.size.cardTitle,
               fontWeight: T.font.weight.bold,
               color: C.text,
               lineHeight: "17px"
@@ -71,7 +71,7 @@ function ColdCampaignCard({ cp, stat = {} }) {
           </div>
           <div
             style={{
-              fontSize: 8,
+              fontSize: T.font.size.caption,
               color: C.muted,
               marginTop: 2,
               lineHeight: "11px"
