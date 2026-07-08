@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiColumns, FiList, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
+import { FiClock, FiColumns, FiList, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 import { LuSquarePen } from "react-icons/lu";
 import { AppButton, AppCard, AppPill, C, T } from "../../../components/utils";
 
@@ -11,6 +11,82 @@ const tasks = [
   { task: "Follow-up call", description: "need to call the client", assignedTo: "ramesh yadav", date: "14/04/2025", status: "to do" },
   { task: "Follow-up call", description: "need to call the client", assignedTo: "ramesh yadav", date: "14/04/2025", status: "in progress" },
   { task: "Follow-up call", description: "need to call the client", assignedTo: "ramesh yadav", date: "14/04/2025", status: "completed" },
+];
+
+const kanbanColumns = [
+  "to do",
+  "Scheduled",
+  "in progress",
+  "Waiting for client",
+  "Review / Approval",
+  "Completed",
+  "Overdue",
+];
+
+const kanbanTasks = [
+  ...Array.from({ length: 2 }, (_, index) => ({
+    id: `todo-${index}`,
+    status: "to do",
+    title: "follow up call",
+    description: "need to call the client for confirmation about the property",
+    assignedTo: "ramesh yadav",
+    date: "14/05/2026",
+    category: index % 2 === 0 ? "property enquiry" : "qualified",
+  })),
+  ...Array.from({ length: 3 }, (_, index) => ({
+    id: `scheduled-${index}`,
+    status: "Scheduled",
+    title: "follow up call",
+    description: "need to call the client for confirmation about the property",
+    assignedTo: "ramesh yadav",
+    date: "14/05/2026",
+    category: ["cold call", "property enquiry", "requirement gathering"][index],
+  })),
+  ...Array.from({ length: 3 }, (_, index) => ({
+    id: `progress-${index}`,
+    status: "in progress",
+    title: "follow up call",
+    description: "need to call the client for confirmation about the property",
+    assignedTo: "ramesh yadav",
+    date: "14/05/2026",
+    category: ["property enquiry", "qualified", "cold call"][index],
+  })),
+  ...Array.from({ length: 3 }, (_, index) => ({
+    id: `waiting-${index}`,
+    status: "Waiting for client",
+    title: "follow up call",
+    description: "need to call the client for confirmation about the property",
+    assignedTo: "ramesh yadav",
+    date: "14/05/2026",
+    category: ["qualified", "property enquiry", "requirement gathering"][index],
+  })),
+  ...Array.from({ length: 3 }, (_, index) => ({
+    id: `review-${index}`,
+    status: "Review / Approval",
+    title: "follow up call",
+    description: "need to call the client for confirmation about the property",
+    assignedTo: "ramesh yadav",
+    date: "14/05/2026",
+    category: ["property enquiry", "cold call", "qualified"][index],
+  })),
+  ...Array.from({ length: 3 }, (_, index) => ({
+    id: `completed-${index}`,
+    status: "Completed",
+    title: "follow up call",
+    description: "need to call the client for confirmation about the property",
+    assignedTo: "ramesh yadav",
+    date: "14/05/2026",
+    category: ["qualified", "requirement gathering", "property enquiry"][index],
+  })),
+  ...Array.from({ length: 3 }, (_, index) => ({
+    id: `overdue-${index}`,
+    status: "Overdue",
+    title: "follow up call",
+    description: "need to call the client for confirmation about the property",
+    assignedTo: "ramesh yadav",
+    date: "14/05/2026",
+    category: ["cold call", "property enquiry", "qualified"][index],
+  })),
 ];
 
 function StatusBadge({ status }) {
@@ -59,6 +135,56 @@ function StatusBadge({ status }) {
       }}
     >
       {status}
+    </AppPill>
+  );
+}
+
+function CategoryBadge({ category }) {
+  const variants = {
+    "property enquiry": {
+      background: C.accentLt,
+      color: C.accent,
+      border: C.accentTrack,
+      dot: C.accent,
+    },
+    qualified: {
+      background: C.greenSoft,
+      color: C.greenText,
+      border: C.greenBdr,
+      dot: C.green,
+    },
+    "cold call": {
+      background: C.warmBg,
+      color: C.warm,
+      border: C.warmBdr,
+      dot: C.warm,
+    },
+    "requirement gathering": {
+      background: C.greenSoft,
+      color: C.greenText,
+      border: C.greenBdr,
+      dot: C.green,
+    },
+  };
+  const tone = variants[category] || variants["property enquiry"];
+
+  return (
+    <AppPill
+      dot
+      size="xs"
+      dotColor={tone.dot}
+      style={{
+        height: 20,
+        padding: "0 8px",
+        background: tone.background,
+        color: tone.color,
+        border: `1px solid ${tone.border}`,
+        fontSize: T.font.size.caption,
+        fontWeight: T.font.weight.medium,
+        textTransform: "lowercase",
+      }}
+    >
+      {category}
     </AppPill>
   );
 }
@@ -112,71 +238,116 @@ function ViewToggleButton({ label, active, onClick, children }) {
   );
 }
 
-function KanbanView() {
-  const columns = ["to do", "in progress", "completed", "pending"];
+function KanbanTaskCard({ task }) {
+  return (
+    <AppCard
+      variant="compact"
+      style={{
+        padding: 12,
+        borderRadius: T.radius.md,
+        border: `1px solid ${C.border}`,
+        boxShadow: T.shadow.none,
+        background: C.card,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 5, color: C.muted, fontSize: T.font.size.caption }}>
+          <FiClock size={12} />
+          {task.date}
+        </div>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 2 }}>
+          <IconAction label={`Delete ${task.title}`}>
+            <FiTrash2 size={13} />
+          </IconAction>
+          <IconAction label={`Edit ${task.title}`}>
+            <LuSquarePen size={14} />
+          </IconAction>
+        </div>
+      </div>
 
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 10 }}>
+        <div style={{ color: C.text, fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.bold, textTransform: "lowercase" }}>
+          {task.title}
+        </div>
+        <CategoryBadge category={task.category} />
+      </div>
+
+      <div style={{ marginTop: 9, color: C.muted, fontSize: T.font.size.caption, lineHeight: 1.45 }}>
+        {task.description}
+      </div>
+      <div style={{ marginTop: 12, color: C.text, fontSize: T.font.size.caption, fontWeight: T.font.weight.medium, textTransform: "lowercase" }}>
+        assigned to - {task.assignedTo}
+      </div>
+    </AppCard>
+  );
+}
+
+function KanbanColumn({ column }) {
+  const columnTasks = kanbanTasks.filter((task) => task.status === column);
+
+  return (
+    <div style={{ width: 214, minWidth: 214 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <div style={{ color: C.text, fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.semibold }}>
+          {column} <span style={{ color: C.muted, fontSize: T.font.size.caption }}>{columnTasks.length}</span>
+        </div>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+          <IconAction label={`Add task to ${column}`}>
+            <FiPlus size={14} />
+          </IconAction>
+          <IconAction label={`Edit ${column} column`}>
+            <LuSquarePen size={14} />
+          </IconAction>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        {columnTasks.map((task) => (
+          <KanbanTaskCard key={task.id} task={task} />
+        ))}
+        <button
+          type="button"
+          style={{
+            width: "100%",
+            height: 34,
+            borderRadius: T.radius.md,
+            border: `1px solid ${C.border}`,
+            background: C.card,
+            color: C.muted,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 7,
+            padding: "0 11px",
+            fontSize: T.font.size.bodySmall,
+            fontWeight: T.font.weight.medium,
+            cursor: "pointer",
+          }}
+        >
+          <FiPlus size={13} />
+          new
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function KanbanView() {
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-        gap: 12,
+        background: C.sectionBg,
+        borderRadius: T.radius.section,
+        padding: 14,
+        overflowX: "auto",
+        border: `1px solid ${C.borderLt}`,
       }}
     >
-      {columns.map((column) => {
-        const columnTasks = tasks.filter((task) => task.status === column);
-
-        return (
-          <AppCard
-            key={column}
-            variant="compact"
-            style={{
-              padding: 12,
-              borderRadius: T.radius.card,
-              border: `1px solid ${C.border}`,
-              boxShadow: T.shadow.none,
-              background: C.surface,
-              minHeight: 260,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <div style={{ color: C.text, fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.bold, textTransform: "lowercase" }}>
-                {column}
-              </div>
-              <StatusBadge status={column} />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {columnTasks.map((task, index) => (
-                <AppCard
-                  key={`${column}-${index}`}
-                  variant="compact"
-                  style={{
-                    padding: 12,
-                    borderRadius: T.radius.md,
-                    border: `1px solid ${C.borderLt}`,
-                    boxShadow: T.shadow.none,
-                    background: C.card,
-                  }}
-                >
-                  <div style={{ color: C.text, fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.semibold }}>
-                    {task.task}
-                  </div>
-                  <div style={{ marginTop: 5, color: C.muted, fontSize: T.font.size.caption, lineHeight: 1.35 }}>
-                    {task.description}
-                  </div>
-                  <div style={{ marginTop: 10, color: C.text, fontSize: T.font.size.caption }}>
-                    {task.assignedTo}
-                  </div>
-                  <div style={{ marginTop: 4, color: C.muted, fontSize: T.font.size.caption }}>
-                    {task.date}
-                  </div>
-                </AppCard>
-              ))}
-            </div>
-          </AppCard>
-        );
-      })}
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start", minWidth: 1560 }}>
+        {kanbanColumns.map((column) => (
+          <KanbanColumn key={column} column={column} />
+        ))}
+      </div>
     </div>
   );
 }
