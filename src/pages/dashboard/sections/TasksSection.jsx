@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiClock, FiColumns, FiList, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 import { LuSquarePen } from "react-icons/lu";
+import EditColumnsPopover from "../../../components/design-system/EditColumnsPopover";
 import { AppButton, AppCard, AppPill, C, T } from "../../../components/utils";
+import AddTaskModal from "../modals/AddTaskModal";
+import EditTaskModal from "../modals/EditTaskModal";
 
 const tasks = [
   { task: "Follow-up call", description: "need to call the client", assignedTo: "ramesh yadav", date: "14/04/2025", status: "to do" },
@@ -13,14 +16,14 @@ const tasks = [
   { task: "Follow-up call", description: "need to call the client", assignedTo: "ramesh yadav", date: "14/04/2025", status: "completed" },
 ];
 
-const kanbanColumns = [
-  "to do",
-  "Scheduled",
-  "in progress",
-  "Waiting for client",
-  "Review / Approval",
-  "Completed",
-  "Overdue",
+const initialKanbanColumns = [
+  { id: "to-do", label: "to do", status: "to do", type: "Text" },
+  { id: "scheduled", label: "scheduled", status: "Scheduled", type: "Text" },
+  { id: "in-progress", label: "in progress", status: "in progress", type: "Text" },
+  { id: "waiting-for-client", label: "waiting for client", status: "Waiting for client", type: "Text" },
+  { id: "review-approval", label: "review / approval", status: "Review / Approval", type: "Text" },
+  { id: "completed", label: "completed", status: "Completed", type: "Text" },
+  { id: "overdue", label: "overdue", status: "Overdue", type: "Text" },
 ];
 
 const kanbanTasks = [
@@ -87,6 +90,22 @@ const kanbanTasks = [
     date: "14/05/2026",
     category: ["cold call", "property enquiry", "qualified"][index],
   })),
+];
+
+const listTasks = tasks.map((task, index) => ({
+  ...task,
+  id: `list-${index}`,
+  title: task.task,
+  dueTime: "14:08",
+}));
+
+const initialTaskTableColumns = [
+  { id: "task", label: "task", visible: true },
+  { id: "description", label: "description", visible: true },
+  { id: "assignedTo", label: "Assigned To", visible: true },
+  { id: "date", label: "date", visible: true },
+  { id: "status", label: "status", visible: true },
+  { id: "nextAction", label: "next action", visible: true },
 ];
 
 function StatusBadge({ status }) {
@@ -189,11 +208,12 @@ function CategoryBadge({ category }) {
   );
 }
 
-function IconAction({ label, children }) {
+function IconAction({ label, children, onClick }) {
   return (
     <button
       type="button"
       aria-label={label}
+      onClick={onClick}
       style={{
         width: 26,
         height: 26,
@@ -238,7 +258,7 @@ function ViewToggleButton({ label, active, onClick, children }) {
   );
 }
 
-function KanbanTaskCard({ task }) {
+function KanbanTaskCard({ task, onEdit }) {
   return (
     <AppCard
       variant="compact"
@@ -259,7 +279,7 @@ function KanbanTaskCard({ task }) {
           <IconAction label={`Delete ${task.title}`}>
             <FiTrash2 size={13} />
           </IconAction>
-          <IconAction label={`Edit ${task.title}`}>
+          <IconAction label={`Edit ${task.title}`} onClick={() => onEdit(task)}>
             <LuSquarePen size={14} />
           </IconAction>
         </div>
@@ -282,9 +302,7 @@ function KanbanTaskCard({ task }) {
   );
 }
 
-function KanbanColumn({ column }) {
-  const columnTasks = kanbanTasks.filter((task) => task.status === column);
-
+function KanbanColumn({ column, tasks: columnTasks, onEditTask }) {
   return (
     <div style={{ width: 214, minWidth: 214 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -303,7 +321,7 @@ function KanbanColumn({ column }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
         {columnTasks.map((task) => (
-          <KanbanTaskCard key={task.id} task={task} />
+          <KanbanTaskCard key={task.id} task={task} onEdit={onEditTask} />
         ))}
         <button
           type="button"
@@ -332,7 +350,7 @@ function KanbanColumn({ column }) {
   );
 }
 
-function KanbanView() {
+function KanbanView({ tasks, columns, onEditTask }) {
   return (
     <div
       style={{
@@ -344,8 +362,13 @@ function KanbanView() {
       }}
     >
       <div style={{ display: "flex", gap: 10, alignItems: "flex-start", minWidth: 1560 }}>
-        {kanbanColumns.map((column) => (
-          <KanbanColumn key={column} column={column} />
+        {columns.map((column) => (
+          <KanbanColumn
+            key={column.id}
+            column={column.label}
+            tasks={tasks.filter((task) => task.status === column.status)}
+            onEditTask={onEditTask}
+          />
         ))}
       </div>
     </div>
@@ -354,6 +377,117 @@ function KanbanView() {
 
 function TasksSection() {
   const [viewMode, setViewMode] = useState("list");
+  const [tableTasks, setTableTasks] = useState(listTasks);
+  const [taskTableColumns, setTaskTableColumns] = useState(initialTaskTableColumns);
+  const [boardTasks, setBoardTasks] = useState(kanbanTasks.map((task) => ({ ...task, dueTime: "14:08" })));
+  const [kanbanColumns, setKanbanColumns] = useState(initialKanbanColumns);
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const editColumnsRef = useRef(null);
+
+  useEffect(() => {
+    if (!isEditColumnsOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (editColumnsRef.current && !editColumnsRef.current.contains(event.target)) {
+        setIsEditColumnsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [isEditColumnsOpen]);
+
+  const openEditTask = (source, task) => {
+    setSelectedTask({ source, task });
+  };
+
+  const closeEditTask = () => {
+    setSelectedTask(null);
+  };
+
+  const saveEditedTask = (updatedTask) => {
+    if (selectedTask?.source === "list") {
+      setTableTasks((current) =>
+        current.map((task) => (task.id === updatedTask.id ? { ...task, ...updatedTask } : task))
+      );
+    }
+
+    if (selectedTask?.source === "kanban") {
+      setBoardTasks((current) =>
+        current.map((task) => (task.id === updatedTask.id ? { ...task, ...updatedTask } : task))
+      );
+    }
+
+    closeEditTask();
+  };
+
+  const handleAddTask = (task) => {
+    const id = `task-${Date.now()}`;
+    const newTableTask = {
+      id: `list-${id}`,
+      task: task.title,
+      title: task.title,
+      description: task.description || "Enter task description",
+      assignedTo: task.assignedTo || "admin",
+      date: task.date,
+      dueTime: task.dueTime,
+      status: "to do",
+    };
+    const newBoardTask = {
+      id: `kanban-${id}`,
+      status: "to do",
+      title: task.title,
+      description: task.description || "Enter task description",
+      assignedTo: task.assignedTo || "admin",
+      date: task.date,
+      dueTime: task.dueTime,
+      category: "property enquiry",
+    };
+
+    setTableTasks((current) => [newTableTask, ...current]);
+    setBoardTasks((current) => [newBoardTask, ...current]);
+    setIsAddTaskOpen(false);
+  };
+
+  const handleDeleteColumn = (columnId) => {
+    setTaskTableColumns((current) => (current.length > 1 ? current.filter((column) => column.id !== columnId) : current));
+  };
+
+  const handleAddColumn = ({ name }) => {
+    const label = name.trim();
+    if (!label) return;
+
+    const id = label
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+    setTaskTableColumns((current) => {
+      if (current.some((column) => column.id === id)) return current;
+      return [...current, { id, label, visible: true }];
+    });
+  };
+
+  const renderTaskActions = (task) => (
+    <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+      <IconAction label={`Edit ${task.task}`} onClick={() => openEditTask("list", task)}>
+        <LuSquarePen size={15} />
+      </IconAction>
+      <IconAction label={`Delete ${task.task}`}>
+        <FiTrash2 size={14} />
+      </IconAction>
+    </div>
+  );
+
+  const renderTaskCell = (task, column) => {
+    if (column.id === "task") return task.task || task.title || "";
+    if (column.id === "assignedTo") return task.assignedTo || "";
+    if (column.id === "nextAction") return renderTaskActions(task);
+    if (column.id === "status") return <StatusBadge status={task.status} />;
+    return task[column.id] || "—";
+  };
 
   return (
     <div
@@ -430,6 +564,7 @@ function TasksSection() {
           <AppButton
             variant="primary"
             compact
+            onClick={() => setIsAddTaskOpen(true)}
             style={{
               height: 34,
               display: "inline-flex",
@@ -443,22 +578,33 @@ function TasksSection() {
             <FiPlus size={14} />
             Add task
           </AppButton>
-          <AppButton
-            compact
-            style={{
-              height: 34,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 7,
-              borderRadius: T.radius.sm,
-              background: C.card,
-              color: C.text,
-              fontSize: T.font.size.bodySmall,
-            }}
-          >
-            <LuSquarePen size={15} />
-            edit column
-          </AppButton>
+          <div ref={editColumnsRef} style={{ position: "relative" }}>
+            <AppButton
+              compact
+              onClick={() => setIsEditColumnsOpen((current) => !current)}
+              style={{
+                height: 34,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 7,
+                borderRadius: T.radius.sm,
+                background: C.card,
+                color: C.text,
+                fontSize: T.font.size.bodySmall,
+              }}
+            >
+              <LuSquarePen size={15} />
+              edit column
+            </AppButton>
+            <EditColumnsPopover
+              open={isEditColumnsOpen}
+              columns={taskTableColumns}
+              onClose={() => setIsEditColumnsOpen(false)}
+              onReorder={setTaskTableColumns}
+              onDelete={handleDeleteColumn}
+              onAdd={handleAddColumn}
+            />
+          </div>
           <div
             style={{
               display: "inline-flex",
@@ -513,52 +659,43 @@ function TasksSection() {
           >
             <thead>
               <tr style={{ background: C.accentLt }}>
-                {["task", "description", "Assigned To", "date", "status", "next action"].map((heading) => (
+                {taskTableColumns.filter((column) => column.visible).map((column) => (
                   <th
-                    key={heading}
+                    key={column.id}
                     scope="col"
                     style={{
                       padding: "12px 16px",
                       color: C.muted,
                       fontSize: T.font.size.xs,
                       fontWeight: T.font.weight.bold,
-                      textAlign: heading === "next action" ? "center" : "left",
+                      textAlign: column.id === "nextAction" ? "center" : "left",
                       borderBottom: `1px solid ${C.border}`,
                     }}
                   >
-                    {heading}
+                    {column.label}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {tasks.map((task, index) => (
-                <tr key={`${task.status}-${index}`}>
-                  <td style={{ padding: "13px 16px", borderBottom: `1px solid ${C.borderLt}`, fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.semibold, color: C.text }}>
-                    {task.task}
-                  </td>
-                  <td style={{ padding: "13px 16px", borderBottom: `1px solid ${C.borderLt}`, fontSize: T.font.size.bodySmall, color: C.text }}>
-                    {task.description}
-                  </td>
-                  <td style={{ padding: "13px 16px", borderBottom: `1px solid ${C.borderLt}`, fontSize: T.font.size.bodySmall, color: C.text, textTransform: "lowercase" }}>
-                    {task.assignedTo}
-                  </td>
-                  <td style={{ padding: "13px 16px", borderBottom: `1px solid ${C.borderLt}`, fontSize: T.font.size.bodySmall, color: C.text }}>
-                    {task.date}
-                  </td>
-                  <td style={{ padding: "12px 16px", borderBottom: `1px solid ${C.borderLt}` }}>
-                    <StatusBadge status={task.status} />
-                  </td>
-                  <td style={{ padding: "9px 16px", borderBottom: `1px solid ${C.borderLt}`, textAlign: "center" }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                      <IconAction label={`Edit ${task.task}`}>
-                        <LuSquarePen size={15} />
-                      </IconAction>
-                      <IconAction label={`Delete ${task.task}`}>
-                        <FiTrash2 size={14} />
-                      </IconAction>
-                    </div>
-                  </td>
+              {tableTasks.map((task) => (
+                <tr key={task.id}>
+                  {taskTableColumns.filter((column) => column.visible).map((column) => (
+                    <td
+                      key={column.id}
+                      style={{
+                        padding: column.id === "nextAction" ? "9px 16px" : column.id === "status" ? "12px 16px" : "13px 16px",
+                        borderBottom: `1px solid ${C.borderLt}`,
+                        fontSize: T.font.size.bodySmall,
+                        fontWeight: column.id === "task" ? T.font.weight.semibold : T.font.weight.medium,
+                        color: C.text,
+                        textAlign: column.id === "nextAction" ? "center" : "left",
+                        textTransform: column.id === "assignedTo" ? "lowercase" : "none",
+                      }}
+                    >
+                      {renderTaskCell(task, column)}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
@@ -566,8 +703,21 @@ function TasksSection() {
         </div>
         </AppCard>
       ) : (
-        <KanbanView />
+        <KanbanView tasks={boardTasks} columns={kanbanColumns} onEditTask={(task) => openEditTask("kanban", task)} />
       )}
+
+      {selectedTask ? (
+        <EditTaskModal
+          task={selectedTask.task}
+          onClose={closeEditTask}
+          onSave={saveEditedTask}
+        />
+      ) : null}
+      <AddTaskModal
+        open={isAddTaskOpen}
+        onClose={() => setIsAddTaskOpen(false)}
+        onSave={handleAddTask}
+      />
     </div>
   );
 }
