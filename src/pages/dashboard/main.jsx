@@ -6,6 +6,8 @@ import LeadsSection from "../dashboard/sections/LeadsSection";
 import CallsSection from "../dashboard/sections/CallsSection";
 import TasksSection from "../dashboard/sections/TasksSection";
 import ContactSection from "../dashboard/sections/ContactSection";
+import IntegrationSection from "../dashboard/sections/IntegrationSection";
+import SettingsSection from "../dashboard/sections/SettingsSection";
 import CreateCampaignModal from "../dashboard/modals/CreateCampaignModal";
 import KnowledgeBaseSection from "./sections/KnowledgeBaseSection";
 import { API_URL } from "../../config/main";
@@ -108,8 +110,8 @@ export default function DashboardMain() {
                 {tab === "kb" && <KnowledgeBaseSection data={knowledgeBaseData} />}
                 {tab === "tasks" && <TasksSection />}
                 {tab === "contact" && <ContactSection />}
-                {tab === "integration" && <PlaceholderSection title="integration" />}
-                {tab === "settings" && <PlaceholderSection title="settings" />}
+                {tab === "integration" && <IntegrationSection />}
+                {tab === "settings" && <SettingsSection />}
             </main>
         </div>
     );
