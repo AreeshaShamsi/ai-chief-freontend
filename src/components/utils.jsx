@@ -35,6 +35,13 @@ const C = {
   greenSoft: T.colors.successSoft,
   greenBdr: T.colors.successBorder,
   purple: T.colors.primaryStrong,
+  backgroundPrimary: T.colors.backgroundPrimary,
+  backgroundSecondary: T.colors.backgroundSecondary,
+  backgroundMuted: T.colors.backgroundMuted,
+  primaryHover: T.colors.primaryHover,
+  textPrimary: T.colors.textPrimary,
+  textSecondary: T.colors.textSecondary,
+  textMuted: T.colors.textMuted,
 };
 
 const cardVariants = {
@@ -230,7 +237,32 @@ function Card(props) {
   return <AppCard {...props} />;
 }
 
-function AppButton({
+function AppCardFooter({ children, action, style }) {
+  return (
+    <footer
+      style={{
+        minHeight: 46,
+        padding: `${T.spacing[3] - 2}px ${T.spacing[4]}px`,
+        borderTop: `1px solid ${C.border}`,
+        background: C.card,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: T.spacing[3],
+        flexWrap: "wrap",
+        boxSizing: "border-box",
+        borderBottomLeftRadius: T.radius.lg,
+        borderBottomRightRadius: T.radius.lg,
+        ...style,
+      }}
+    >
+      {children}
+      {action}
+    </footer>
+  );
+}
+
+const AppButton = React.forwardRef(function AppButton({
   children,
   variant = "secondary",
   compact = false,
@@ -239,10 +271,12 @@ function AppButton({
   onClick,
   disabled,
   type = "button",
-}) {
+  ...props
+}, ref) {
   const primary = variant === "primary";
   return (
     <button
+      ref={ref}
       type={type}
       onClick={onClick}
       disabled={disabled}
@@ -257,13 +291,18 @@ function AppButton({
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
         fontFamily: T.font.family,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: T.spacing[2],
         ...style,
       }}
+      {...props}
     >
       {children}
     </button>
   );
-}
+});
 
 function IconButton({ children, onClick, disabled, style, "aria-label": ariaLabel }) {
   return (
@@ -529,6 +568,69 @@ function Alert({ children, variant = "warning", contentAlign = "start", style })
   );
 }
 
+const textVariants = {
+  pageTitle: {
+    color: C.text,
+    fontSize: T.font.size.pageTitle,
+    fontWeight: T.font.weight.bold,
+    lineHeight: 1.15,
+  },
+  subtitle: {
+    color: C.muted,
+    fontSize: T.font.size.bodySmall,
+    fontWeight: T.font.weight.medium,
+  },
+  sectionTitle: {
+    color: C.text,
+    fontSize: T.font.size.cardTitle,
+    fontWeight: T.font.weight.bold,
+  },
+  body: {
+    color: C.text,
+    fontSize: T.font.size.bodySmall,
+    fontWeight: T.font.weight.medium,
+    lineHeight: 1.4,
+  },
+  label: {
+    color: C.text,
+    fontSize: T.font.size.bodySmall,
+    fontWeight: T.font.weight.semibold,
+  },
+  mutedLabel: {
+    color: C.muted,
+    fontSize: T.font.size.bodySmall,
+    fontWeight: T.font.weight.semibold,
+  },
+  headerCell: {
+    color: C.muted,
+    fontSize: T.font.size.bodySmall,
+    fontWeight: T.font.weight.semibold,
+    lineHeight: 1,
+  },
+  iconGlyph: {
+    color: C.muted,
+    fontSize: T.font.size.sm,
+    fontWeight: T.font.weight.bold,
+    lineHeight: 1,
+  },
+};
+
+function Text({ as: Component = "span", variant = "body", color, style, children, ...props }) {
+  return (
+    <Component
+      style={{
+        ...textVariants[variant],
+        color: color || textVariants[variant]?.color,
+        fontFamily: T.font.family,
+        ...style,
+      }}
+      {...props}
+    >
+      {children}
+    </Component>
+  );
+}
+
 function AppStepper({ steps, currentStep, style }) {
   return (
     <div style={{ padding: "16px 20px 0", ...style }}>
@@ -667,6 +769,7 @@ export {
   C,
   T,
   AppCard,
+  AppCardFooter,
   AppPill,
   AppButton,
   AppIconCircle,
@@ -676,6 +779,7 @@ export {
   Modal,
   IconButton,
   TextField,
+  Text,
   Alert,
   AppStepper,
 };

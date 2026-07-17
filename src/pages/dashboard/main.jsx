@@ -41,11 +41,9 @@ export default function DashboardMain() {
     const navigate = useNavigate();
     const tab = pathToTab[location.pathname] || "dashboard";
     const [showModal, setShowModal] = useState(false);
-    const [selLead, setSelLead] = useState(null);
 
     const [summaryData, setSummaryData] = useState(null);
     const [activityData, setActivityData] = useState(null);
-    const [knowledgeBaseData, setKnowledgeBaseData] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const fetchSummaryData = async () => {
@@ -69,19 +67,11 @@ export default function DashboardMain() {
                     }
                 }
 
-                if (tab === "deals" || tab === "calls") {
+                if (tab === "calls") {
                     if (!activityData) {
                         const res = await fetch(`${API_URL}/dashboard/activity?company_id=${company_id}`);
                         const data = await res.json();
                         setActivityData(data);
-                    }
-                }
-                if (tab === "kb") {
-                    if (!knowledgeBaseData) {
-                        const res = await fetch(`${API_URL}/knowledge-base/${company_id}`);
-                        const data = await res.json();
-                        console.log(data);
-                        setKnowledgeBaseData(data);
                     }
                 }
             } catch (err) {
@@ -94,7 +84,7 @@ export default function DashboardMain() {
         fetchData();
     }, [tab]);
 
-    const handleLead = lead => { setSelLead(lead); navigate("/deals"); };
+    const handleLead = () => { navigate("/deals"); };
     const handleLaunch = async () => { await fetchSummaryData(); };
 
     if (loading) return <Loader />;
@@ -105,9 +95,9 @@ export default function DashboardMain() {
             <main style={{ width: "100%", minWidth: 0 }}>
                 {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => navigate("/campaigns")} />}
                 {tab === "campaigns" && <CampaignsSection data={summaryData} onShowCreate={() => setShowModal(true)} />}
-                {tab === "deals" && <LeadsSection data={activityData} selectedLead={selLead} onLeadClick={setSelLead} />}
+                {tab === "deals" && <LeadsSection />}
                 {tab === "calls" && <CallsSection data={activityData} />}
-                {tab === "kb" && <KnowledgeBaseSection data={knowledgeBaseData} />}
+                {tab === "kb" && <KnowledgeBaseSection />}
                 {tab === "tasks" && <TasksSection />}
                 {tab === "contact" && <ContactSection />}
                 {tab === "integration" && <IntegrationSection />}
