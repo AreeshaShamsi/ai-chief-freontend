@@ -18,7 +18,7 @@ import {
   FiType,
   FiUser,
 } from "react-icons/fi";
-import { C, T, Text, TextField } from "../utils";
+import { C, T, Text, TextField } from "../../../components/utils";
 
 const fieldTypes = [
   { label: "Single Line Text", icon: FiType },

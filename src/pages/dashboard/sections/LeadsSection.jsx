@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { AgGridReact } from "ag-grid-react";
 import { themeQuartz } from "ag-grid-community";
@@ -14,6 +14,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { FaBars } from "react-icons/fa";
+import { LuExpand } from "react-icons/lu";
 import "../../../config/agGridCommunity";
 import {
   AppButton,
@@ -27,11 +28,12 @@ import {
   Text,
   TextField,
 } from "../../../components/utils";
-import AddColumnModal from "../../../components/modals/AddColumnModal";
-import ManageFieldsModal from "../../../components/modals/ManageFieldsModal";
-import EditFieldModal from "../../../components/modals/EditFieldModal";
-import { getFieldTypeMeta } from "../../../components/modals/fieldTypeMeta";
+import AddColumnModal from "../modals/AddColumnModal";
+import ManageFieldsModal from "../modals/ManageFieldsModal";
+import EditFieldModal from "../modals/EditFieldModal";
+import { getFieldTypeMeta } from "../modals/fieldTypeMeta";
 import CreateDealSourceModal from "../modals/CreateDealSourceModal";
+import DealDetailsModal from "../modals/DealDetailsModal";
 
 const categoryDefinitions = [
   {
@@ -78,6 +80,7 @@ const initialDealFields = [
 
 const dealRows = [
   {
+    id: "deal-1",
     dealName: "Deal Name",
     callType: "Call Type",
     score: "Score",
@@ -93,6 +96,7 @@ const dealRows = [
     lastModifiedBy: "Admin",
   },
   {
+    id: "deal-2",
     dealName: "Deal Name",
     callType: "Call Type",
     score: "Score",
@@ -108,6 +112,7 @@ const dealRows = [
     lastModifiedBy: "Admin",
   },
   {
+    id: "deal-3",
     dealName: "Deal Name",
     callType: "Call Type",
     score: "Score",
@@ -311,6 +316,37 @@ function DealsCell({ value }) {
 
 DealsCell.propTypes = {
   value: PropTypes.node,
+};
+
+function DealNameCell(params) {
+  const { value, data, context } = params;
+  const isExpanded = context?.selectedDealId === data?.id;
+
+  return (
+    <div className="deal-name-cell-container">
+      <Text variant="body">{value}</Text>
+      <button
+        type="button"
+        className="deal-expand-btn"
+        aria-label="Open deal details"
+        onClick={(e) => {
+          e.stopPropagation();
+          context?.openDealDetails(data);
+        }}
+      >
+        <LuExpand
+          size={10}
+          className={`deal-expand-arrow${isExpanded ? " expanded" : ""}`}
+        />
+      </button>
+    </div>
+  );
+}
+
+DealNameCell.propTypes = {
+  value: PropTypes.node,
+  data: PropTypes.object,
+  context: PropTypes.object,
 };
 
 function UserBadgeCell({ value }) {
@@ -690,6 +726,14 @@ const columnWidths = {
 };
 
 function DealsGrid({ search, fields }) {
+  const [selectedDeal, setSelectedDeal] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const triggerRefresh = useCallback(() => {
+    setRefreshKey((prev) => prev + 1);
+  }, []);
+
   const columnDefs = useMemo(
     () => [
       ...fields.map((field) => {
@@ -698,7 +742,11 @@ function DealsGrid({ search, fields }) {
           field: field.id,
           ...createHeader(field.name, typeMeta.icon),
           minWidth: columnWidths[field.id] || 130,
-          ...(field.id === "createdBy" || field.id === "lastModifiedBy" ? { cellRenderer: UserBadgeCell } : {}),
+          ...(field.id === "dealName"
+            ? { cellRenderer: DealNameCell }
+            : field.id === "createdBy" || field.id === "lastModifiedBy"
+            ? { cellRenderer: UserBadgeCell }
+            : {}),
         };
       }),
       {
@@ -716,16 +764,61 @@ function DealsGrid({ search, fields }) {
     ],
     [fields]
   );
+
   const defaultColDef = useMemo(
     () => ({ sortable: true, resizable: true, filter: false, cellRenderer: DealsCell }),
     []
   );
 
+  const openDealDetails = useCallback((row) => {
+    setSelectedDeal(row);
+    setIsDetailsOpen(true);
+  }, []);
+
+  const handlePrevRow = useCallback(() => {
+    const idx = dealRows.findIndex((r) => r.id === selectedDeal?.id);
+    if (idx > 0) {
+      setSelectedDeal(dealRows[idx - 1]);
+    }
+  }, [selectedDeal]);
+
+  const handleNextRow = useCallback(() => {
+    const idx = dealRows.findIndex((r) => r.id === selectedDeal?.id);
+    if (idx >= 0 && idx < dealRows.length - 1) {
+      setSelectedDeal(dealRows[idx + 1]);
+    }
+  }, [selectedDeal]);
+
+  const handleUpdateField = useCallback((rowId, fieldId, newValue) => {
+    const row = dealRows.find((r) => r.id === rowId);
+    if (row) {
+      row[fieldId] = newValue;
+      triggerRefresh();
+    }
+  }, [triggerRefresh]);
+
+  const idx = selectedDeal ? dealRows.findIndex((r) => r.id === selectedDeal.id) : -1;
+  const hasPrev = idx > 0;
+  const hasNext = idx >= 0 && idx < dealRows.length - 1;
+
+  const context = useMemo(
+    () => ({
+      selectedDealId: selectedDeal?.id || null,
+      openDealDetails,
+    }),
+    [selectedDeal, openDealDetails]
+  );
+
+  const rowData = useMemo(() => {
+    if (refreshKey === -1) console.log(refreshKey);
+    return dealRows;
+  }, [refreshKey]);
+
   return (
     <div style={{ flex: "1 1 620px", minWidth: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <div style={{ height: 318, minWidth: 0, flex: "0 0 auto" }}>
         <AgGridReact
-          rowData={dealRows}
+          rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           theme={agGridTheme}
@@ -735,8 +828,18 @@ function DealsGrid({ search, fields }) {
           rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true }}
           selectionColumnDef={{ width: 46, maxWidth: 46, resizable: false, sortable: false }}
           suppressCellFocus
+          context={context}
         />
       </div>
+
+      <DealDetailsModal
+        open={isDetailsOpen}
+        row={selectedDeal}
+        onPrevRow={hasPrev ? handlePrevRow : null}
+        onNextRow={hasNext ? handleNextRow : null}
+        onClose={() => setIsDetailsOpen(false)}
+        onUpdateField={handleUpdateField}
+      />
     </div>
   );
 }

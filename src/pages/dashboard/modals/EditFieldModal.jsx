@@ -7,7 +7,7 @@ import {
   FiTag,
   FiX,
 } from "react-icons/fi";
-import { AppPill, C, IconButton, Modal, T, Text, TextField } from "../utils";
+import { AppPill, C, IconButton, Modal, T, Text, TextField } from "../../../components/utils";
 import { getFieldTypeMeta } from "./fieldTypeMeta";
 
 const chipTones = [
@@ -16,7 +16,7 @@ const chipTones = [
   { variant: "neutral", style: { color: C.accentStrong, borderColor: C.accentTrack, background: C.accentLt } },
 ];
 
-function FieldRow({ icon: Icon, label, children }) {
+export function FieldRow({ icon: Icon, label, children }) {
   return (
     <label
       style={{
@@ -53,7 +53,7 @@ FieldRow.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-function SelectField({ value, options, onChange }) {
+export function SelectField({ value, options, onChange }) {
   return (
     <div style={{ position: "relative" }}>
       <select

@@ -86,3 +86,108 @@ button:focus-visible {
     transform: rotate(360deg);
   }
 }
+
+/* Row expand/collapse button styling */
+.deal-name-cell-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+.deal-expand-btn {
+  opacity: 0;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  border: 1px solid #D9DCE3;
+  background-color: #FFFFFF;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ag-row:hover .deal-expand-btn,
+.ag-row-hover .deal-expand-btn {
+  opacity: 1;
+}
+
+.deal-expand-btn:hover {
+  background-color: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.deal-expand-arrow {
+  color: #98A2B3;
+  width: 10px;
+  height: 10px;
+  display: block;
+  transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.deal-expand-btn:hover .deal-expand-arrow {
+  color: #667085;
+}
+
+.deal-expand-arrow.expanded {
+  transform: rotate(90deg);
+}
+
+/* Expandable row details panel */
+.detail-panel-container {
+  padding: 16px 20px;
+  background-color: var(--neutral-100);
+  border-bottom: 1px solid var(--gray-200);
+  animation: slideDown 200ms ease-out forwards;
+  transform-origin: top;
+}
+
+.detail-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.detail-panel-header-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.detail-panel-form {
+  display: grid;
+  gap: 12px;
+}
+
+.agent-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.status-tag-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}

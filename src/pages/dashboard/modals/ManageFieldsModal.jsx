@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { FiX } from "react-icons/fi";
 import { FaEdit } from "react-icons/fa";
-import { Modal, IconButton, C, T, Text } from "../utils";
+import { Modal, IconButton, C, T, Text } from "../../../components/utils";
 import { getFieldTypeMeta } from "./fieldTypeMeta";
 
 function ManageFieldsModal({ open, fields, onClose, onEditField }) {
