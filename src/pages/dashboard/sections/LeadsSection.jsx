@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { AgGridReact } from "ag-grid-react";
-import { themeQuartz } from "ag-grid-community";
+import AgGridTable from "../../../components/AgGridTable/AgGridTable";
 import {
   FiChevronDown,
   FiChevronUp,
@@ -15,7 +14,6 @@ import {
 } from "react-icons/fi";
 import { FaBars } from "react-icons/fa";
 import { LuExpand } from "react-icons/lu";
-import "../../../config/agGridCommunity";
 import {
   AppButton,
   AppCard,
@@ -213,24 +211,7 @@ PageSection.propTypes = {
   style: PropTypes.object,
 };
 
-const agGridTheme = themeQuartz.withParams({
-  accentColor: C.accent,
-  backgroundColor: C.card,
-  borderColor: C.border,
-  browserColorScheme: "light",
-  cellHorizontalPadding: 12,
-  columnBorder: true,
-  foregroundColor: C.text,
-  headerBackgroundColor: C.surface,
-  headerTextColor: C.muted,
-  oddRowBackgroundColor: C.card,
-  rowBorder: true,
-  rowHoverColor: C.surface,
-  selectedRowBackgroundColor: C.accentLt,
-  spacing: 6,
-  wrapperBorder: false,
-  wrapperBorderRadius: 0,
-});
+
 
 function DealsHeader({ displayName, icon: Icon }) {
   return (
@@ -817,13 +798,10 @@ function DealsGrid({ search, fields }) {
   return (
     <div style={{ flex: "1 1 620px", minWidth: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <div style={{ height: 318, minWidth: 0, flex: "0 0 auto" }}>
-        <AgGridReact
+        <AgGridTable
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          theme={agGridTheme}
-          rowHeight={36}
-          headerHeight={34}
           quickFilterText={search}
           rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true }}
           selectionColumnDef={{ width: 46, maxWidth: 46, resizable: false, sortable: false }}
