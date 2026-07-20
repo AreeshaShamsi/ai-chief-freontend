@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
+import { createPortal } from "react-dom";
 import { FiEdit3, FiFileText, FiGrid } from "react-icons/fi";
 import { C, T, Text } from "../../../components/utils";
 
@@ -60,7 +61,7 @@ function CreateDealSourceModal({
   triggerRef,
 }) {
   const popupRef = useRef(null);
-  const [offsetLeft, setOffsetLeft] = useState(preferredOffsetLeft);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -69,13 +70,16 @@ function CreateDealSourceModal({
       const trigger = triggerRef?.current;
       if (!trigger) return;
 
-      const containerRect = trigger.parentElement?.getBoundingClientRect();
-      if (!containerRect) return;
+      const rect = trigger.getBoundingClientRect();
+      const top = rect.bottom + 8;
 
-      const preferredRight = containerRect.left + preferredOffsetLeft + popupWidth;
+      const preferredLeft = rect.left + preferredOffsetLeft;
+      const preferredRight = preferredLeft + popupWidth;
       const maxRight = window.innerWidth - viewportGutter;
       const overflow = preferredRight - maxRight;
-      setOffsetLeft(Math.max(0, preferredOffsetLeft - Math.max(0, overflow)));
+      const left = Math.max(viewportGutter, preferredLeft - Math.max(0, overflow));
+
+      setPosition({ top, left });
     };
 
     updatePosition();
@@ -91,10 +95,12 @@ function CreateDealSourceModal({
     };
 
     window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
     document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
@@ -107,16 +113,16 @@ function CreateDealSourceModal({
     onClose();
   };
 
-  return (
+  return createPortal(
     <div
       ref={popupRef}
       role="menu"
       aria-label="Create deal source"
       style={{
-        position: "absolute",
-        top: "calc(100% + 8px)",
-        left: offsetLeft,
-        zIndex: 80,
+        position: "fixed",
+        top: position.top,
+        left: position.left,
+        zIndex: 1000,
         width: popupWidth,
         borderRadius: T.radius.md,
         border: `1px solid ${C.border}`,
@@ -146,7 +152,8 @@ function CreateDealSourceModal({
         ariaLabel="Import Microsoft Excel file"
         onClick={() => runAction(onExcelImport)}
       />
-    </div>
+    </div>,
+    document.body
   );
 }
 
