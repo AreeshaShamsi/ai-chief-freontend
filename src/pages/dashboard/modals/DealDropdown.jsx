@@ -21,7 +21,7 @@ const overlayZIndex = 1000;
 const submenuWidth = 180;
 const submenuGap = 10;
 
-export default function WorkspaceActionsModal({
+export default function DealDropdown({
   isOpen,
   onClose,
   triggerRef,
@@ -341,7 +341,7 @@ export default function WorkspaceActionsModal({
   );
 }
 
-WorkspaceActionsModal.propTypes = {
+DealDropdown.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   triggerRef: PropTypes.shape({ current: PropTypes.any }).isRequired,

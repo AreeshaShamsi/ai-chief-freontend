@@ -31,7 +31,7 @@ import { getFieldTypeMeta } from "../modals/fieldTypeMeta";
 import CreateDealSourceModal from "../modals/CreateDealSourceModal";
 import DealDetailsModal from "../modals/DealDetailsModal";
 import ImportModal from "../modals/ImportModal";
-import WorkspaceActionsModal from "../modals/WorkspaceActionsModal";
+import DealDropdown from "../modals/DealDropdown";
 import ColumnActionsModal from "../modals/ColumnActionsModal";
 import GridNameActionsModal from "../modals/GridNameActionsModal";
 import FieldConfigurationModal from "../modals/FieldConfigurationModal";
@@ -525,7 +525,7 @@ function WorkspaceToolbar({
         </AppButton>
       </div>
 
-      <WorkspaceActionsModal
+      <DealDropdown
         isOpen={isActionsOpen}
         onClose={() => setIsActionsOpen(false)}
         triggerRef={dealsButtonRef}
