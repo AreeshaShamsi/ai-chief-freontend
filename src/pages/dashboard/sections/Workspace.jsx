@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import AgGridTable from "../../../components/AgGridTable/AgGridTable";
 import {
@@ -30,6 +30,13 @@ import EditFieldModal from "../modals/EditFieldModal";
 import { getFieldTypeMeta } from "../modals/fieldTypeMeta";
 import CreateDealSourceModal from "../modals/CreateDealSourceModal";
 import DealDetailsModal from "../modals/DealDetailsModal";
+import ImportModal from "../modals/ImportModal";
+import WorkspaceActionsModal from "../modals/WorkspaceActionsModal";
+import ColumnActionsModal from "../modals/ColumnActionsModal";
+import GridNameActionsModal from "../modals/GridNameActionsModal";
+import FieldConfigurationModal from "../modals/FieldConfigurationModal";
+import { LuChevronDown, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertical } from "react-icons/lu";
+import { FaStar } from "react-icons/fa";
 
 // ==========================
 // Workspace Initialization
@@ -234,6 +241,160 @@ GenericHeader.propTypes = {
   icon: PropTypes.elementType,
 };
 
+function ColumnHeaderWrapper(props) {
+  const { displayName, column, api, innerHeaderComponent: InnerHeader, innerHeaderComponentParams } = props;
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const triggerRef = useRef(null);
+
+  const [sortState, setSortState] = useState(column.getSort());
+  useEffect(() => {
+    const onSortChanged = () => {
+      setSortState(column.getSort());
+    };
+    column.addEventListener("sortChanged", onSortChanged);
+    return () => {
+      column.removeEventListener("sortChanged", onSortChanged);
+    };
+  }, [column]);
+
+  const handleHeaderClick = (e) => {
+    if (triggerRef.current?.contains(e.target)) return;
+    if (props.enableSorting) {
+      props.progressSort(e.shiftKey);
+    }
+  };
+
+  const isAddColumn = column.getColId() === "addColumn";
+  const isCheckbox = column.getColId() === "ag-Grid-SelectionColumn" || column.getColId() === "selection";
+
+  const colId = column.getColId();
+  const context = props.context || {};
+
+  const onMoveLeft = () => {
+    const allColumns = api.getColumns() || [];
+    const index = allColumns.findIndex((col) => col.getColId() === colId);
+    if (index > 0) {
+      api.moveColumn(colId, index - 1);
+    }
+  };
+
+  const onMoveRight = () => {
+    const allColumns = api.getColumns() || [];
+    const index = allColumns.findIndex((col) => col.getColId() === colId);
+    if (index >= 0 && index < allColumns.length - 1) {
+      api.moveColumn(colId, index + 1);
+    }
+  };
+
+  const onSortAsc = () => {
+    api.applyColumnState({
+      state: [{ colId: colId, sort: "asc" }],
+      defaultState: { sort: null },
+    });
+  };
+
+  const onSortDesc = () => {
+    api.applyColumnState({
+      state: [{ colId: colId, sort: "desc" }],
+      defaultState: { sort: null },
+    });
+  };
+
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={handleHeaderClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        cursor: props.enableSorting ? "pointer" : "default",
+        paddingRight: !isAddColumn && !isCheckbox ? 16 : 0,
+        boxSizing: "border-box",
+        userSelect: "none",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0, flex: 1 }}>
+        {InnerHeader ? (
+          <InnerHeader displayName={displayName} context={props.context} api={api} column={column} {...innerHeaderComponentParams} />
+        ) : (
+          <Text variant="headerCell">{displayName}</Text>
+        )}
+        
+        {sortState === "asc" && (
+          <LuArrowUpAZ size={12} color={C.accent} style={{ flexShrink: 0 }} />
+        )}
+        {sortState === "desc" && (
+          <LuArrowDownZA size={12} color={C.accent} style={{ flexShrink: 0 }} />
+        )}
+      </div>
+
+      {!isAddColumn && !isCheckbox && (
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDropdownOpen((prev) => !prev);
+          }}
+          style={{
+            position: "absolute",
+            right: 2,
+            top: "50%",
+            transform: "translateY(-50%)",
+            border: "none",
+            background: "transparent",
+            padding: 2,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: isHovered || isDropdownOpen ? 1 : 0,
+            transition: "opacity 150ms ease",
+            color: C.muted,
+          }}
+        >
+          <LuChevronDown size={14} />
+        </button>
+      )}
+
+      {!isAddColumn && !isCheckbox && (
+        <ColumnActionsModal
+          isOpen={isDropdownOpen}
+          onClose={() => setIsDropdownOpen(false)}
+          triggerRef={triggerRef}
+          columnId={colId}
+          columnName={displayName}
+          onEditField={() => context.onEditColumn?.(colId)}
+          onRenameField={() => context.onRenameColumn?.(colId)}
+          onDuplicateField={() => context.onDuplicateColumn?.(colId)}
+          onMoveLeft={onMoveLeft}
+          onMoveRight={onMoveRight}
+          onSortAsc={onSortAsc}
+          onSortDesc={onSortDesc}
+          onDeleteField={() => context.onDeleteColumn?.(colId)}
+        />
+      )}
+    </div>
+  );
+}
+
+ColumnHeaderWrapper.propTypes = {
+  displayName: PropTypes.string,
+  column: PropTypes.object.isRequired,
+  api: PropTypes.object.isRequired,
+  innerHeaderComponent: PropTypes.elementType,
+  innerHeaderComponentParams: PropTypes.object,
+  enableSorting: PropTypes.bool,
+  progressSort: PropTypes.func,
+  context: PropTypes.object,
+};
+
 function createHeader(label, icon) {
   return {
     headerName: label,
@@ -244,61 +405,98 @@ function createHeader(label, icon) {
   };
 }
 
-function handleSelectAddColumnField() {}
+function AddColumnHeader({ displayName, icon: Icon, context }) {
+  const [selectedType, setSelectedType] = useState(null);
 
-function AddColumnHeader({ displayName, icon: Icon }) {
+  const handleSelectField = (typeLabel) => {
+    setSelectedType(typeLabel);
+  };
+
+  const handleCreateField = (fieldConfig) => {
+    if (context?.addColumn) {
+      context.addColumn(fieldConfig);
+    }
+    setSelectedType(null);
+  };
+
   return (
-    <AddColumnModal onSelectField={handleSelectAddColumnField}>
-      {({ ref, onClick, ...triggerProps }) => (
-        <button
-          ref={ref}
-          type="button"
-          onClick={onClick}
-          style={{
-            border: T.border.none,
-            background: "transparent",
-            padding: 0,
-            margin: 0,
-            cursor: "pointer",
-            fontFamily: T.font.family,
-            display: "inline-flex",
-            alignItems: "center",
-            minWidth: 0,
-          }}
-          {...triggerProps}
-        >
-          <Text
-            variant="headerCell"
+    <>
+      <AddColumnModal onSelectField={handleSelectField}>
+        {({ ref, onClick, ...triggerProps }) => (
+          <button
+            ref={ref}
+            type="button"
+            onClick={onClick}
             style={{
+              border: T.border.none,
+              background: "transparent",
+              padding: 0,
+              margin: 0,
+              cursor: "pointer",
+              fontFamily: T.font.family,
               display: "inline-flex",
               alignItems: "center",
-              gap: 6,
               minWidth: 0,
             }}
+            {...triggerProps}
           >
-            {Icon ? <Icon size={12} style={{ flexShrink: 0, color: C.muted }} /> : null}
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
-          </Text>
-        </button>
-      )}
-    </AddColumnModal>
+            <Text
+              variant="headerCell"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                minWidth: 0,
+              }}
+            >
+              {Icon ? <Icon size={12} style={{ flexShrink: 0, color: C.muted }} /> : null}
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
+            </Text>
+          </button>
+        )}
+      </AddColumnModal>
+
+      <FieldConfigurationModal
+        open={Boolean(selectedType)}
+        fieldType={selectedType || "Single Line Text"}
+        mode="create"
+        onClose={() => setSelectedType(null)}
+        onSubmit={handleCreateField}
+      />
+    </>
   );
 }
 
 AddColumnHeader.propTypes = {
   displayName: PropTypes.string.isRequired,
   icon: PropTypes.elementType,
+  context: PropTypes.object,
 };
 
-function WorkspaceToolbar({ workspaceId, isViewsPanelHidden, onToggleViewsPanel, onManageFields }) {
+function WorkspaceToolbar({
+  workspaceId,
+  isViewsPanelHidden,
+  onToggleViewsPanel,
+  onManageFields,
+  onRenameTab,
+  onDuplicateTab,
+  onManageTab,
+  onClearData,
+  onDeleteField,
+  onOpenImportModal,
+}) {
   const workspaceTitle = workspaceId.charAt(0).toUpperCase() + workspaceId.slice(1);
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const dealsButtonRef = useRef(null);
 
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <AppButton
+            ref={dealsButtonRef}
             compact
+            onClick={() => setIsActionsOpen((prev) => !prev)}
             style={{
               ...dealTabButtonStyle,
               background: C.accentLt,
@@ -326,6 +524,21 @@ function WorkspaceToolbar({ workspaceId, isViewsPanelHidden, onToggleViewsPanel,
           <Text variant="mutedLabel">Manage Fields</Text>
         </AppButton>
       </div>
+
+      <WorkspaceActionsModal
+        isOpen={isActionsOpen}
+        onClose={() => setIsActionsOpen(false)}
+        triggerRef={dealsButtonRef}
+        onImportData={(importType) => {
+          setIsActionsOpen(false);
+          if (onOpenImportModal) onOpenImportModal(importType);
+        }}
+        onRenameTab={onRenameTab}
+        onDuplicateTab={onDuplicateTab}
+        onManageTab={onManageTab}
+        onClearData={onClearData}
+        onDeleteField={onDeleteField}
+      />
 
       <div
         style={{
@@ -374,15 +587,145 @@ WorkspaceToolbar.propTypes = {
   isViewsPanelHidden: PropTypes.bool.isRequired,
   onToggleViewsPanel: PropTypes.func.isRequired,
   onManageFields: PropTypes.func.isRequired,
+  onRenameTab: PropTypes.func,
+  onDuplicateTab: PropTypes.func,
+  onManageTab: PropTypes.func,
+  onClearData: PropTypes.func,
+  onDeleteField: PropTypes.func,
+  onOpenImportModal: PropTypes.func,
+};
+
+function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggleFavorite }) {
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const optionsButtonRef = useRef(null);
+
+  const handleFavorite = () => {
+    if (onToggleFavorite) onToggleFavorite(viewItem.id);
+  };
+  const handleRename = () => {
+    const newName = window.prompt("Rename grid:", viewItem.name);
+    if (newName) console.log("Renamed:", newName);
+  };
+  const handleDuplicate = () => {
+    console.log("Duplicated:", viewItem.id);
+  };
+  const handleDelete = () => {
+    if (window.confirm(`Delete grid "${viewItem.name}"?`)) console.log("Deleted:", viewItem.id);
+  };
+
+  return (
+    <div
+      onClick={() => onSelectView(viewItem.id)}
+      style={{
+        height: 34,
+        width: "100%",
+        borderRadius: T.radius.sm,
+        background: isActive ? C.accentLt : "transparent",
+        color: isActive ? C.accent : C.text,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "0 8px",
+        cursor: "pointer",
+        boxSizing: "border-box",
+        position: "relative",
+      }}
+    >
+      <FiGrid size={13} style={{ flexShrink: 0 }} />
+      <Text variant="label" color={isActive ? C.accent : C.text} style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {viewItem.name}
+      </Text>
+
+      {isFavorite && (
+        <FaStar
+          size={13}
+          color="#EAB308"
+          style={{ flexShrink: 0, marginLeft: 4, marginRight: 2 }}
+        />
+      )}
+
+      <button
+        ref={optionsButtonRef}
+        type="button"
+        aria-label="Grid actions"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsActionsOpen((prev) => !prev);
+        }}
+        style={{
+          border: "none",
+          background: "transparent",
+          padding: 4,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: isActive ? C.accent : C.muted,
+          borderRadius: T.radius.sm,
+        }}
+      >
+        <LuEllipsisVertical size={14} />
+      </button>
+
+      <GridNameActionsModal
+        isOpen={isActionsOpen}
+        onClose={() => setIsActionsOpen(false)}
+        triggerRef={optionsButtonRef}
+        viewName={viewItem.name}
+        isFavorite={isFavorite}
+        onFavorite={handleFavorite}
+        onRenameGrid={handleRename}
+        onDuplicateGrid={handleDuplicate}
+        onDeleteGrid={handleDelete}
+      />
+    </div>
+  );
+}
+
+GridNameRowItem.propTypes = {
+  viewItem: PropTypes.shape({ id: PropTypes.string.isRequired, name: PropTypes.string.isRequired }).isRequired,
+  isActive: PropTypes.bool.isRequired,
+  isFavorite: PropTypes.bool,
+  onSelectView: PropTypes.func.isRequired,
+  onToggleFavorite: PropTypes.func,
 };
 
 function WorkspaceViewsPanel({ isHidden, viewsList }) {
-  const [activeView, setActiveView] = useState(0);
+  const normalizedViews = useMemo(() => {
+    return viewsList.map((view, idx) => {
+      if (typeof view === "string") {
+        return { id: `grid-${idx + 1}`, name: view === "Grid Name" ? `Grid Name ${idx + 1}` : view };
+      }
+      return view;
+    });
+  }, [viewsList]);
+
+  const [activeViewId, setActiveViewId] = useState(() => normalizedViews[0]?.id || "grid-1");
   const [viewSearch, setViewSearch] = useState("");
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState(() => new Set());
   const createButtonRef = useRef(null);
 
-  const filteredViews = viewsList.filter((view) => view.toLowerCase().includes(viewSearch.toLowerCase()));
+  const toggleFavorite = useCallback((gridId) => {
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(gridId)) {
+        next.delete(gridId);
+      } else {
+        next.add(gridId);
+      }
+      return next;
+    });
+  }, []);
+
+  const filteredViews = useMemo(() => {
+    const list = normalizedViews.filter((item) =>
+      item.name.toLowerCase().includes(viewSearch.toLowerCase())
+    );
+    const favs = list.filter((item) => favoriteIds.has(item.id));
+    const nonFavs = list.filter((item) => !favoriteIds.has(item.id));
+    return [...favs, ...nonFavs];
+  }, [normalizedViews, viewSearch, favoriteIds]);
 
   const handleStartFromScratch = () => {};
   const handleCsvImport = () => {};
@@ -457,34 +800,16 @@ function WorkspaceViewsPanel({ isHidden, viewsList }) {
           <SearchBox value={viewSearch} onChange={setViewSearch} placeholder="Find A View" width="100%" />
         </div>
         <div style={{ display: "grid", gap: 5, marginTop: 12 }}>
-          {filteredViews.map((view, index) => {
-            const isActive = index === activeView;
-            return (
-              <button
-                type="button"
-                key={`${view}-${index}`}
-                onClick={() => setActiveView(index)}
-                style={{
-                  height: 34,
-                  width: "100%",
-                  border: T.border.none,
-                  borderRadius: T.radius.sm,
-                  background: isActive ? C.accentLt : "transparent",
-                  color: isActive ? C.accent : C.text,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "0 8px",
-                  cursor: "pointer",
-                  textAlign: "left",
-                }}
-              >
-                <FiGrid size={13} />
-                <Text variant="label" color={isActive ? C.accent : C.text} style={{ flex: 1 }}>{view}</Text>
-                {isActive ? <FiMoreHorizontal size={14} /> : null}
-              </button>
-            );
-          })}
+          {filteredViews.map((viewItem) => (
+            <GridNameRowItem
+              key={viewItem.id}
+              viewItem={viewItem}
+              isActive={viewItem.id === activeViewId}
+              isFavorite={favoriteIds.has(viewItem.id)}
+              onSelectView={setActiveViewId}
+              onToggleFavorite={toggleFavorite}
+            />
+          ))}
         </div>
       </div>
     </aside>
@@ -541,7 +866,13 @@ function WorkspaceGrid({
   );
 
   const defaultColDef = useMemo(
-    () => ({ sortable: true, resizable: true, filter: false, cellRenderer: WorkspaceCell }),
+    () => ({
+      sortable: true,
+      resizable: true,
+      filter: false,
+      cellRenderer: WorkspaceCell,
+      headerComponent: ColumnHeaderWrapper,
+    }),
     []
   );
 
@@ -744,6 +1075,13 @@ export function Workspace({ workspaceId }) {
 
   const [isManageFieldsOpen, setIsManageFieldsOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+  const handleClearData = useCallback(() => {
+    if (window.confirm("Are you sure you want to clear all row data?")) {
+      setGridRowData([]);
+    }
+  }, []);
   const [, setChangeHistory] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -931,6 +1269,17 @@ export function Workspace({ workspaceId }) {
             isViewsPanelHidden={isViewsPanelHidden}
             onToggleViewsPanel={toggleViewsPanel}
             onManageFields={() => setIsManageFieldsOpen(true)}
+            onRenameTab={() => {
+              const newName = window.prompt("Rename workspace tab:", workspaceId);
+              if (newName && newName.trim()) {
+                renameWorkspace(newName.trim());
+              }
+            }}
+            onDuplicateTab={duplicateWorkspace}
+            onManageTab={() => setIsManageFieldsOpen(true)}
+            onClearData={handleClearData}
+            onDeleteField={() => setIsManageFieldsOpen(true)}
+            onOpenImportModal={() => setIsImportModalOpen(true)}
           />
         </div>
         <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
@@ -965,6 +1314,16 @@ export function Workspace({ workspaceId }) {
         fields={fields}
         onClose={() => setSelectedFieldId(null)}
         onMoveField={handleMoveField}
+      />
+      <ImportModal
+        open={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onMatchExisting={() => {
+          console.log("Matched to existing grid");
+        }}
+        onCreateNew={() => {
+          console.log("Created a new grid");
+        }}
       />
 
       {/* Reference the context object to prevent ESLint warning */}

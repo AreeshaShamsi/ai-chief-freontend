@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { NavLink, useLocation } from "react-router-dom";
-import { FiClipboard, FiPhone, FiPhoneCall, FiSettings, FiUser, FiUsers } from "react-icons/fi";
+import { FiPhone, FiPhoneCall, FiSettings, FiUser, FiUsers } from "react-icons/fi";
 import { HiOutlineBookOpen, HiOutlineSpeakerphone } from "react-icons/hi";
 import { LuWorkflow } from "react-icons/lu";
 import { RiDashboardLine } from "react-icons/ri";
@@ -11,7 +11,6 @@ const navItems = [
   { label: "Deals", path: "/deals", icon: FiUsers },
   { label: "Call Log", path: "/call-log", icon: FiPhoneCall },
   { label: "Knowledge Base", path: "/knowledge-base", icon: HiOutlineBookOpen },
-  { label: "tasks", path: "/tasks", icon: FiClipboard },
   { label: "contact", path: "/contact", icon: FiUser },
   { label: "integration", path: "/integration", icon: LuWorkflow },
   { label: "settings", path: "/settings", icon: FiSettings },
