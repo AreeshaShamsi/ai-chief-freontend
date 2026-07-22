@@ -498,7 +498,9 @@ function WorkspaceToolbar({
   const isDealsActive = currentTab === "deals";
   const isTasksActive = currentTab === "tasks";
   const isContactsActive = currentTab === "contacts";
-  const workspaceTitle = currentTab === "contacts" ? "Contact" : currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
+  const isKbActive = currentTab === "kb";
+  const isStaffActive = currentTab === "staff" || currentTab === "mystaff";
+  const workspaceTitle = currentTab === "contacts" ? "Contact" : currentTab === "kb" ? "Knowledge Base" : isStaffActive ? "My Staff" : currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
 
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const dealsButtonRef = useRef(null);
@@ -523,7 +525,7 @@ function WorkspaceToolbar({
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          {isContactsActive ? (
+          {isContactsActive || isKbActive || isStaffActive ? (
             <AppButton
               ref={dealsButtonRef}
               compact
@@ -886,17 +888,22 @@ function WorkspaceGrid({
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const primaryNameKey = `${workspaceId.slice(0, -1)}Name`; // e.g. "dealName", "leadName"
+  const primaryNameKey = useMemo(() => {
+    const found = fields.find((f) => f.id.toLowerCase().includes("name"))?.id;
+    if (found) return found;
+    return `${workspaceId.slice(0, -1)}Name`;
+  }, [fields, workspaceId]);
 
   const columnDefs = useMemo(
     () => [
-      ...fields.map((field) => {
+      ...fields.map((field, index) => {
         const typeMeta = getFieldTypeMeta(field.type);
+        const isPrimary = field.id === primaryNameKey || index === 0;
         return {
           field: field.id,
           ...createHeader(field.name, typeMeta.icon),
           minWidth: columnWidths[field.id] || 130,
-          ...(field.id === primaryNameKey
+          ...(isPrimary
             ? { cellRenderer: PrimaryNameCell }
             : field.id === "createdBy" || field.id === "lastModifiedBy"
             ? { cellRenderer: UserBadgeCell }
@@ -1172,6 +1179,90 @@ const defaultWorkspaceConfigurations = {
         date: "16/04/2025",
         status: "Completed",
       },
+    ],
+    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
+  },
+  kb: {
+    fields: [
+      { id: "propertyName", name: "Property Name", type: "Single Line Text", value: "Property Name" },
+      { id: "bhk", name: "BHK", type: "Single Select", value: "BHK", options: ["1 BHK", "2 BHK", "3 BHK", "4 BHK"] },
+      { id: "carpetArea", name: "Carpet Area", type: "Single Line Text", value: "Carpet Area" },
+      { id: "priceRange", name: "Price Range", type: "Currency", value: "Price Range" },
+      { id: "possession", name: "Possession", type: "Single Line Text", value: "Possession" },
+      { id: "unitLeft", name: "Unit Left", type: "Number", value: "Unit Left" },
+      { id: "facing", name: "Facing", type: "Single Select", value: "Facing", options: ["East", "West", "North", "South", "North-East"] },
+      { id: "amenities", name: "Amenities", type: "Multiple Select", value: "Amenities", options: ["Pool", "Gym", "Clubhouse", "Park", "Security"], editorKind: "tags" },
+    ],
+    rows: [
+      {
+        id: "property-1",
+        propertyName: "Green Acres Villa",
+        bhk: "3 BHK",
+        carpetArea: "1550 sqft",
+        priceRange: "1.2 - 1.5 Cr",
+        possession: "Ready to Move",
+        unitLeft: "4",
+        facing: "East",
+        amenities: "Pool, Gym, Clubhouse",
+      },
+      {
+        id: "property-2",
+        propertyName: "Skyline Heights",
+        bhk: "2 BHK",
+        carpetArea: "1100 sqft",
+        priceRange: "85 - 95 Lakhs",
+        possession: "Dec 2026",
+        unitLeft: "12",
+        facing: "North-East",
+        amenities: "Park, Security, Power Backup",
+      },
+      {
+        id: "property-3",
+        propertyName: "Ocean Breeze Apartments",
+        bhk: "4 BHK",
+        carpetArea: "2200 sqft",
+        priceRange: "2.5 - 3.0 Cr",
+        possession: "Ready to Move",
+        unitLeft: "2",
+        facing: "West",
+        amenities: "Sea View, Squash Court, Spa",
+      },
+    ],
+    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
+  },
+  staff: {
+    fields: [
+      { id: "staffMember", name: "Staff Member", type: "Single Line Text", value: "Staff Member" },
+      { id: "email", name: "Email", type: "Email", value: "Email" },
+      { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
+      { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["access to edit deals", "access to knowledge base", "full access"], editorKind: "tags" },
+      { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
+    ],
+    rows: [
+      { id: "staff-1", staffMember: "Rahul Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin", access: "access to edit deals" },
+      { id: "staff-2", staffMember: "Ananya Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin", access: "access to knowledge base" },
+      { id: "staff-3", staffMember: "Rohan Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent", access: "access to edit deals" },
+      { id: "staff-4", staffMember: "Kavya Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager", access: "access to knowledge base" },
+      { id: "staff-5", staffMember: "Vikram Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin", access: "access to edit deals" },
+      { id: "staff-6", staffMember: "Priya Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker", access: "access to knowledge base" },
+    ],
+    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
+  },
+  mystaff: {
+    fields: [
+      { id: "staffMember", name: "Staff Member", type: "Single Line Text", value: "Staff Member" },
+      { id: "email", name: "Email", type: "Email", value: "Email" },
+      { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
+      { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["access to edit deals", "access to knowledge base", "full access"], editorKind: "tags" },
+      { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
+    ],
+    rows: [
+      { id: "staff-1", staffMember: "Rahul Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin", access: "access to edit deals" },
+      { id: "staff-2", staffMember: "Ananya Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin", access: "access to knowledge base" },
+      { id: "staff-3", staffMember: "Rohan Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent", access: "access to edit deals" },
+      { id: "staff-4", staffMember: "Kavya Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager", access: "access to knowledge base" },
+      { id: "staff-5", staffMember: "Vikram Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin", access: "access to edit deals" },
+      { id: "staff-6", staffMember: "Priya Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker", access: "access to knowledge base" },
     ],
     views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },

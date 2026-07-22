@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import DashboardSection from "../dashboard/sections/DashboardSection";
 import CampaignsSection from "../dashboard/sections/CampaignsSection";
 import LeadsSection from "../dashboard/sections/LeadsSection";
-import CallsSection from "../dashboard/sections/CallsSection";
+import CallLogSection from "../dashboard/sections/CallLogSection";
 import TasksSection from "../dashboard/sections/TasksSection";
 import ContactSection from "../dashboard/sections/ContactSection";
 import IntegrationSection from "../dashboard/sections/IntegrationSection";
@@ -96,7 +96,7 @@ export default function DashboardMain() {
                 {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => navigate("/campaigns")} />}
                 {tab === "campaigns" && <CampaignsSection data={summaryData} onShowCreate={() => setShowModal(true)} />}
                 {tab === "deals" && <LeadsSection />}
-                {tab === "calls" && <CallsSection data={activityData} />}
+                {tab === "calls" && <CallLogSection data={activityData} />}
                 {tab === "kb" && <KnowledgeBaseSection />}
                 {tab === "tasks" && <TasksSection />}
                 {tab === "contact" && <ContactSection />}

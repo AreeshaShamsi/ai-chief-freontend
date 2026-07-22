@@ -74,12 +74,6 @@ PageSection.propTypes = {
 };
 
 function ContactSection({ activeTab = "contacts", onTabChange }) {
-  const [selectedRow, setSelectedRow] = useState(null);
-
-  const handleExpandRow = (row) => {
-    setSelectedRow(row);
-  };
-
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       <PageSection>
@@ -98,14 +92,6 @@ function ContactSection({ activeTab = "contacts", onTabChange }) {
           views={contactViews}
           activeTab={activeTab}
           onTabChange={onTabChange}
-          onExpandRow={handleExpandRow}
-        />
-        <DealDetailsModal
-          open={Boolean(selectedRow)}
-          row={selectedRow}
-          fields={contactColumns}
-          workspaceId="contacts"
-          onClose={() => setSelectedRow(null)}
         />
       </PageSection>
     </div>

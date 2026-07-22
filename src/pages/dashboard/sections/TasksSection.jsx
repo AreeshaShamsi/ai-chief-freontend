@@ -435,8 +435,6 @@ PageSection.propTypes = {
 };
 
 function TasksSection({ activeTab = "tasks", onTabChange }) {
-  const [selectedRow, setSelectedRow] = useState(null);
-
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       <PageSection>
@@ -455,14 +453,6 @@ function TasksSection({ activeTab = "tasks", onTabChange }) {
           views={taskViews}
           activeTab={activeTab}
           onTabChange={onTabChange}
-          onExpandRow={setSelectedRow}
-        />
-        <DealDetailsModal
-          open={Boolean(selectedRow)}
-          row={selectedRow}
-          fields={taskColumns}
-          workspaceId="tasks"
-          onClose={() => setSelectedRow(null)}
         />
       </PageSection>
     </div>
