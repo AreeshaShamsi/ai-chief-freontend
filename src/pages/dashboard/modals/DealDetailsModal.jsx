@@ -1,13 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import PropTypes from "prop-types";
 import {
-  LuType,
-  LuPhone,
-  LuBadgeCheck,
-  LuDollarSign,
-  LuCalendarDays,
-  LuUserRound,
-  LuCircleCheck,
   LuChevronDown,
   LuX,
   LuChevronUp,
@@ -15,9 +8,11 @@ import {
   LuPencilLine,
   LuCopy,
   LuTrash2,
+  LuCalendarDays,
 } from "react-icons/lu";
 import { AppButton, AppPill, C, IconButton, Modal, T, Text, TextField } from "../../../components/utils";
 import AddColumnModal from "./AddColumnModal";
+import { getFieldTypeMeta } from "./fieldTypeMeta";
 
 function ConfirmationDialog({ open, onConfirm, onCancel }) {
   if (!open) return null;
@@ -61,53 +56,57 @@ ConfirmationDialog.propTypes = {
   onCancel: PropTypes.func.isRequired,
 };
 
-function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateField, onAddField, onDuplicateRow, onDeleteRow }) {
-  const [dealName, setDealName] = useState("Xyz");
-  const [callType, setCallType] = useState("Tags");
-  const [score, setScore] = useState("Tags, Tag2, Tag3");
-  const [callOutcome, setCallOutcome] = useState("Call Scheduled");
-  const [budget, setBudget] = useState("$9876543");
-  const [timeline, setTimeline] = useState("14/07/2026");
-  const [assignedAgent, setAssignedAgent] = useState("User");
-  const [status, setStatus] = useState("Tags");
-  const [nextAction, setNextAction] = useState("................");
-
+export default function DealDetailsModal({
+  open,
+  row,
+  fields,
+  columns,
+  workspaceId,
+  onPrevRow,
+  onNextRow,
+  onClose,
+  onUpdateField,
+  onAddField,
+  onDuplicateRow,
+  onDeleteRow,
+}) {
+  const [fieldValues, setFieldValues] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [openDropdownFieldId, setOpenDropdownFieldId] = useState(null);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
-  const dealNameRef = useRef(null);
-  const callOutcomeRef = useRef(null);
-  const budgetRef = useRef(null);
-  const timelineRef = useRef(null);
-  const nextActionRef = useRef(null);
-
   const actionsMenuRef = useRef(null);
   const itemRefs = useRef([]);
+  const fieldRefs = useRef({});
 
-  const fieldRefs = {
-    dealName: dealNameRef,
-    callOutcome: callOutcomeRef,
-    budget: budgetRef,
-    timeline: timelineRef,
-    nextAction: nextActionRef,
-  };
+  const effectiveFields = useMemo(() => {
+    const rawList = fields || columns;
+    if (rawList && rawList.length > 0) {
+      return rawList.filter((f) => f.id !== "addColumn");
+    }
+    if (row) {
+      return Object.keys(row)
+        .filter((key) => key !== "id")
+        .map((key) => ({
+          id: key,
+          name: key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase()),
+          type: "Single Line Text",
+        }));
+    }
+    return [];
+  }, [fields, columns, row]);
 
   useEffect(() => {
     if (!row) return;
-    setDealName(row.dealName || "Xyz");
-    setCallType(row.callType || "Tags");
-    setScore(row.score || "Tags, Tag2, Tag3");
-    setCallOutcome(row.callOutcome || "Call Scheduled");
-    setBudget(row.budget || "$9876543");
-    setTimeline(row.timeline || "14/07/2026");
-    setAssignedAgent(row.assignedAgent || "User");
-    setStatus(row.status || "Tags");
-    setNextAction(row.nextAction || "................");
+    const initial = {};
+    effectiveFields.forEach((field) => {
+      initial[field.id] = row[field.id] !== undefined ? row[field.id] : row[field.name] !== undefined ? row[field.name] : "";
+    });
+    setFieldValues(initial);
     setIsEditing(false);
     setOpenDropdownFieldId(null);
-  }, [row]);
+  }, [row, effectiveFields]);
 
   useEffect(() => {
     if (open) {
@@ -148,21 +147,23 @@ function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateFi
   if (!open || !row) return null;
 
   const handleUpdate = (fieldId, value) => {
-    onUpdateField(row.id, fieldId, value);
+    setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
+    if (onUpdateField) {
+      onUpdateField(row.id, fieldId, value);
+    }
   };
 
   const handleEditRow = (fieldId) => {
     setOpenDropdownFieldId(null);
     setIsEditing(true);
     setTimeout(() => {
-      const activeRef = fieldRefs[fieldId] || dealNameRef;
-      activeRef.current?.focus();
+      fieldRefs.current[fieldId]?.focus();
     }, 50);
   };
 
   const handleConfirmDelete = () => {
     setIsConfirmDeleteOpen(false);
-    onDeleteRow(row.id);
+    if (onDeleteRow) onDeleteRow(row.id);
     onClose();
   };
 
@@ -273,7 +274,7 @@ function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateFi
               type="button"
               onClick={() => {
                 setOpenDropdownFieldId(null);
-                onDuplicateRow(row.id);
+                if (onDuplicateRow) onDuplicateRow(row.id);
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = C.surface)}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
@@ -307,6 +308,92 @@ function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateFi
     );
   };
 
+  const renderFieldValueInput = (field) => {
+    const val = fieldValues[field.id] !== undefined ? fieldValues[field.id] : "";
+    const meta = getFieldTypeMeta(field.type);
+
+    if (meta.editorKind === "singleSelect" || meta.editorKind === "multiSelect" || meta.editorKind === "tags") {
+      const valStr = String(val);
+      const tags = valStr.includes(",") ? valStr.split(",") : [valStr];
+      return (
+        <div style={inputContainerStyle}>
+          {tags.map((tag) => {
+            const trimmed = tag.trim();
+            if (!trimmed) return null;
+            let variant = "primary";
+            if (trimmed.toLowerCase() === "hot" || trimmed.toLowerCase() === "pending") variant = "danger";
+            else if (trimmed.toLowerCase() === "completed" || trimmed.toLowerCase() === "won") variant = "success";
+            else if (trimmed.toLowerCase() === "warm" || trimmed.toLowerCase() === "in progress") variant = "neutral";
+            return (
+              <AppPill key={trimmed} size="xs" variant={variant}>
+                {trimmed}
+              </AppPill>
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (meta.editorKind === "user") {
+      return (
+        <div style={inputContainerStyle}>
+          {val ? (
+            <AppPill
+              size="xs"
+              style={{
+                background: C.accentLt,
+                border: `1px solid ${C.accentTrack}`,
+                color: C.accent,
+                fontWeight: T.font.weight.semibold,
+              }}
+            >
+              {String(val)}
+              <LuX
+                size={10}
+                style={{ cursor: "pointer", marginLeft: 4 }}
+                onClick={() => handleUpdate(field.id, "")}
+              />
+            </AppPill>
+          ) : null}
+        </div>
+      );
+    }
+
+    if (meta.editorKind === "date" || meta.editorKind === "datetime") {
+      return (
+        <div style={{ position: "relative", width: "100%" }}>
+          <TextField
+            ref={(el) => (fieldRefs.current[field.id] = el)}
+            value={String(val)}
+            readOnly={!isEditing}
+            onChange={(e) => handleUpdate(field.id, e.target.value)}
+            style={{ paddingRight: 31 }}
+          />
+          <LuCalendarDays
+            size={14}
+            style={{
+              position: "absolute",
+              right: 11,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: C.muted,
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <TextField
+        ref={(el) => (fieldRefs.current[field.id] = el)}
+        value={String(val)}
+        readOnly={!isEditing}
+        onChange={(e) => handleUpdate(field.id, e.target.value)}
+      />
+    );
+  };
+
   return (
     <>
       <Modal
@@ -337,7 +424,7 @@ function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateFi
             {/* Collapse Up & Down buttons */}
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
               <IconButton
-                aria-label="Previous deal"
+                aria-label="Previous row"
                 disabled={!onPrevRow}
                 onClick={onPrevRow}
                 style={{ borderRadius: T.radius.sm }}
@@ -345,7 +432,7 @@ function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateFi
                 <LuChevronUp size={16} />
               </IconButton>
               <IconButton
-                aria-label="Next deal"
+                aria-label="Next row"
                 disabled={!onNextRow}
                 onClick={onNextRow}
                 style={{ borderRadius: T.radius.sm }}
@@ -372,253 +459,24 @@ function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateFi
                 gap: `${T.spacing[3]}px ${T.spacing[4]}px`,
               }}
             >
-              {/* 1. Deal Name */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuType size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Deal Name
-                  </Text>
-                </div>
-                {renderChevronColumn("dealName", "Deal Name")}
-                <div style={{ width: "100%" }}>
-                  <TextField
-                    ref={dealNameRef}
-                    value={dealName}
-                    readOnly={!isEditing}
-                    onChange={(e) => {
-                      setDealName(e.target.value);
-                      handleUpdate("dealName", e.target.value);
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* 2. Call Type */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuPhone size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Call Type
-                  </Text>
-                </div>
-                {renderChevronColumn("callType", "Call Type")}
-                <div style={{ width: "100%" }}>
-                  <div style={inputContainerStyle}>
-                    {callType ? <AppPill variant="primary" size="xs">{callType}</AppPill> : null}
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Score */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuBadgeCheck size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Score
-                  </Text>
-                </div>
-                {renderChevronColumn("score", "Score")}
-                <div style={{ width: "100%" }}>
-                  <div style={inputContainerStyle}>
-                    {score.split(",").map((tag) => {
-                      const trimmed = tag.trim();
-                      let variant = "neutral";
-                      if (trimmed.toLowerCase() === "tags") {
-                        variant = "primary";
-                      } else if (trimmed.toLowerCase() === "tag3") {
-                        variant = "success";
-                      }
-                      return (
-                        <AppPill key={trimmed} size="xs" variant={variant}>
-                          {trimmed}
-                        </AppPill>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. Call Outcome */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuType size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Call Outcome
-                  </Text>
-                </div>
-                {renderChevronColumn("callOutcome", "Call Outcome")}
-                <div style={{ width: "100%" }}>
-                  <TextField
-                    ref={callOutcomeRef}
-                    value={callOutcome}
-                    readOnly={!isEditing}
-                    onChange={(e) => {
-                      setCallOutcome(e.target.value);
-                      handleUpdate("callOutcome", e.target.value);
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* 5. Budget */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuDollarSign size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Budget
-                  </Text>
-                </div>
-                {renderChevronColumn("budget", "Budget")}
-                <div style={{ width: "100%" }}>
-                  <TextField
-                    ref={budgetRef}
-                    value={budget}
-                    readOnly={!isEditing}
-                    onChange={(e) => {
-                      setBudget(e.target.value);
-                      handleUpdate("budget", e.target.value);
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* 6. Timeline */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuCalendarDays size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Timeline
-                  </Text>
-                </div>
-                {renderChevronColumn("timeline", "Timeline")}
-                <div style={{ width: "100%" }}>
-                  <div style={{ position: "relative", width: "100%" }}>
-                    <TextField
-                      ref={timelineRef}
-                      value={timeline}
-                      readOnly={!isEditing}
-                      onChange={(e) => {
-                        setTimeline(e.target.value);
-                        handleUpdate("timeline", e.target.value);
-                      }}
-                      style={{ paddingRight: 31 }}
-                    />
-                    <LuCalendarDays
-                      size={14}
-                      style={{
-                        position: "absolute",
-                        right: 11,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: C.muted,
-                        pointerEvents: "none",
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* 7. Assigned Agent */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuUserRound size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Assigned Agent
-                  </Text>
-                </div>
-                {renderChevronColumn("assignedAgent", "Assigned Agent")}
-                <div style={{ width: "100%" }}>
-                  <div style={inputContainerStyle}>
-                    {assignedAgent ? (
-                      <AppPill
-                        size="xs"
-                        style={{
-                          background: C.accentLt,
-                          border: `1px solid ${C.accentTrack}`,
-                          color: C.accent,
-                          fontWeight: T.font.weight.semibold,
-                        }}
+              {effectiveFields.map((field) => {
+                const IconComponent = getFieldTypeMeta(field.type).icon;
+                return (
+                  <div key={field.id} style={{ display: "contents" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
+                      <IconComponent size={14} style={{ color: C.muted, flexShrink: 0 }} />
+                      <Text
+                        variant="mutedLabel"
+                        style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                       >
-                        User
-                        <LuX
-                          size={10}
-                          style={{ cursor: "pointer", marginLeft: 4 }}
-                          onClick={() => {
-                            setAssignedAgent("");
-                            handleUpdate("assignedAgent", "");
-                          }}
-                        />
-                      </AppPill>
-                    ) : null}
+                        {field.name}
+                      </Text>
+                    </div>
+                    {renderChevronColumn(field.id, field.name)}
+                    <div style={{ width: "100%" }}>{renderFieldValueInput(field)}</div>
                   </div>
-                </div>
-              </div>
-
-              {/* 8. Status */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuCircleCheck size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Status
-                  </Text>
-                </div>
-                {renderChevronColumn("status", "Status")}
-                <div style={{ width: "100%" }}>
-                  <div style={inputContainerStyle}>
-                    {status ? <AppPill variant="primary" size="xs">{status}</AppPill> : null}
-                  </div>
-                </div>
-              </div>
-
-              {/* 9. Next Action */}
-              <div style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", overflow: "hidden" }}>
-                  <LuType size={14} style={{ color: C.muted, flexShrink: 0 }} />
-                  <Text
-                    variant="mutedLabel"
-                    style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                  >
-                    Next Action
-                  </Text>
-                </div>
-                {renderChevronColumn("nextAction", "Next Action")}
-                <div style={{ width: "100%" }}>
-                  <TextField
-                    ref={nextActionRef}
-                    value={nextAction}
-                    readOnly={!isEditing}
-                    onChange={(e) => {
-                      setNextAction(e.target.value);
-                      handleUpdate("nextAction", e.target.value);
-                    }}
-                  />
-                </div>
-              </div>
+                );
+              })}
             </div>
 
             <AddColumnModal onSelectField={(type) => {
@@ -676,13 +534,17 @@ function DealDetailsModal({ open, row, onPrevRow, onNextRow, onClose, onUpdateFi
 DealDetailsModal.propTypes = {
   open: PropTypes.bool.isRequired,
   row: PropTypes.object,
+  fields: PropTypes.array,
+  columns: PropTypes.array,
+  workspaceId: PropTypes.string,
   onPrevRow: PropTypes.func,
   onNextRow: PropTypes.func,
   onClose: PropTypes.func.isRequired,
-  onUpdateField: PropTypes.func.isRequired,
+  onUpdateField: PropTypes.func,
   onAddField: PropTypes.func,
-  onDuplicateRow: PropTypes.func.isRequired,
-  onDeleteRow: PropTypes.func.isRequired,
+  onDuplicateRow: PropTypes.func,
+  onDeleteRow: PropTypes.func,
 };
 
-export default DealDetailsModal;
+export const RowDetailsModal = DealDetailsModal;
+export const RecordDetailsModal = DealDetailsModal;

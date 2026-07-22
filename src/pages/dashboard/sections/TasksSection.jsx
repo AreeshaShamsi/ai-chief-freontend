@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import PropTypes from "prop-types";
 import { FiClock, FiColumns, FiList, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 import { LuSquarePen } from "react-icons/lu";
 import EditColumnsPopover from "../../../components/design-system/EditColumnsPopover";
 import { AppButton, AppCard, AppPill, C, T } from "../../../components/utils";
 import AddTaskModal from "../modals/AddTaskModal";
 import EditTaskModal from "../modals/EditTaskModal";
+import DealDetailsModal from "../modals/DealDetailsModal";
 
 const tasks = [
   { task: "Follow-up call", description: "need to call the client", assignedTo: "ramesh yadav", date: "14/04/2025", status: "to do" },
@@ -433,6 +435,8 @@ PageSection.propTypes = {
 };
 
 function TasksSection({ activeTab = "tasks", onTabChange }) {
+  const [selectedRow, setSelectedRow] = useState(null);
+
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       <PageSection>
@@ -444,7 +448,22 @@ function TasksSection({ activeTab = "tasks", onTabChange }) {
             View and manage your tasks.
           </Text>
         </header>
-        <Workspace workspaceId="tasks" activeTab={activeTab} onTabChange={onTabChange} />
+        <Workspace
+          workspaceId="tasks"
+          columns={taskColumns}
+          rowData={taskRows}
+          views={taskViews}
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+          onExpandRow={setSelectedRow}
+        />
+        <DealDetailsModal
+          open={Boolean(selectedRow)}
+          row={selectedRow}
+          fields={taskColumns}
+          workspaceId="tasks"
+          onClose={() => setSelectedRow(null)}
+        />
       </PageSection>
     </div>
   );

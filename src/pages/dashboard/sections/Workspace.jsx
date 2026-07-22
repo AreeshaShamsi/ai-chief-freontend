@@ -144,8 +144,14 @@ function PrimaryNameCell(params) {
         className="deal-expand-btn"
         aria-label="Open details"
         onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
-          context?.openDetails(data);
+          if (context?.onExpandRow) {
+            context.onExpandRow(data);
+          }
+          if (context?.openDetails) {
+            context.openDetails(data);
+          }
         }}
       >
         <LuExpand
@@ -853,6 +859,8 @@ function WorkspaceGrid({
   rowDataProp,
   updateCell,
   refreshKey,
+  renderDetailsModal,
+  onExpandRow,
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -904,7 +912,10 @@ function WorkspaceGrid({
   const openDetails = useCallback((row) => {
     setSelectedRow(row);
     setIsDetailsOpen(true);
-  }, []);
+    if (onExpandRow) {
+      onExpandRow(row);
+    }
+  }, [onExpandRow]);
 
   const handlePrevRow = useCallback(() => {
     const idx = rowDataProp.findIndex((r) => r.id === selectedRow?.id);
@@ -932,6 +943,7 @@ function WorkspaceGrid({
     () => ({
       selectedRowId: selectedRow?.id || null,
       openDetails,
+      onExpandRow: openDetails,
     }),
     [selectedRow, openDetails]
   );
@@ -956,10 +968,23 @@ function WorkspaceGrid({
         />
       </div>
 
-      {workspaceId === "deals" && (
+      {renderDetailsModal ? (
+        renderDetailsModal({
+          open: isDetailsOpen,
+          row: selectedRow,
+          fields,
+          workspaceId,
+          onPrevRow: hasPrev ? handlePrevRow : null,
+          onNextRow: hasNext ? handleNextRow : null,
+          onClose: () => setIsDetailsOpen(false),
+          onUpdateField: handleUpdateField,
+        })
+      ) : (
         <DealDetailsModal
           open={isDetailsOpen}
           row={selectedRow}
+          fields={fields}
+          workspaceId={workspaceId}
           onPrevRow={hasPrev ? handlePrevRow : null}
           onNextRow={hasNext ? handleNextRow : null}
           onClose={() => setIsDetailsOpen(false)}
@@ -977,6 +1002,8 @@ WorkspaceGrid.propTypes = {
   rowDataProp: PropTypes.array.isRequired,
   updateCell: PropTypes.func.isRequired,
   refreshKey: PropTypes.number.isRequired,
+  renderDetailsModal: PropTypes.func,
+  onExpandRow: PropTypes.func,
 };
 
 // ==========================
@@ -1386,12 +1413,14 @@ export function Workspace({
         <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
           <WorkspaceViewsPanel isHidden={isViewsPanelHidden} viewsList={viewsList} />
           <WorkspaceGrid
-            workspaceId={workspaceId}
+            workspaceId={effectiveWorkspaceId}
             search=""
             fields={fields}
             rowDataProp={gridRowData}
             updateCell={updateCell}
             refreshKey={refreshKey}
+            renderDetailsModal={renderDetailsModal}
+            onExpandRow={onExpandRow}
           />
         </div>
         <AppCardFooter style={{ justifyContent: "flex-start", gap: T.spacing[2] }}>
