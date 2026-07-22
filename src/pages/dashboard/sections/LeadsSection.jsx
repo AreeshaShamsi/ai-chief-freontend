@@ -153,6 +153,9 @@ function LeadCategorySection() {
 }
 
 function LeadsSection() {
+  const [activeTab, setActiveTab] = useState("deals");
+  const isTasks = activeTab === "tasks";
+
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       <PageSection>
@@ -165,7 +168,11 @@ function LeadsSection() {
           </Text>
         </header>
         <LeadCategorySection />
-        <Workspace workspaceId="deals" />
+        <Workspace
+          workspaceId={isTasks ? "tasks" : "deals"}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </PageSection>
     </div>
   );

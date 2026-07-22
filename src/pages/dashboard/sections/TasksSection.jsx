@@ -375,351 +375,84 @@ function KanbanView({ tasks, columns, onEditTask }) {
   );
 }
 
-function TasksSection() {
-  const [viewMode, setViewMode] = useState("list");
-  const [tableTasks, setTableTasks] = useState(listTasks);
-  const [taskTableColumns, setTaskTableColumns] = useState(initialTaskTableColumns);
-  const [boardTasks, setBoardTasks] = useState(kanbanTasks.map((task) => ({ ...task, dueTime: "14:08" })));
-  const [kanbanColumns, setKanbanColumns] = useState(initialKanbanColumns);
-  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
-  const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const editColumnsRef = useRef(null);
+export const taskColumns = [
+  { id: "taskName", name: "Task Name", type: "Single Line Text", value: "Task Name" },
+  { id: "description", name: "Description", type: "Single Line Text", value: "Description" },
+  { id: "assignedAgent", name: "Assigned Agent", type: "User / Assigned Agent", value: "Assigned Agent", options: ["Ramesh Yadav", "Himanshu S.", "Admin"] },
+  { id: "date", name: "Date", type: "Date", value: "14/04/2025" },
+  { id: "status", name: "Status", type: "Single Select", value: "Status", options: ["To Do", "In Progress", "Completed", "Pending"], editorKind: "tags" },
+];
 
-  useEffect(() => {
-    if (!isEditColumnsOpen) return undefined;
+export const taskRows = [
+  {
+    id: "task-1",
+    taskName: "Follow-up call",
+    description: "Need to call the client for confirmation",
+    assignedAgent: "Ramesh Yadav",
+    date: "14/04/2025",
+    status: "To Do",
+  },
+  {
+    id: "task-2",
+    taskName: "Property Inspection",
+    description: "Accompany buyer for site visit",
+    assignedAgent: "Himanshu S.",
+    date: "15/04/2025",
+    status: "In Progress",
+  },
+  {
+    id: "task-3",
+    taskName: "Document Verification",
+    description: "Verify title deed documents",
+    assignedAgent: "Ramesh Yadav",
+    date: "16/04/2025",
+    status: "Completed",
+  },
+];
 
-    const handlePointerDown = (event) => {
-      if (editColumnsRef.current && !editColumnsRef.current.contains(event.target)) {
-        setIsEditColumnsOpen(false);
-      }
-    };
+export const taskViews = ["Grid Name", "Grid Name", "Grid Name", "Grid Name"];
 
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [isEditColumnsOpen]);
-
-  const openEditTask = (source, task) => {
-    setSelectedTask({ source, task });
-  };
-
-  const closeEditTask = () => {
-    setSelectedTask(null);
-  };
-
-  const saveEditedTask = (updatedTask) => {
-    if (selectedTask?.source === "list") {
-      setTableTasks((current) =>
-        current.map((task) => (task.id === updatedTask.id ? { ...task, ...updatedTask } : task))
-      );
-    }
-
-    if (selectedTask?.source === "kanban") {
-      setBoardTasks((current) =>
-        current.map((task) => (task.id === updatedTask.id ? { ...task, ...updatedTask } : task))
-      );
-    }
-
-    closeEditTask();
-  };
-
-  const handleAddTask = (task) => {
-    const id = `task-${Date.now()}`;
-    const newTableTask = {
-      id: `list-${id}`,
-      task: task.title,
-      title: task.title,
-      description: task.description || "Enter task description",
-      assignedTo: task.assignedTo || "admin",
-      date: task.date,
-      dueTime: task.dueTime,
-      status: "to do",
-    };
-    const newBoardTask = {
-      id: `kanban-${id}`,
-      status: "to do",
-      title: task.title,
-      description: task.description || "Enter task description",
-      assignedTo: task.assignedTo || "admin",
-      date: task.date,
-      dueTime: task.dueTime,
-      category: "property enquiry",
-    };
-
-    setTableTasks((current) => [newTableTask, ...current]);
-    setBoardTasks((current) => [newBoardTask, ...current]);
-    setIsAddTaskOpen(false);
-  };
-
-  const handleDeleteColumn = (columnId) => {
-    setTaskTableColumns((current) => (current.length > 1 ? current.filter((column) => column.id !== columnId) : current));
-  };
-
-  const handleAddColumn = ({ name }) => {
-    const label = name.trim();
-    if (!label) return;
-
-    const id = label
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-
-    setTaskTableColumns((current) => {
-      if (current.some((column) => column.id === id)) return current;
-      return [...current, { id, label, visible: true }];
-    });
-  };
-
-  const renderTaskActions = (task) => (
-    <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-      <IconAction label={`Edit ${task.task}`} onClick={() => openEditTask("list", task)}>
-        <LuSquarePen size={15} />
-      </IconAction>
-      <IconAction label={`Delete ${task.task}`}>
-        <FiTrash2 size={14} />
-      </IconAction>
-    </div>
-  );
-
-  const renderTaskCell = (task, column) => {
-    if (column.id === "task") return task.task || task.title || "";
-    if (column.id === "assignedTo") return task.assignedTo || "";
-    if (column.id === "nextAction") return renderTaskActions(task);
-    if (column.id === "status") return <StatusBadge status={task.status} />;
-    return task[column.id] || "—";
-  };
-
+function PageSection({ children, style }) {
   return (
-    <div
+    <section
       style={{
-        minHeight: "100%",
         width: "100%",
-        minWidth: 0,
-        background: C.card,
-        padding: T.spacing.page,
-        boxSizing: "border-box",
-        color: C.text,
+        maxWidth: T.layout.pageMaxWidth,
+        margin: "0 auto",
+        ...style,
       }}
     >
-      <header style={{ marginBottom: 18 }}>
-        <h1
-          style={{
-            margin: 0,
-            color: C.text,
-            fontSize: T.font.size.pageTitle,
-            fontWeight: T.font.weight.extraBold,
-            lineHeight: 1.1,
-            textTransform: "lowercase",
-          }}
-        >
-          tasks
-        </h1>
-        <div style={{ marginTop: 4, color: C.muted, fontSize: T.font.size.caption, fontWeight: T.font.weight.medium }}>
-          view and manage your task
-        </div>
-      </header>
+      {children}
+    </section>
+  );
+}
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
-        <div
-          style={{
-            width: 300,
-            flex: "0 0 300px",
-            height: 34,
-            border: `1px solid ${C.border}`,
-            borderRadius: T.radius.sm,
-            background: C.card,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "0 11px",
-            boxSizing: "border-box",
-          }}
-        >
-          <FiSearch size={14} color={C.muted} />
-          <input
-            aria-label="Search tasks"
-            placeholder="Search in all deals"
-            style={{
-              flex: 1,
-              minWidth: 0,
-              border: "none",
-              outline: "none",
-              background: "transparent",
-              color: C.text,
-              fontFamily: T.font.family,
-              fontSize: T.font.size.bodySmall,
-            }}
-          />
-        </div>
+PageSection.propTypes = {
+  children: PropTypes.node.isRequired,
+  style: PropTypes.object,
+};
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <AppButton
-            variant="primary"
-            compact
-            onClick={() => setIsAddTaskOpen(true)}
-            style={{
-              height: 34,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 7,
-              borderRadius: T.radius.sm,
-              fontSize: T.font.size.bodySmall,
-              fontWeight: T.font.weight.semibold,
-            }}
-          >
-            <FiPlus size={14} />
-            Add task
-          </AppButton>
-          <div ref={editColumnsRef} style={{ position: "relative" }}>
-            <AppButton
-              compact
-              onClick={() => setIsEditColumnsOpen((current) => !current)}
-              style={{
-                height: 34,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 7,
-                borderRadius: T.radius.sm,
-                background: C.card,
-                color: C.text,
-                fontSize: T.font.size.bodySmall,
-              }}
-            >
-              <LuSquarePen size={15} />
-              edit column
-            </AppButton>
-            <EditColumnsPopover
-              open={isEditColumnsOpen}
-              columns={taskTableColumns}
-              onClose={() => setIsEditColumnsOpen(false)}
-              onReorder={setTaskTableColumns}
-              onDelete={handleDeleteColumn}
-              onAdd={handleAddColumn}
-            />
-          </div>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 3,
-              height: 36,
-              padding: 2,
-              borderRadius: 12,
-              border: `1px solid ${C.border}`,
-              background: C.card,
-              boxSizing: "border-box",
-            }}
-          >
-            <ViewToggleButton
-              label="List view"
-              active={viewMode === "list"}
-              onClick={() => setViewMode("list")}
-            >
-              <FiList size={16} />
-            </ViewToggleButton>
-            <ViewToggleButton
-              label="Kanban view"
-              active={viewMode === "kanban"}
-              onClick={() => setViewMode("kanban")}
-            >
-              <FiColumns size={16} />
-            </ViewToggleButton>
-          </div>
-        </div>
-      </div>
-
-      {viewMode === "list" ? (
-        <AppCard
-        variant="compact"
-        style={{
-          padding: 0,
-          overflow: "hidden",
-          borderRadius: T.radius.card,
-          border: `1px solid ${C.border}`,
-          boxShadow: T.shadow.none,
-          background: C.card,
-        }}
-      >
-        <div style={{ overflowX: "auto", width: "100%" }}>
-          <table
-            style={{
-              width: "100%",
-              minWidth: 860,
-              borderCollapse: "separate",
-              borderSpacing: 0,
-            }}
-          >
-            <thead>
-              <tr style={{ background: C.accentLt }}>
-                {taskTableColumns.filter((column) => column.visible).map((column) => (
-                  <th
-                    key={column.id}
-                    scope="col"
-                    style={{
-                      padding: "12px 16px",
-                      color: C.muted,
-                      fontSize: T.font.size.xs,
-                      fontWeight: T.font.weight.bold,
-                      textAlign: column.id === "nextAction" ? "center" : "left",
-                      borderBottom: `1px solid ${C.border}`,
-                    }}
-                  >
-                    {column.label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {tableTasks.map((task) => (
-                <tr key={task.id}>
-                  {taskTableColumns.filter((column) => column.visible).map((column) => (
-                    <td
-                      key={column.id}
-                      style={{
-                        padding: column.id === "nextAction" ? "9px 16px" : column.id === "status" ? "12px 16px" : "13px 16px",
-                        borderBottom: `1px solid ${C.borderLt}`,
-                        fontSize: T.font.size.bodySmall,
-                        fontWeight: column.id === "task" ? T.font.weight.semibold : T.font.weight.medium,
-                        color: C.text,
-                        textAlign: column.id === "nextAction" ? "center" : "left",
-                        textTransform: column.id === "assignedTo" ? "lowercase" : "none",
-                      }}
-                    >
-                      {renderTaskCell(task, column)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        </AppCard>
-      ) : (
-        <KanbanView tasks={boardTasks} columns={kanbanColumns} onEditTask={(task) => openEditTask("kanban", task)} />
-      )}
-
-      {selectedTask ? (
-        <EditTaskModal
-          task={selectedTask.task}
-          onClose={closeEditTask}
-          onSave={saveEditedTask}
-        />
-      ) : null}
-      <AddTaskModal
-        open={isAddTaskOpen}
-        onClose={() => setIsAddTaskOpen(false)}
-        onSave={handleAddTask}
-      />
+function TasksSection({ activeTab = "tasks", onTabChange }) {
+  return (
+    <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
+      <PageSection>
+        <header style={{ marginBottom: 18 }}>
+          <Text as="h1" variant="pageTitle" style={{ margin: 0 }}>
+            Tasks
+          </Text>
+          <Text as="div" variant="subtitle" style={{ marginTop: 5 }}>
+            View and manage your tasks.
+          </Text>
+        </header>
+        <Workspace workspaceId="tasks" activeTab={activeTab} onTabChange={onTabChange} />
+      </PageSection>
     </div>
   );
 }
+
+TasksSection.propTypes = {
+  activeTab: PropTypes.string,
+  onTabChange: PropTypes.func,
+};
 
 export default TasksSection;

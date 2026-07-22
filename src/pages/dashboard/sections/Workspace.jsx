@@ -484,39 +484,64 @@ function WorkspaceToolbar({
   onClearData,
   onDeleteField,
   onOpenImportModal,
+  activeTab,
+  onTabChange,
+  renderDropdown,
 }) {
-  const workspaceTitle = workspaceId.charAt(0).toUpperCase() + workspaceId.slice(1);
+  const currentTab = activeTab || workspaceId || "deals";
+  const isDealsActive = currentTab === "deals";
+  const isTasksActive = currentTab === "tasks";
+
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const dealsButtonRef = useRef(null);
+
+  const handleDealsClick = () => {
+    if (isDealsActive) {
+      setIsActionsOpen((prev) => !prev);
+    } else if (onTabChange) {
+      onTabChange("deals");
+    }
+  };
+
+  const handleTasksClick = () => {
+    if (isTasksActive) {
+      setIsActionsOpen((prev) => !prev);
+    } else if (onTabChange) {
+      onTabChange("tasks");
+    }
+  };
 
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <AppButton
-            ref={dealsButtonRef}
+            ref={isDealsActive ? dealsButtonRef : null}
             compact
-            onClick={() => setIsActionsOpen((prev) => !prev)}
+            onClick={handleDealsClick}
             style={{
               ...dealTabButtonStyle,
-              background: C.accentLt,
-              color: C.accent,
-              border: `1px solid ${C.accentTrack}`,
+              background: isDealsActive ? C.accentLt : C.card,
+              color: isDealsActive ? C.accent : C.text,
+              border: isDealsActive ? `1px solid ${C.accentTrack}` : "1px solid transparent",
             }}
           >
-            <Text variant="label" color={C.accent}>{workspaceTitle}</Text>
-            <FiChevronDown size={15} style={{ color: C.accent }} />
+            <Text variant="label" color={isDealsActive ? C.accent : C.text}>Deals</Text>
+            {isDealsActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
           </AppButton>
           <AppButton
+            ref={isTasksActive ? dealsButtonRef : null}
             compact
+            onClick={handleTasksClick}
             style={{
               ...dealTabButtonStyle,
-              background: C.card,
-              color: C.text,
-              border: "1px solid transparent",
+              background: isTasksActive ? C.accentLt : C.card,
+              color: isTasksActive ? C.accent : C.text,
+              border: isTasksActive ? `1px solid ${C.accentTrack}` : "1px solid transparent",
             }}
           >
-            <Text variant="label">Tasks</Text>
+            <Text variant="label" color={isTasksActive ? C.accent : C.text}>Tasks</Text>
+            {isTasksActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
           </AppButton>
         </div>
         <AppButton compact onClick={onManageFields} style={toolbarActionButtonStyle}>
@@ -1053,25 +1078,95 @@ const defaultWorkspaceConfigurations = {
   tasks: {
     fields: [
       { id: "taskName", name: "Task Name", type: "Single Line Text", value: "Task Name" },
-      { id: "dueDate", name: "Due Date", type: "Date", value: "Due Date" },
+      { id: "description", name: "Description", type: "Single Line Text", value: "Description" },
+      { id: "assignedAgent", name: "Assigned Agent", type: "User / Assigned Agent", value: "Assigned Agent", options: ["Ramesh Yadav", "Himanshu S.", "Admin"] },
+      { id: "date", name: "Date", type: "Date", value: "14/04/2025" },
+      { id: "status", name: "Status", type: "Single Select", value: "Status", options: ["To Do", "In Progress", "Completed", "Pending"], editorKind: "tags" },
     ],
     rows: [
-      { id: "task-1", taskName: "Task A", dueDate: "2026-08-14" },
+      {
+        id: "task-1",
+        taskName: "Follow-up call",
+        description: "Need to call the client for confirmation",
+        assignedAgent: "Ramesh Yadav",
+        date: "14/04/2025",
+        status: "To Do",
+      },
+      {
+        id: "task-2",
+        taskName: "Property Inspection",
+        description: "Accompany buyer for site visit",
+        assignedAgent: "Himanshu S.",
+        date: "15/04/2025",
+        status: "In Progress",
+      },
+      {
+        id: "task-3",
+        taskName: "Document Verification",
+        description: "Verify title deed documents",
+        assignedAgent: "Ramesh Yadav",
+        date: "16/04/2025",
+        status: "Completed",
+      },
     ],
-    views: ["All Tasks"],
+    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },
 };
 
 // ==========================
 // Workspace State
 // ==========================
-export function Workspace({ workspaceId }) {
-  const config = defaultWorkspaceConfigurations[workspaceId] || defaultWorkspaceConfigurations.deals;
+export function Workspace({
+  workspaceId = "deals",
+  columns,
+  rowData,
+  views,
+  activeTab: activeTabProp,
+  onTabChange,
+  renderDropdown,
+  renderCreateModal,
+  renderDetailsModal,
+  renderManageFieldsModal,
+  renderEditFieldModal,
+  renderImportModal,
+  onImportClick,
+  onCellClick,
+  onRowDoubleClick,
+  onExpandRow,
+}) {
+  const [internalTab, setInternalTab] = useState(activeTabProp || workspaceId || "deals");
+  const effectiveWorkspaceId = activeTabProp || internalTab;
 
-  const [fields, setFields] = useState(config.fields);
-  const [gridRowData, setGridRowData] = useState(config.rows);
-  const [viewsList] = useState(config.views);
+  useEffect(() => {
+    if (activeTabProp) {
+      setInternalTab(activeTabProp);
+    }
+  }, [activeTabProp]);
+
+  const config = useMemo(() => {
+    return defaultWorkspaceConfigurations[effectiveWorkspaceId] || defaultWorkspaceConfigurations.deals;
+  }, [effectiveWorkspaceId]);
+
+  const initialFields = useMemo(() => columns && columns.length > 0 ? columns : config.fields, [columns, config]);
+  const initialRows = useMemo(() => rowData && rowData.length > 0 ? rowData : config.rows, [rowData, config]);
+  const initialViews = useMemo(() => views && views.length > 0 ? views : config.views, [views, config]);
+
+  const [fields, setFields] = useState(initialFields);
+  const [gridRowData, setGridRowData] = useState(initialRows);
+  const [viewsList, setViewsList] = useState(initialViews);
   const [isViewsPanelHidden, setIsViewsPanelHidden] = useState(false);
+
+  useEffect(() => {
+    setFields(initialFields);
+  }, [initialFields]);
+
+  useEffect(() => {
+    setGridRowData(initialRows);
+  }, [initialRows]);
+
+  useEffect(() => {
+    setViewsList(initialViews);
+  }, [initialViews]);
 
   const [isManageFieldsOpen, setIsManageFieldsOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState(null);
@@ -1265,12 +1360,12 @@ export function Workspace({ workspaceId }) {
       <AppCard variant="compact" style={{ ...cardFrameStyle, padding: 0, marginTop: T.spacing[4], overflow: "hidden", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: T.spacing[4], borderBottom: `1px solid ${C.border}` }}>
           <WorkspaceToolbar
-            workspaceId={workspaceId}
+            workspaceId={effectiveWorkspaceId}
             isViewsPanelHidden={isViewsPanelHidden}
             onToggleViewsPanel={toggleViewsPanel}
             onManageFields={() => setIsManageFieldsOpen(true)}
             onRenameTab={() => {
-              const newName = window.prompt("Rename workspace tab:", workspaceId);
+              const newName = window.prompt("Rename workspace tab:", effectiveWorkspaceId);
               if (newName && newName.trim()) {
                 renameWorkspace(newName.trim());
               }
@@ -1280,6 +1375,12 @@ export function Workspace({ workspaceId }) {
             onClearData={handleClearData}
             onDeleteField={() => setIsManageFieldsOpen(true)}
             onOpenImportModal={() => setIsImportModalOpen(true)}
+            activeTab={effectiveWorkspaceId}
+            onTabChange={(tab) => {
+              setInternalTab(tab);
+              if (onTabChange) onTabChange(tab);
+            }}
+            renderDropdown={renderDropdown}
           />
         </div>
         <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
