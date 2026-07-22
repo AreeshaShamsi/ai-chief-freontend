@@ -497,6 +497,8 @@ function WorkspaceToolbar({
   const currentTab = activeTab || workspaceId || "deals";
   const isDealsActive = currentTab === "deals";
   const isTasksActive = currentTab === "tasks";
+  const isContactsActive = currentTab === "contacts";
+  const workspaceTitle = currentTab === "contacts" ? "Contact" : currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
 
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const dealsButtonRef = useRef(null);
@@ -521,34 +523,53 @@ function WorkspaceToolbar({
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <AppButton
-            ref={isDealsActive ? dealsButtonRef : null}
-            compact
-            onClick={handleDealsClick}
-            style={{
-              ...dealTabButtonStyle,
-              background: isDealsActive ? C.accentLt : C.card,
-              color: isDealsActive ? C.accent : C.text,
-              border: isDealsActive ? `1px solid ${C.accentTrack}` : "1px solid transparent",
-            }}
-          >
-            <Text variant="label" color={isDealsActive ? C.accent : C.text}>Deals</Text>
-            {isDealsActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
-          </AppButton>
-          <AppButton
-            ref={isTasksActive ? dealsButtonRef : null}
-            compact
-            onClick={handleTasksClick}
-            style={{
-              ...dealTabButtonStyle,
-              background: isTasksActive ? C.accentLt : C.card,
-              color: isTasksActive ? C.accent : C.text,
-              border: isTasksActive ? `1px solid ${C.accentTrack}` : "1px solid transparent",
-            }}
-          >
-            <Text variant="label" color={isTasksActive ? C.accent : C.text}>Tasks</Text>
-            {isTasksActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
-          </AppButton>
+          {isContactsActive ? (
+            <AppButton
+              ref={dealsButtonRef}
+              compact
+              onClick={() => setIsActionsOpen((prev) => !prev)}
+              style={{
+                ...dealTabButtonStyle,
+                background: C.accentLt,
+                color: C.accent,
+                border: `1px solid ${C.accentTrack}`,
+              }}
+            >
+              <Text variant="label" color={C.accent}>{workspaceTitle}</Text>
+              <FiChevronDown size={15} style={{ color: C.accent }} />
+            </AppButton>
+          ) : (
+            <>
+              <AppButton
+                ref={isDealsActive ? dealsButtonRef : null}
+                compact
+                onClick={handleDealsClick}
+                style={{
+                  ...dealTabButtonStyle,
+                  background: isDealsActive ? C.accentLt : C.card,
+                  color: isDealsActive ? C.accent : C.text,
+                  border: isDealsActive ? `1px solid ${C.accentTrack}` : "1px solid transparent",
+                }}
+              >
+                <Text variant="label" color={isDealsActive ? C.accent : C.text}>Deals</Text>
+                {isDealsActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
+              </AppButton>
+              <AppButton
+                ref={isTasksActive ? dealsButtonRef : null}
+                compact
+                onClick={handleTasksClick}
+                style={{
+                  ...dealTabButtonStyle,
+                  background: isTasksActive ? C.accentLt : C.card,
+                  color: isTasksActive ? C.accent : C.text,
+                  border: isTasksActive ? `1px solid ${C.accentTrack}` : "1px solid transparent",
+                }}
+              >
+                <Text variant="label" color={isTasksActive ? C.accent : C.text}>Tasks</Text>
+                {isTasksActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
+              </AppButton>
+            </>
+          )}
         </div>
         <AppButton compact onClick={onManageFields} style={toolbarActionButtonStyle}>
           <FiSliders size={13} />
@@ -1096,11 +1117,27 @@ const defaultWorkspaceConfigurations = {
     fields: [
       { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
       { id: "email", name: "Email", type: "Email", value: "Email" },
+      { id: "phoneNumber", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
+      { id: "callOutcome", name: "Call Outcome", type: "Single Line Text", value: "Call Outcome" },
+      { id: "created", name: "Created", type: "Date Time", value: "14/08/2026 5:00pm" },
+      { id: "businessName", name: "Business Name", type: "Single Line Text", value: "Business Name" },
+      { id: "lastActivity", name: "Last Activity", type: "Date Time", value: "14/08/2026 5:00pm" },
+      { id: "assignedAgent", name: "Assigned Agent", type: "User / Assigned Agent", value: "Assigned Agent", options: ["Ramesh Yadav", "Vikash Yadav", "User", "Admin"] },
     ],
     rows: [
-      { id: "contact-1", contactName: "Contact A", email: "contacta@gmail.com" },
+      {
+        id: "contact-1",
+        contactName: "Rakesh Paul",
+        email: "rakeshpaul234@gmail.com",
+        phoneNumber: "0989876543",
+        callOutcome: "Interested",
+        created: "14/08/2026 5:00pm",
+        businessName: "Paul Properties",
+        lastActivity: "14/08/2026 5:00pm",
+        assignedAgent: "Vikash Yadav",
+      },
     ],
-    views: ["All Contacts"],
+    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },
   tasks: {
     fields: [

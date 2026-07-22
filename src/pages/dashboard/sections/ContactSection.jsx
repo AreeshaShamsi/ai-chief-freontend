@@ -1,274 +1,120 @@
-import React, { useEffect, useRef, useState } from "react";
-import { FiSearch } from "react-icons/fi";
-import { LuSquarePen } from "react-icons/lu";
-import EditColumnsPopover from "../../../components/design-system/EditColumnsPopover";
-import { AppButton, AppCard, AppPill, C, T } from "../../../components/utils";
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { C, T, Text } from "../../../components/utils";
+import Workspace from "./Workspace";
+import DealDetailsModal from "../modals/DealDetailsModal";
 
-const contacts = [
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "seller", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "investor", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "buyer", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "seller", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "investor", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "buyer", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "seller", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "investor", agent: "Vikash yadav", budget: "1.2 cr" },
-  { name: "rakesh paul", email: "rakeshpaul234@gmail.com", phone: "0989876543", type: "buyer", agent: "Vikash yadav", budget: "1.2 cr" },
+export const contactColumns = [
+  { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
+  { id: "email", name: "Email", type: "Email", value: "Email" },
+  { id: "phoneNumber", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
+  { id: "callOutcome", name: "Call Outcome", type: "Single Line Text", value: "Call Outcome" },
+  { id: "created", name: "Created", type: "Date Time", value: "14/08/2026 5:00pm" },
+  { id: "businessName", name: "Business Name", type: "Single Line Text", value: "Business Name" },
+  { id: "lastActivity", name: "Last Activity", type: "Date Time", value: "14/08/2026 5:00pm" },
+  { id: "assignedAgent", name: "Assigned Agent", type: "User / Assigned Agent", value: "Assigned Agent", options: ["Ramesh Yadav", "Vikash Yadav", "User", "Admin"] },
 ];
 
-const initialColumns = [
-  { id: "name", label: "contact", tableLabel: "contact name", type: "Text" },
-  { id: "email", label: "email", type: "Text" },
-  { id: "phone", label: "phone number", type: "Text" },
-  { id: "type", label: "contact type", type: "Text" },
-  { id: "agent", label: "assigned agent", type: "Text" },
-  { id: "budget", label: "budget", type: "Text" },
+export const contactRows = [
+  {
+    id: "contact-1",
+    contactName: "Rakesh Paul",
+    email: "rakeshpaul234@gmail.com",
+    phoneNumber: "0989876543",
+    callOutcome: "Interested",
+    created: "14/08/2026 5:00pm",
+    businessName: "Paul Properties",
+    lastActivity: "14/08/2026 5:00pm",
+    assignedAgent: "Vikash Yadav",
+  },
+  {
+    id: "contact-2",
+    contactName: "Sunil Verma",
+    email: "sunil.verma@gmail.com",
+    phoneNumber: "0987654321",
+    callOutcome: "Follow Up",
+    created: "14/08/2026 5:00pm",
+    businessName: "Verma Realty",
+    lastActivity: "14/08/2026 5:00pm",
+    assignedAgent: "Ramesh Yadav",
+  },
+  {
+    id: "contact-3",
+    contactName: "Anita Sharma",
+    email: "anita.sharma@gmail.com",
+    phoneNumber: "0912345678",
+    callOutcome: "Meeting Scheduled",
+    created: "14/08/2026 5:00pm",
+    businessName: "Sharma Enterprises",
+    lastActivity: "14/08/2026 5:00pm",
+    assignedAgent: "Vikash Yadav",
+  },
 ];
 
-function ContactTypeBadge({ type }) {
-  const variants = {
-    seller: {
-      background: C.hotBg,
-      color: C.hot,
-      border: C.hotBdr,
-    },
-    investor: {
-      background: C.warmBg,
-      color: C.warm,
-      border: C.warmBdr,
-    },
-    buyer: {
-      background: C.greenSoft,
-      color: C.greenText,
-      border: C.greenBdr,
-    },
-  };
-  const tone = variants[type] || variants.buyer;
+export const contactViews = ["Grid Name", "Grid Name", "Grid Name", "Grid Name"];
 
+function PageSection({ children, style }) {
   return (
-    <AppPill
-      size="xs"
+    <section
       style={{
-        height: 22,
-        padding: "0 11px",
-        background: tone.background,
-        color: tone.color,
-        border: `1px solid ${tone.border}`,
-        fontSize: T.font.size.caption,
-        fontWeight: T.font.weight.semibold,
-        textTransform: "lowercase",
+        width: "100%",
+        maxWidth: T.layout.pageMaxWidth,
+        margin: "0 auto",
+        ...style,
       }}
     >
-      {type}
-    </AppPill>
+      {children}
+    </section>
   );
 }
 
-function ContactSection() {
-  const [columns, setColumns] = useState(initialColumns);
-  const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
-  const editColumnsRef = useRef(null);
+PageSection.propTypes = {
+  children: PropTypes.node.isRequired,
+  style: PropTypes.object,
+};
 
-  useEffect(() => {
-    if (!isEditColumnsOpen) return undefined;
+function ContactSection({ activeTab = "contacts", onTabChange }) {
+  const [selectedRow, setSelectedRow] = useState(null);
 
-    const handlePointerDown = (event) => {
-      if (editColumnsRef.current && !editColumnsRef.current.contains(event.target)) {
-        setIsEditColumnsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [isEditColumnsOpen]);
-
-  const handleDeleteColumn = (columnId) => {
-    setColumns((current) => (current.length > 1 ? current.filter((column) => column.id !== columnId) : current));
-  };
-
-  const handleAddColumn = ({ name, type }) => {
-    const idBase = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "column";
-    const existingIds = new Set(columns.map((column) => column.id));
-    let id = idBase;
-    let index = 1;
-    while (existingIds.has(id)) {
-      id = `${idBase}-${index}`;
-      index += 1;
-    }
-    setColumns((current) => [...current, { id, label: name, type }]);
-  };
-
-  const renderCell = (contact, column) => {
-    if (column.id === "type") return <ContactTypeBadge type={contact.type} />;
-    return contact[column.id] || "";
+  const handleExpandRow = (row) => {
+    setSelectedRow(row);
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100%",
-        width: "100%",
-        minWidth: 0,
-        background: C.card,
-        padding: T.spacing.page,
-        boxSizing: "border-box",
-        color: C.text,
-      }}
-    >
-      <header style={{ marginBottom: 18 }}>
-        <h1
-          style={{
-            margin: 0,
-            color: C.text,
-            fontSize: T.font.size.pageTitle,
-            fontWeight: T.font.weight.extraBold,
-            lineHeight: 1.1,
-          }}
-        >
-          Contact
-        </h1>
-        <div style={{ marginTop: 4, color: C.muted, fontSize: T.font.size.caption, fontWeight: T.font.weight.medium }}>
-          view all of your contact
-        </div>
-      </header>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
-        <div
-          style={{
-            width: 300,
-            flex: "0 0 300px",
-            height: 34,
-            border: `1px solid ${C.border}`,
-            borderRadius: T.radius.sm,
-            background: C.card,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "0 11px",
-            boxSizing: "border-box",
-          }}
-        >
-          <FiSearch size={14} color={C.muted} />
-          <input
-            aria-label="Search contacts"
-            placeholder="search any number"
-            style={{
-              flex: 1,
-              minWidth: 0,
-              border: "none",
-              outline: "none",
-              background: "transparent",
-              color: C.text,
-              fontFamily: T.font.family,
-              fontSize: T.font.size.bodySmall,
-            }}
-          />
-        </div>
-
-        <div ref={editColumnsRef} style={{ position: "relative" }}>
-          <AppButton
-            compact
-            onClick={() => setIsEditColumnsOpen((current) => !current)}
-            style={{
-              height: 34,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 7,
-              borderRadius: T.radius.sm,
-              background: C.card,
-              color: C.text,
-              fontSize: T.font.size.bodySmall,
-            }}
-          >
-            <LuSquarePen size={15} />
-            edit column
-          </AppButton>
-          <EditColumnsPopover
-            open={isEditColumnsOpen}
-            columns={columns}
-            onClose={() => setIsEditColumnsOpen(false)}
-            onReorder={setColumns}
-            onDelete={handleDeleteColumn}
-            onAdd={handleAddColumn}
-          />
-        </div>
-      </div>
-
-      <AppCard
-        variant="compact"
-        style={{
-          padding: 0,
-          overflow: "hidden",
-          borderRadius: T.radius.card,
-          border: `1px solid ${C.border}`,
-          boxShadow: T.shadow.none,
-          background: C.card,
-        }}
-      >
-        <div style={{ overflowX: "auto", width: "100%" }}>
-          <table
-            style={{
-              width: "100%",
-              minWidth: 900,
-              borderCollapse: "separate",
-              borderSpacing: 0,
-            }}
-          >
-            <thead>
-              <tr style={{ background: C.accentLt }}>
-                {columns.map((column) => (
-                  <th
-                    key={column.id}
-                    scope="col"
-                    style={{
-                      padding: "12px 16px",
-                      color: C.muted,
-                      fontSize: T.font.size.xs,
-                      fontWeight: T.font.weight.bold,
-                      textAlign: "left",
-                      borderBottom: `1px solid ${C.border}`,
-                      textTransform: "lowercase",
-                    }}
-                  >
-                    {column.tableLabel || column.label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {contacts.map((contact, index) => (
-                <tr key={`${contact.type}-${index}`}>
-                  {columns.map((column) => (
-                    <td
-                      key={`${contact.type}-${index}-${column.id}`}
-                      style={{
-                        padding: column.id === "type" ? "12px 16px" : "13px 16px",
-                        borderBottom: `1px solid ${C.borderLt}`,
-                        fontSize: T.font.size.bodySmall,
-                        fontWeight: column.id === "name" ? T.font.weight.semibold : T.font.weight.medium,
-                        color: C.text,
-                        textTransform: column.id === "name" || column.id === "budget" ? "lowercase" : "none",
-                      }}
-                    >
-                      {renderCell(contact, column)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </AppCard>
+    <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
+      <PageSection>
+        <header style={{ marginBottom: 18 }}>
+          <Text as="h1" variant="pageTitle" style={{ margin: 0 }}>
+            Contacts
+          </Text>
+          <Text as="div" variant="subtitle" style={{ marginTop: 5 }}>
+            View and manage your contacts.
+          </Text>
+        </header>
+        <Workspace
+          workspaceId="contacts"
+          columns={contactColumns}
+          rowData={contactRows}
+          views={contactViews}
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+          onExpandRow={handleExpandRow}
+        />
+        <DealDetailsModal
+          open={Boolean(selectedRow)}
+          row={selectedRow}
+          fields={contactColumns}
+          workspaceId="contacts"
+          onClose={() => setSelectedRow(null)}
+        />
+      </PageSection>
     </div>
   );
 }
+
+ContactSection.propTypes = {
+  activeTab: PropTypes.string,
+  onTabChange: PropTypes.func,
+};
 
 export default ContactSection;
