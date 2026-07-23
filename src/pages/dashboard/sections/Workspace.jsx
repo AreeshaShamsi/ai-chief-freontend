@@ -35,7 +35,8 @@ import DealDropdown from "../modals/DealDropdown";
 import ColumnActionsModal from "../modals/ColumnActionsModal";
 import GridNameActionsModal from "../modals/GridNameActionsModal";
 import FieldConfigurationModal from "../modals/FieldConfigurationModal";
-import { LuChevronDown, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertical } from "react-icons/lu";
+import FaqObjectionsSection from "./FaqObjectionsSection";
+import { LuChevronDown, LuBookOpen, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertical } from "react-icons/lu";
 import { FaStar } from "react-icons/fa";
 
 // ==========================
@@ -498,12 +499,33 @@ function WorkspaceToolbar({
   const isDealsActive = currentTab === "deals";
   const isTasksActive = currentTab === "tasks";
   const isContactsActive = currentTab === "contacts";
-  const isKbActive = currentTab === "kb";
+  const isKbActive = workspaceId === "kb" || currentTab === "kb" || currentTab === "inventory" || currentTab === "faq";
   const isStaffActive = currentTab === "staff" || currentTab === "mystaff";
-  const workspaceTitle = currentTab === "contacts" ? "Contact" : currentTab === "kb" ? "Knowledge Base" : isStaffActive ? "My Staff" : currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
+  const workspaceTitle = currentTab === "contacts" ? "Contact" : isKbActive ? "Knowledge Base" : isStaffActive ? "My Staff" : currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
+
+  const [internalKbTab, setInternalKbTab] = useState(currentTab === "faq" ? "faq" : "inventory");
+  const activeKbTab = currentTab === "faq" ? "faq" : currentTab === "inventory" ? "inventory" : internalKbTab;
 
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const dealsButtonRef = useRef(null);
+
+  const handleInventoryClick = () => {
+    if (activeKbTab === "inventory") {
+      setIsActionsOpen((prev) => !prev);
+    } else {
+      setInternalKbTab("inventory");
+      if (onTabChange) onTabChange("inventory");
+    }
+  };
+
+  const handleFaqClick = () => {
+    if (activeKbTab === "faq") {
+      setIsActionsOpen((prev) => !prev);
+    } else {
+      setInternalKbTab("faq");
+      if (onTabChange) onTabChange("faq");
+    }
+  };
 
   const handleDealsClick = () => {
     if (isDealsActive) {
@@ -525,7 +547,54 @@ function WorkspaceToolbar({
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          {isContactsActive || isKbActive || isStaffActive ? (
+          {isKbActive ? (
+            <>
+              <AppButton
+                ref={activeKbTab === "inventory" ? dealsButtonRef : null}
+                compact
+                onClick={handleInventoryClick}
+                style={{
+                  ...dealTabButtonStyle,
+                  background: activeKbTab === "inventory" ? C.accentLt : C.card,
+                  color: activeKbTab === "inventory" ? C.accent : C.text,
+                  border: activeKbTab === "inventory" ? `1px solid ${C.accentTrack}` : "1px solid transparent",
+                }}
+              >
+                <Text variant="label" color={activeKbTab === "inventory" ? C.accent : C.text}>Inventory</Text>
+                <LuChevronDown size={15} style={{ color: activeKbTab === "inventory" ? C.accent : C.muted }} />
+              </AppButton>
+              <AppButton
+                ref={activeKbTab === "faq" ? dealsButtonRef : null}
+                compact
+                onClick={handleFaqClick}
+                style={{
+                  ...dealTabButtonStyle,
+                  background: activeKbTab === "faq" ? C.accentLt : C.card,
+                  color: activeKbTab === "faq" ? C.accent : C.text,
+                  border: activeKbTab === "faq" ? `1px solid ${C.accentTrack}` : "1px solid transparent",
+                }}
+              >
+                <LuBookOpen size={15} style={{ color: activeKbTab === "faq" ? C.accent : C.muted }} />
+                <Text variant="label" color={activeKbTab === "faq" ? C.accent : C.text}>FAQ & Objections</Text>
+                <AppPill
+                  variant={activeKbTab === "faq" ? "primary" : "neutral"}
+                  size="xs"
+                  style={{
+                    height: 18,
+                    padding: "0 6px",
+                    fontSize: 10,
+                    fontWeight: T.font.weight.bold,
+                    borderRadius: T.radius.pill,
+                    background: activeKbTab === "faq" ? C.accentLt : C.surface,
+                    color: activeKbTab === "faq" ? C.accent : C.muted,
+                    border: `1px solid ${activeKbTab === "faq" ? C.accentTrack : C.border}`,
+                  }}
+                >
+                  4
+                </AppPill>
+              </AppButton>
+            </>
+          ) : isContactsActive || isStaffActive ? (
             <AppButton
               ref={dealsButtonRef}
               compact
@@ -594,44 +663,46 @@ function WorkspaceToolbar({
         onDeleteField={onDeleteField}
       />
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          flexWrap: "wrap",
-          marginTop: 12,
-          paddingTop: 12,
-          borderTop: `1px solid ${C.borderLt}`,
-        }}
-      >
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "nowrap" }}>
-          <IconButton
-            aria-label={isViewsPanelHidden ? "Show grid views panel" : "Hide grid views panel"}
-            onClick={onToggleViewsPanel}
-            style={{ width: 18, height: 40, color: C.muted, borderRadius: T.radius.sm }}
-          >
-            <FaBars size={13} style={{ display: "block" }} />
-          </IconButton>
-          <AppButton compact style={gridSelectorButtonStyle}>
-            <FiGrid size={16} style={{ color: C.accent }} />
-            <Text variant="label">Grid Name</Text>
-            <FiChevronDown size={15} style={{ color: C.text }} />
-          </AppButton>
-        </div>
+      {activeKbTab !== "faq" && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            marginTop: 12,
+            paddingTop: 12,
+            borderTop: `1px solid ${C.borderLt}`,
+          }}
+        >
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "nowrap" }}>
+            <IconButton
+              aria-label={isViewsPanelHidden ? "Show grid views panel" : "Hide grid views panel"}
+              onClick={onToggleViewsPanel}
+              style={{ width: 18, height: 40, color: C.muted, borderRadius: T.radius.sm }}
+            >
+              <FaBars size={13} style={{ display: "block" }} />
+            </IconButton>
+            <AppButton compact style={gridSelectorButtonStyle}>
+              <FiGrid size={16} style={{ color: C.accent }} />
+              <Text variant="label">Grid Name</Text>
+              <FiChevronDown size={15} style={{ color: C.text }} />
+            </AppButton>
+          </div>
 
-        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
-          <AppButton compact style={toolbarActionButtonStyle}>
-            <FiLink size={13} />
-            <Text variant="mutedLabel">Sync</Text>
-          </AppButton>
-          <AppButton compact style={toolbarActionButtonStyle}>
-            <FiSearch size={13} />
-            <Text variant="mutedLabel">Search</Text>
-          </AppButton>
+          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
+            <AppButton compact style={toolbarActionButtonStyle}>
+              <FiLink size={13} />
+              <Text variant="mutedLabel">Sync</Text>
+            </AppButton>
+            <AppButton compact style={toolbarActionButtonStyle}>
+              <FiSearch size={13} />
+              <Text variant="mutedLabel">Search</Text>
+            </AppButton>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
@@ -1538,26 +1609,34 @@ export function Workspace({
             renderDropdown={renderDropdown}
           />
         </div>
-        <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
-          <WorkspaceViewsPanel isHidden={isViewsPanelHidden} viewsList={viewsList} />
-          <WorkspaceGrid
-            workspaceId={effectiveWorkspaceId}
-            search=""
-            fields={fields}
-            rowDataProp={gridRowData}
-            updateCell={updateCell}
-            refreshKey={refreshKey}
-            renderDetailsModal={renderDetailsModal}
-            onExpandRow={onExpandRow}
-          />
-        </div>
-        <AppCardFooter style={{ justifyContent: "flex-start", gap: T.spacing[2] }}>
-          <Text variant="mutedLabel">{recordsCountText}</Text>
-          <AppButton variant="secondary" compact onClick={() => {}} style={addRecordButtonStyle}>
-            <FiPlus size={T.font.size.sm} color={C.muted} />
-            <Text variant="mutedLabel">Add Record</Text>
-          </AppButton>
-        </AppCardFooter>
+        {effectiveWorkspaceId === "faq" ? (
+          <div style={{ padding: T.spacing[4], width: "100%", boxSizing: "border-box" }}>
+            <FaqObjectionsSection />
+          </div>
+        ) : (
+          <>
+            <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
+              <WorkspaceViewsPanel isHidden={isViewsPanelHidden} viewsList={viewsList} />
+              <WorkspaceGrid
+                workspaceId={effectiveWorkspaceId}
+                search=""
+                fields={fields}
+                rowDataProp={gridRowData}
+                updateCell={updateCell}
+                refreshKey={refreshKey}
+                renderDetailsModal={renderDetailsModal}
+                onExpandRow={onExpandRow}
+              />
+            </div>
+            <AppCardFooter style={{ justifyContent: "flex-start", gap: T.spacing[2] }}>
+              <Text variant="mutedLabel">{recordsCountText}</Text>
+              <AppButton variant="secondary" compact onClick={() => {}} style={addRecordButtonStyle}>
+                <FiPlus size={T.font.size.sm} color={C.muted} />
+                <Text variant="mutedLabel">Add Record</Text>
+              </AppButton>
+            </AppCardFooter>
+          </>
+        )}
       </AppCard>
 
       <ManageFieldsModal

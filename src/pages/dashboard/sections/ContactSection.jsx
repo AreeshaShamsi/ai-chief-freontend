@@ -1,8 +1,9 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { C, T, Text } from "../../../components/utils";
+import { FiPlus } from "react-icons/fi";
+import { AppButton, C, T, Text } from "../../../components/utils";
 import Workspace from "./Workspace";
-import DealDetailsModal from "../modals/DealDetailsModal";
+import CreateCampaignModal from "../modals/CreateCampaignModal";
 
 export const contactColumns = [
   { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
@@ -73,17 +74,59 @@ PageSection.propTypes = {
   style: PropTypes.object,
 };
 
-function ContactSection({ activeTab = "contacts", onTabChange }) {
+function ContactSection({ activeTab = "contacts", onTabChange, onCreateCampaign }) {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const handleCreateClick = () => {
+    if (onCreateCampaign) {
+      onCreateCampaign();
+    } else {
+      setShowCreateModal(true);
+    }
+  };
+
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
+      {showCreateModal && (
+        <CreateCampaignModal onClose={() => setShowCreateModal(false)} />
+      )}
       <PageSection>
-        <header style={{ marginBottom: 18 }}>
-          <Text as="h1" variant="pageTitle" style={{ margin: 0 }}>
-            Contacts
-          </Text>
-          <Text as="div" variant="subtitle" style={{ marginTop: 5 }}>
-            View and manage your contacts.
-          </Text>
+        <header
+          style={{
+            marginBottom: 18,
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <Text as="h1" variant="pageTitle" style={{ margin: 0 }}>
+              Contacts
+            </Text>
+            <Text as="div" variant="subtitle" style={{ marginTop: 5 }}>
+              View and manage your contacts.
+            </Text>
+          </div>
+          <AppButton
+            variant="primary"
+            onClick={handleCreateClick}
+            style={{
+              height: 36,
+              borderRadius: T.radius.md,
+              padding: "0 16px",
+              fontSize: T.font.size.bodySmall,
+              fontWeight: T.font.weight.semibold,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              boxShadow: T.shadow.xs,
+            }}
+          >
+            <FiPlus size={14} />
+            <span>Create Campaign</span>
+          </AppButton>
         </header>
         <Workspace
           workspaceId="contacts"
@@ -101,6 +144,7 @@ function ContactSection({ activeTab = "contacts", onTabChange }) {
 ContactSection.propTypes = {
   activeTab: PropTypes.string,
   onTabChange: PropTypes.func,
+  onCreateCampaign: PropTypes.func,
 };
 
 export default ContactSection;

@@ -73,7 +73,16 @@ PageSection.propTypes = {
   style: PropTypes.object,
 };
 
-function KnowledgeBaseSection({ activeTab = "kb", onTabChange }) {
+function KnowledgeBaseSection({ activeTab = "inventory", onTabChange }) {
+  const [currentTab, setCurrentTab] = useState(activeTab === "kb" ? "inventory" : activeTab);
+
+  const handleTabChange = (tab) => {
+    setCurrentTab(tab);
+    if (onTabChange) {
+      onTabChange(tab);
+    }
+  };
+
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       <PageSection>
@@ -108,8 +117,8 @@ function KnowledgeBaseSection({ activeTab = "kb", onTabChange }) {
           columns={knowledgeBaseColumns}
           rowData={knowledgeBaseRows}
           views={knowledgeBaseViews}
-          activeTab={activeTab}
-          onTabChange={onTabChange}
+          activeTab={currentTab}
+          onTabChange={handleTabChange}
         />
       </PageSection>
     </div>
