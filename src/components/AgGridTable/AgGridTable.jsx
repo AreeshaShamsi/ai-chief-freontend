@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { AgGridReact } from "ag-grid-react";
 import { themeQuartz } from "ag-grid-community";
@@ -34,6 +35,32 @@ export default function AgGridTable({
   context,
   ...rest
 }) {
+  const gridApiRef = useRef(null);
+
+  const onGridReady = useCallback(
+    (params) => {
+      gridApiRef.current = params.api;
+      if (quickFilterText) {
+        if (params.api.setGridOption) {
+          params.api.setGridOption("quickFilterText", quickFilterText);
+        } else if (params.api.setQuickFilter) {
+          params.api.setQuickFilter(quickFilterText);
+        }
+      }
+    },
+    [quickFilterText]
+  );
+
+  useEffect(() => {
+    if (gridApiRef.current) {
+      if (gridApiRef.current.setGridOption) {
+        gridApiRef.current.setGridOption("quickFilterText", quickFilterText || "");
+      } else if (gridApiRef.current.setQuickFilter) {
+        gridApiRef.current.setQuickFilter(quickFilterText || "");
+      }
+    }
+  }, [quickFilterText]);
+
   return (
     <AgGridReact
       rowData={rowData}
@@ -47,6 +74,7 @@ export default function AgGridTable({
       selectionColumnDef={selectionColumnDef}
       suppressCellFocus={suppressCellFocus}
       context={context}
+      onGridReady={onGridReady}
       {...rest}
     />
   );

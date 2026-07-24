@@ -494,7 +494,10 @@ function WorkspaceToolbar({
   activeTab,
   onTabChange,
   renderDropdown,
+  searchQuery = "",
+  onSearchChange,
 }) {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const currentTab = activeTab || workspaceId || "deals";
   const isDealsActive = currentTab === "deals";
   const isTasksActive = currentTab === "tasks";
@@ -696,10 +699,37 @@ function WorkspaceToolbar({
               <FiLink size={13} />
               <Text variant="mutedLabel">Sync</Text>
             </AppButton>
-            <AppButton compact style={toolbarActionButtonStyle}>
-              <FiSearch size={13} />
-              <Text variant="mutedLabel">Search</Text>
-            </AppButton>
+            {isSearchOpen || searchQuery ? (
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <SearchBox
+                  value={searchQuery}
+                  onChange={(val) => {
+                    if (onSearchChange) onSearchChange(val);
+                  }}
+                  placeholder="Search..."
+                  width={160}
+                />
+                <IconButton
+                  aria-label="Clear search"
+                  onClick={() => {
+                    if (onSearchChange) onSearchChange("");
+                    setIsSearchOpen(false);
+                  }}
+                  style={{ width: 22, height: 22 }}
+                >
+                  <FiX size={12} />
+                </IconButton>
+              </div>
+            ) : (
+              <AppButton
+                compact
+                onClick={() => setIsSearchOpen(true)}
+                style={toolbarActionButtonStyle}
+              >
+                <FiSearch size={13} />
+                <Text variant="mutedLabel">Search</Text>
+              </AppButton>
+            )}
           </div>
         </div>
       )}
@@ -1349,6 +1379,8 @@ export function Workspace({
   views,
   activeTab: activeTabProp,
   onTabChange,
+  search: externalSearch,
+  onSearchChange: externalOnSearchChange,
   renderDropdown,
   renderCreateModal,
   renderDetailsModal,
@@ -1362,6 +1394,14 @@ export function Workspace({
 }) {
   const [internalTab, setInternalTab] = useState(activeTabProp || workspaceId || "deals");
   const effectiveWorkspaceId = activeTabProp || internalTab;
+
+  const [internalSearchQuery, setInternalSearchQuery] = useState("");
+  const searchQuery = externalSearch !== undefined ? externalSearch : internalSearchQuery;
+
+  const handleSearchChange = (val) => {
+    setInternalSearchQuery(val);
+    if (externalOnSearchChange) externalOnSearchChange(val);
+  };
 
   useEffect(() => {
     if (activeTabProp) {
@@ -1607,6 +1647,8 @@ export function Workspace({
               if (onTabChange) onTabChange(tab);
             }}
             renderDropdown={renderDropdown}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
           />
         </div>
         {effectiveWorkspaceId === "faq" ? (
@@ -1619,7 +1661,7 @@ export function Workspace({
               <WorkspaceViewsPanel isHidden={isViewsPanelHidden} viewsList={viewsList} />
               <WorkspaceGrid
                 workspaceId={effectiveWorkspaceId}
-                search=""
+                search={searchQuery}
                 fields={fields}
                 rowDataProp={gridRowData}
                 updateCell={updateCell}
