@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import PropTypes from "prop-types";
 import {
   Alert,
   AppButton,
@@ -91,6 +92,11 @@ function ModalHeader({ step, onClose }) {
   );
 }
 
+ModalHeader.propTypes = {
+  step: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
+
 function ScriptOption({ option, selected, onSelect }) {
   const icons = {
     property_enquiry: <FiClipboard size={13} />,
@@ -165,6 +171,12 @@ function ScriptOption({ option, selected, onSelect }) {
   );
 }
 
+ScriptOption.propTypes = {
+  option: PropTypes.object.isRequired,
+  selected: PropTypes.bool.isRequired,
+  onSelect: PropTypes.func.isRequired,
+};
+
 function ModalFooter({ children }) {
   return (
     <div
@@ -180,6 +192,10 @@ function ModalFooter({ children }) {
     </div>
   );
 }
+
+ModalFooter.propTypes = {
+  children: PropTypes.node,
+};
 
 function CreateCampaignModal({ onClose, onLaunch }) {
   const [step, setStep] = useState("details");
@@ -240,7 +256,7 @@ function CreateCampaignModal({ onClose, onLaunch }) {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("company_id", localStorage.getItem("company_id"));
+    formData.append("company_id", localStorage.getItem("company_id") || "default");
     formData.append("type", "leads");
     formData.append("campaign_name", name.trim());
     formData.append("script_type", script);
@@ -315,55 +331,54 @@ function CreateCampaignModal({ onClose, onLaunch }) {
 
       {step === "details" ? (
         <>
-        <div style={{ padding: "18px 20px" }}>
-          {error ? (
-            <Alert variant="error" style={{ marginBottom: 14 }}>
-              {error}
-            </Alert>
-          ) : null}
+          <div style={{ padding: "18px 20px" }}>
+            {error ? (
+              <Alert variant="error" style={{ marginBottom: 14 }}>
+                {error}
+              </Alert>
+            ) : null}
 
-          <div style={{ marginBottom: 16 }}>
-            <label
+            <div style={{ marginBottom: 16 }}>
+              <label
+                style={{
+                  display: "block",
+                  color: C.text,
+                  fontSize: T.font.size.bodySmall,
+                  fontWeight: T.font.weight.semibold,
+                  marginBottom: 7,
+                }}
+              >
+                Campaign name *
+              </label>
+              <TextField
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="e.g. Prestige Lakeside — Jan 2026"
+                style={{ height: 36 }}
+              />
+            </div>
+
+            <div
               style={{
-                display: "block",
                 color: C.text,
                 fontSize: T.font.size.bodySmall,
                 fontWeight: T.font.weight.semibold,
-                marginBottom: 7,
+                marginBottom: 9,
               }}
             >
-              Campaign name *
-            </label>
-            <TextField
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="e.g. Prestige Lakeside — Jan 2026"
-              style={{ height: 36 }}
-            />
+              AI qualification script
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {scripts.map((option) => (
+                <ScriptOption
+                  key={option.id}
+                  option={option}
+                  selected={script === option.id}
+                  onSelect={() => setScript(option.id)}
+                />
+              ))}
+            </div>
           </div>
-
-          <div
-            style={{
-              color: C.text,
-              fontSize: T.font.size.bodySmall,
-              fontWeight: T.font.weight.semibold,
-              marginBottom: 9,
-            }}
-          >
-            AI qualification script
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {scripts.map((option) => (
-              <ScriptOption
-                key={option.id}
-                option={option}
-                selected={script === option.id}
-                onSelect={() => setScript(option.id)}
-              />
-            ))}
-          </div>
-
-        </div>
           <ModalFooter>
             <AppButton onClick={resetAndClose} compact>
               cancel
@@ -381,62 +396,62 @@ function CreateCampaignModal({ onClose, onLaunch }) {
         </>
       ) : (
         <>
-        <div style={{ padding: "18px 20px" }}>
-          <input
-            ref={inputRef}
-            type="file"
-            accept={acceptedTypes}
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-          />
+          <div style={{ padding: "18px 20px" }}>
+            <input
+              ref={inputRef}
+              type="file"
+              accept={acceptedTypes}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
 
-          {error ? (
-            <Alert variant="error" style={{ marginBottom: 14 }}>
-              {error}
-            </Alert>
-          ) : null}
+            {error ? (
+              <Alert variant="error" style={{ marginBottom: 14 }}>
+                {error}
+              </Alert>
+            ) : null}
 
-          <AppCard
-            variant="upload"
-            style={{
-              textAlign: "center",
-              cursor: "default",
-              marginBottom: 12,
-            }}
-          >
-            <AppIconCircle
-              size={34}
-              variant="primary"
-              style={{ margin: "0 auto 12px", borderRadius: T.radius.sm }}
+            <AppCard
+              variant="upload"
+              style={{
+                textAlign: "center",
+                cursor: "default",
+                marginBottom: 12,
+              }}
             >
-              <FiFileText size={18} />
-            </AppIconCircle>
-            <div style={{ color: C.text, fontSize: T.font.size.sm, fontWeight: T.font.weight.semibold }}>
-              Drop your Excel or CSV file here
-            </div>
-            <div style={{ color: C.muted, fontSize: T.font.size.caption, marginTop: 4, marginBottom: 14 }}>
-              Supports .xlsx, .xls, .csv&nbsp;&nbsp; Max 10MB
-            </div>
-            <AppButton variant="primary" compact onClick={() => inputRef.current?.click()}>
-              Browse files
-            </AppButton>
-          </AppCard>
+              <AppIconCircle
+                size={34}
+                variant="primary"
+                style={{ margin: "0 auto 12px", borderRadius: T.radius.sm }}
+              >
+                <FiFileText size={18} />
+              </AppIconCircle>
+              <div style={{ color: C.text, fontSize: T.font.size.sm, fontWeight: T.font.weight.semibold }}>
+                Drop your Excel or CSV file here
+              </div>
+              <div style={{ color: C.muted, fontSize: T.font.size.caption, marginTop: 4, marginBottom: 14 }}>
+                Supports .xlsx, .xls, .csv&nbsp;&nbsp; Max 10MB
+              </div>
+              <AppButton variant="primary" compact onClick={() => inputRef.current?.click()}>
+                Browse files
+              </AppButton>
+            </AppCard>
 
-          {file ? (
-            <Alert variant="success" style={{ marginBottom: 12 }}>
-              <strong>{file.name}</strong> selected
+            {file ? (
+              <Alert variant="success" style={{ marginBottom: 12 }}>
+                <strong>{file.name}</strong> selected
+              </Alert>
+            ) : null}
+
+            <Alert
+              variant="warning"
+              contentAlign="center"
+              style={{ minHeight: 28, padding: "0 12px", fontSize: T.font.size.caption }}
+            >
+              <FiAlertTriangle size={11} color={C.warm} />
+              <span>Required columns: phone number and first name</span>
             </Alert>
-          ) : null}
-
-          <Alert
-            variant="warning"
-            contentAlign="center"
-            style={{ minHeight: 28, padding: "0 12px", fontSize: T.font.size.caption }}
-          >
-            <FiAlertTriangle size={11} color={C.warm} />
-            <span>Required columns: phone number and first name</span>
-          </Alert>
-        </div>
+          </div>
           <ModalFooter>
             <AppButton
               compact
@@ -463,5 +478,10 @@ function CreateCampaignModal({ onClose, onLaunch }) {
     </Modal>
   );
 }
+
+CreateCampaignModal.propTypes = {
+  onClose: PropTypes.func,
+  onLaunch: PropTypes.func,
+};
 
 export default CreateCampaignModal;

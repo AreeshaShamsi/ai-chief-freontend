@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FiPlus } from "react-icons/fi";
 import { AppButton, C, T, Text } from "../../../components/utils";
 import Workspace from "./Workspace";
-import CreateCampaignModal from "../modals/CreateCampaignModal";
+import CreateCampaignSelectionModal from "../modals/CreateCampaignSelectionModal";
 
 export const contactColumns = [
   { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
@@ -88,7 +88,7 @@ function ContactSection({ activeTab = "contacts", onTabChange, onCreateCampaign 
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       {showCreateModal && (
-        <CreateCampaignModal onClose={() => setShowCreateModal(false)} />
+        <CreateCampaignSelectionModal onClose={() => setShowCreateModal(false)} />
       )}
       <PageSection>
         <header
