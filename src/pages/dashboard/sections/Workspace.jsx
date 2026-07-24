@@ -41,6 +41,22 @@ import FaqObjectionsSection from "./FaqObjectionsSection";
 import { LuChevronDown, LuBookOpen, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertical } from "react-icons/lu";
 import { FaStar } from "react-icons/fa";
 
+export function formatTimestamp(date = new Date()) {
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return "";
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = months[d.getMonth()];
+  const day = d.getDate();
+  const year = d.getFullYear();
+  let hours = d.getHours();
+  const minutes = d.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const formattedHours = hours.toString().padStart(2, "0");
+  return `${month} ${day}, ${year} ${formattedHours}:${minutes} ${ampm}`;
+}
+
 // ==========================
 // Workspace Initialization
 // ==========================
@@ -1114,6 +1130,24 @@ function WorkspaceGrid({
 
   const defaultColDef = useMemo(
     () => ({
+      editable: (params) => {
+        if (!params?.colDef) return false;
+        const field = (params.colDef.field || "").toLowerCase();
+        const readOnlyFields = [
+          "addcolumn",
+          "ag-grid-selectioncolumn",
+          "selection",
+          "created",
+          "createdtime",
+          "createdat",
+          "createddate",
+          "lastmodified",
+          "lastmodifiedtime",
+          "updatedat",
+        ];
+        if (readOnlyFields.includes(field)) return false;
+        return true;
+      },
       sortable: true,
       resizable: true,
       filter: false,
@@ -1122,6 +1156,32 @@ function WorkspaceGrid({
       ...(isStaff ? { suppressMenu: true, suppressHeaderMenuButton: true } : {}),
     }),
     [isStaff]
+  );
+
+  const handleCellValueChanged = useCallback(
+    (event) => {
+      const { data, colDef, newValue, oldValue } = event;
+      if (newValue === oldValue) return;
+      const fieldId = colDef.field;
+      if (!fieldId || fieldId === "addColumn") return;
+
+      let parsedValue = newValue;
+      const fieldObj = fields.find((f) => f.id === fieldId);
+      if (fieldObj) {
+        const typeLower = (fieldObj.type || "").toLowerCase();
+        if (typeLower.includes("number") || typeLower.includes("currency") || typeLower.includes("rating")) {
+          const num = Number(newValue);
+          if (!isNaN(num) && newValue !== "" && newValue !== null) {
+            parsedValue = num;
+          }
+        }
+      }
+
+      if (updateCell && data?.id) {
+        updateCell(data.id, fieldId, parsedValue);
+      }
+    },
+    [updateCell, fields]
   );
 
   const openDetails = useCallback((row) => {
@@ -1178,9 +1238,10 @@ function WorkspaceGrid({
           defaultColDef={defaultColDef}
           quickFilterText={search}
           rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true }}
-          selectionColumnDef={{ width: 46, maxWidth: 46, resizable: false, sortable: false }}
-          suppressCellFocus
+          selectionColumnDef={{ width: 44, headerClass: "ag-selection-header" }}
           context={context}
+          onCellValueChanged={handleCellValueChanged}
+          suppressCellFocus={false}
         />
       </div>
 
@@ -1571,11 +1632,23 @@ export function Workspace({
   // Row Operations
   // ==========================
   const addRow = useCallback((newRow) => {
+    const nowFormatted = formatTimestamp();
     const row = newRow || { id: `row-${Date.now()}` };
+    const initializedRow = {
+      createdTime: nowFormatted,
+      created: nowFormatted,
+      createdAt: nowFormatted,
+      lastModifiedTime: nowFormatted,
+      lastModified: nowFormatted,
+      updatedAt: nowFormatted,
+      createdBy: "Ramesh Yadav",
+      lastModifiedBy: "Ramesh Yadav",
+      ...row,
+    };
     const prev = [...gridRowData];
-    const next = [...prev, row];
+    const next = [...prev, initializedRow];
     setGridRowData(next);
-    trackChange("Add Row", row.id, prev, next);
+    trackChange("Add Row", initializedRow.id, prev, next);
   }, [gridRowData, trackChange]);
 
   const deleteRow = useCallback((rowId) => {
@@ -1598,8 +1671,9 @@ export function Workspace({
   }, [gridRowData, trackChange]);
 
   const updateRow = useCallback((rowId, updatedFields) => {
+    const nowFormatted = formatTimestamp();
     const prev = [...gridRowData];
-    const next = prev.map((r) => (r.id === rowId ? { ...r, ...updatedFields } : r));
+    const next = prev.map((r) => (r.id === rowId ? { ...r, ...updatedFields, lastModifiedTime: nowFormatted, lastModified: nowFormatted, updatedAt: nowFormatted } : r));
     setGridRowData(next);
     trackChange("Update Row", rowId, prev, next);
   }, [gridRowData, trackChange]);
@@ -1659,9 +1733,19 @@ export function Workspace({
     const row = prev.find((r) => r.id === rowId);
     if (row) {
       const prevVal = row[columnId];
+      if (prevVal === newValue) return;
+
+      const nowFormatted = formatTimestamp();
       const next = prev.map((r) => {
         if (r.id === rowId) {
-          return { ...r, [columnId]: newValue };
+          return {
+            ...r,
+            [columnId]: newValue,
+            lastModifiedTime: nowFormatted,
+            lastModified: nowFormatted,
+            updatedAt: nowFormatted,
+            lastModifiedBy: r.lastModifiedBy || "Ramesh Yadav",
+          };
         }
         return r;
       });
@@ -1724,7 +1808,7 @@ export function Workspace({
   // ==========================
   // Render
   // ==========================
-  const recordsCountText = workspaceId === "deals" ? "15 records" : `${gridRowData.length} records`;
+  const recordsCountText = `${gridRowData.length} records`;
 
   const context = useMemo(() => ({
     addRow,

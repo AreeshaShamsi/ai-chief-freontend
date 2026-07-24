@@ -331,7 +331,24 @@ export default function DealDetailsModal({
   const renderFieldValueInput = (field) => {
     const val = fieldValues[field.id] !== undefined ? fieldValues[field.id] : "";
     const meta = getFieldTypeMeta(field.type);
-    const isPassword = field.id.toLowerCase().includes("password");
+    const fieldLower = field.id.toLowerCase();
+    const isTimestamp =
+      fieldLower.includes("created") ||
+      fieldLower.includes("lastmodified") ||
+      fieldLower.includes("updatedat");
+
+    if (isTimestamp) {
+      return (
+        <TextField
+          ref={(el) => (fieldRefs.current[field.id] = el)}
+          value={String(val)}
+          readOnly={true}
+          style={{ background: C.surface, color: C.muted, cursor: "not-allowed" }}
+        />
+      );
+    }
+
+    const isPassword = fieldLower.includes("password");
 
     if (isPassword) {
       const isVisible = Boolean(showPasswords[field.id]);

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { FiCheck } from "react-icons/fi";
+import { FiCheck, FiPlus } from "react-icons/fi";
 import { appTheme as T } from "./design-tokens";
 
 const C = {
@@ -238,7 +238,10 @@ function Card(props) {
   return <AppCard {...props} />;
 }
 
-function AppCardFooter({ children, action, style }) {
+function AppCardFooter({ children, action, recordsCountText, recordsCount, onAddRow, onAddRecord, style }) {
+  const countText = recordsCountText || (recordsCount !== undefined ? `${recordsCount} records` : null);
+  const handleAdd = onAddRow || onAddRecord;
+
   return (
     <footer
       style={{
@@ -248,15 +251,43 @@ function AppCardFooter({ children, action, style }) {
         background: C.card,
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
-        gap: T.spacing[3],
-        flexWrap: "wrap",
+        justifyContent: "flex-start",
+        gap: 16,
         boxSizing: "border-box",
         borderBottomLeftRadius: T.radius.lg,
         borderBottomRightRadius: T.radius.lg,
         ...style,
       }}
     >
+      {countText ? (
+        <Text variant="mutedLabel" style={{ fontSize: T.font.size.bodySmall, color: C.muted, fontWeight: T.font.weight.medium }}>
+          {countText}
+        </Text>
+      ) : null}
+
+      {handleAdd ? (
+        <AppButton
+          compact
+          onClick={handleAdd}
+          style={{
+            height: 30,
+            padding: "0 12px",
+            borderRadius: T.radius.sm,
+            background: C.card,
+            color: C.text,
+            border: `1px solid ${C.border}`,
+            fontSize: T.font.size.bodySmall,
+            fontWeight: T.font.weight.medium,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <FiPlus size={14} style={{ color: C.muted }} />
+          <span>Add Record</span>
+        </AppButton>
+      ) : null}
+
       {children}
       {action}
     </footer>
