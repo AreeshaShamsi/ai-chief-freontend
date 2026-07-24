@@ -19,7 +19,9 @@ import {
   AppCardFooter,
   AppPill,
   C,
+  ConfirmationModal,
   IconButton,
+  RenameModal,
   T,
   Text,
   TextField,
@@ -110,6 +112,12 @@ const columnWidths = {
   dealName: 150,
   leadName: 150,
   contactName: 150,
+  phone: 140,
+  email: 180,
+  businessName: 160,
+  created: 165,
+  lastActivity: 130,
+  tags: 130,
   taskName: 150,
   callType: 130,
   score: 110,
@@ -496,6 +504,9 @@ function WorkspaceToolbar({
   renderDropdown,
   searchQuery = "",
   onSearchChange,
+  hideGridSelector = false,
+  hideViewsPanel = false,
+  hideManageFields = false,
 }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const currentTab = activeTab || workspaceId || "deals";
@@ -645,10 +656,12 @@ function WorkspaceToolbar({
             </>
           )}
         </div>
-        <AppButton compact onClick={onManageFields} style={toolbarActionButtonStyle}>
-          <FiSliders size={13} />
-          <Text variant="mutedLabel">Manage Fields</Text>
-        </AppButton>
+        {!hideManageFields && (
+          <AppButton compact onClick={onManageFields} style={toolbarActionButtonStyle}>
+            <FiSliders size={13} />
+            <Text variant="mutedLabel">Manage Fields</Text>
+          </AppButton>
+        )}
       </div>
 
       <DealDropdown
@@ -680,18 +693,22 @@ function WorkspaceToolbar({
           }}
         >
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "nowrap" }}>
-            <IconButton
-              aria-label={isViewsPanelHidden ? "Show grid views panel" : "Hide grid views panel"}
-              onClick={onToggleViewsPanel}
-              style={{ width: 18, height: 40, color: C.muted, borderRadius: T.radius.sm }}
-            >
-              <FaBars size={13} style={{ display: "block" }} />
-            </IconButton>
-            <AppButton compact style={gridSelectorButtonStyle}>
-              <FiGrid size={16} style={{ color: C.accent }} />
-              <Text variant="label">Grid Name</Text>
-              <FiChevronDown size={15} style={{ color: C.text }} />
-            </AppButton>
+            {!hideViewsPanel && (
+              <IconButton
+                aria-label={isViewsPanelHidden ? "Show grid views panel" : "Hide grid views panel"}
+                onClick={onToggleViewsPanel}
+                style={{ width: 18, height: 40, color: C.muted, borderRadius: T.radius.sm }}
+              >
+                <FaBars size={13} style={{ display: "block" }} />
+              </IconButton>
+            )}
+            {!hideGridSelector && (
+              <AppButton compact style={gridSelectorButtonStyle}>
+                <FiGrid size={16} style={{ color: C.accent }} />
+                <Text variant="label">Grid Name</Text>
+                <FiChevronDown size={15} style={{ color: C.text }} />
+              </AppButton>
+            )}
           </div>
 
           <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
@@ -752,88 +769,145 @@ WorkspaceToolbar.propTypes = {
 
 function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggleFavorite }) {
   const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(viewItem.name);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const optionsButtonRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select?.();
+    }
+  }, [isEditing]);
 
   const handleFavorite = () => {
     if (onToggleFavorite) onToggleFavorite(viewItem.id);
   };
   const handleRename = () => {
-    const newName = window.prompt("Rename grid:", viewItem.name);
-    if (newName) console.log("Renamed:", newName);
+    setIsEditing(true);
+  };
+  const handleSaveRename = () => {
+    if (editName.trim()) {
+      viewItem.name = editName.trim();
+    } else {
+      setEditName(viewItem.name);
+    }
+    setIsEditing(false);
+  };
+  const handleCancelRename = () => {
+    setEditName(viewItem.name);
+    setIsEditing(false);
   };
   const handleDuplicate = () => {
     console.log("Duplicated:", viewItem.id);
   };
   const handleDelete = () => {
-    if (window.confirm(`Delete grid "${viewItem.name}"?`)) console.log("Deleted:", viewItem.id);
+    setShowDeleteConfirm(true);
   };
 
   return (
-    <div
-      onClick={() => onSelectView(viewItem.id)}
-      style={{
-        height: 34,
-        width: "100%",
-        borderRadius: T.radius.sm,
-        background: isActive ? C.accentLt : "transparent",
-        color: isActive ? C.accent : C.text,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "0 8px",
-        cursor: "pointer",
-        boxSizing: "border-box",
-        position: "relative",
-      }}
-    >
-      <FiGrid size={13} style={{ flexShrink: 0 }} />
-      <Text variant="label" color={isActive ? C.accent : C.text} style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {viewItem.name}
-      </Text>
-
-      {isFavorite && (
-        <FaStar
-          size={13}
-          color="#EAB308"
-          style={{ flexShrink: 0, marginLeft: 4, marginRight: 2 }}
+    <>
+      {showDeleteConfirm && (
+        <ConfirmationModal
+          title="Delete Grid"
+          message={`Are you sure you want to delete grid "${viewItem.name}"?`}
+          confirmText="Delete"
+          variant="danger"
+          onConfirm={() => {
+            console.log("Deleted:", viewItem.id);
+            setShowDeleteConfirm(false);
+          }}
+          onClose={() => setShowDeleteConfirm(false)}
         />
       )}
-
-      <button
-        ref={optionsButtonRef}
-        type="button"
-        aria-label="Grid actions"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsActionsOpen((prev) => !prev);
-        }}
+      <div
+        onClick={() => !isEditing && onSelectView(viewItem.id)}
         style={{
-          border: "none",
-          background: "transparent",
-          padding: 4,
-          cursor: "pointer",
+          height: 34,
+          width: "100%",
+          borderRadius: T.radius.sm,
+          background: isActive ? C.accentLt : "transparent",
+          color: isActive ? C.accent : C.text,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          color: isActive ? C.accent : C.muted,
-          borderRadius: T.radius.sm,
+          gap: 8,
+          padding: "0 8px",
+          cursor: "pointer",
+          boxSizing: "border-box",
+          position: "relative",
         }}
       >
-        <LuEllipsisVertical size={14} />
-      </button>
+        <FiGrid size={13} style={{ flexShrink: 0 }} />
+        {isEditing ? (
+          <TextField
+            ref={inputRef}
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSaveRename();
+              if (e.key === "Escape") handleCancelRename();
+            }}
+            onBlur={handleSaveRename}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              height: 26,
+              fontSize: T.font.size.bodySmall,
+              padding: "0 6px",
+              flex: 1,
+            }}
+          />
+        ) : (
+          <Text variant="label" color={isActive ? C.accent : C.text} style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {viewItem.name}
+          </Text>
+        )}
 
-      <GridNameActionsModal
-        isOpen={isActionsOpen}
-        onClose={() => setIsActionsOpen(false)}
-        triggerRef={optionsButtonRef}
-        viewName={viewItem.name}
-        isFavorite={isFavorite}
-        onFavorite={handleFavorite}
-        onRenameGrid={handleRename}
-        onDuplicateGrid={handleDuplicate}
-        onDeleteGrid={handleDelete}
-      />
-    </div>
+        {isFavorite && (
+          <FaStar
+            size={13}
+            color="#EAB308"
+            style={{ flexShrink: 0, marginLeft: 4, marginRight: 2 }}
+          />
+        )}
+
+        <button
+          ref={optionsButtonRef}
+          type="button"
+          aria-label="Grid actions"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsActionsOpen((prev) => !prev);
+          }}
+          style={{
+            border: "none",
+            background: "transparent",
+            padding: 4,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: isActive ? C.accent : C.muted,
+            borderRadius: T.radius.sm,
+          }}
+        >
+          <LuEllipsisVertical size={14} />
+        </button>
+
+        <GridNameActionsModal
+          isOpen={isActionsOpen}
+          onClose={() => setIsActionsOpen(false)}
+          triggerRef={optionsButtonRef}
+          viewName={viewItem.name}
+          isFavorite={isFavorite}
+          onFavorite={handleFavorite}
+          onRenameGrid={handleRename}
+          onDuplicateGrid={handleDuplicate}
+          onDeleteGrid={handleDelete}
+        />
+      </div>
+    </>
   );
 }
 
@@ -985,6 +1059,7 @@ function WorkspaceGrid({
   refreshKey,
   renderDetailsModal,
   onExpandRow,
+  hideAddColumn = false,
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -1011,20 +1086,24 @@ function WorkspaceGrid({
             : {}),
         };
       }),
-      {
-        field: "addColumn",
-        headerName: "Add Column",
-        headerComponentParams: {
-          innerHeaderComponent: AddColumnHeader,
-          innerHeaderComponentParams: { icon: FiPlus },
-        },
-        minWidth: 135,
-        sortable: false,
-        resizable: false,
-        valueGetter: () => "",
-      },
+      ...(hideAddColumn
+        ? []
+        : [
+            {
+              field: "addColumn",
+              headerName: "Add Column",
+              headerComponentParams: {
+                innerHeaderComponent: AddColumnHeader,
+                innerHeaderComponentParams: { icon: FiPlus },
+              },
+              minWidth: 135,
+              sortable: false,
+              resizable: false,
+              valueGetter: () => "",
+            },
+          ]),
     ],
-    [fields, primaryNameKey]
+    [fields, primaryNameKey, hideAddColumn]
   );
 
   const defaultColDef = useMemo(
@@ -1222,27 +1301,29 @@ const defaultWorkspaceConfigurations = {
     views: ["All Leads"],
   },
   contacts: {
+    hideGridSelector: true,
+    hideViewsPanel: true,
+    hideManageFields: true,
+    hideAddColumn: true,
     fields: [
       { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
+      { id: "phone", name: "Phone", type: "Phone Number", value: "Phone" },
       { id: "email", name: "Email", type: "Email", value: "Email" },
-      { id: "phoneNumber", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
-      { id: "callOutcome", name: "Call Outcome", type: "Single Line Text", value: "Call Outcome" },
-      { id: "created", name: "Created", type: "Date Time", value: "14/08/2026 5:00pm" },
       { id: "businessName", name: "Business Name", type: "Single Line Text", value: "Business Name" },
-      { id: "lastActivity", name: "Last Activity", type: "Date Time", value: "14/08/2026 5:00pm" },
-      { id: "assignedAgent", name: "Assigned Agent", type: "User / Assigned Agent", value: "Assigned Agent", options: ["Ramesh Yadav", "Vikash Yadav", "User", "Admin"] },
+      { id: "created", name: "Created", type: "Date Time", value: "Created" },
+      { id: "lastActivity", name: "Last Activity", type: "Single Line Text", value: "Last Activity" },
+      { id: "tags", name: "Tags", type: "Multiple Select", value: "Tags", options: ["Interested", "Follow Up", "Hot Lead", "Cold", "VIP"], editorKind: "tags" },
     ],
     rows: [
       {
         id: "contact-1",
         contactName: "Rakesh Paul",
+        phone: "+91 98987 65432",
         email: "rakeshpaul234@gmail.com",
-        phoneNumber: "0989876543",
-        callOutcome: "Interested",
-        created: "14/08/2026 5:00pm",
         businessName: "Paul Properties",
-        lastActivity: "14/08/2026 5:00pm",
-        assignedAgent: "Vikash Yadav",
+        created: "Nov 7, 2025 06:39 PM",
+        lastActivity: "2 weeks ago",
+        tags: "Interested",
       },
     ],
     views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
@@ -1381,6 +1462,9 @@ export function Workspace({
   onTabChange,
   search: externalSearch,
   onSearchChange: externalOnSearchChange,
+  hideGridSelector = false,
+  hideManageFields = false,
+  hideAddColumn = false,
   renderDropdown,
   renderCreateModal,
   renderDetailsModal,
@@ -1437,11 +1521,11 @@ export function Workspace({
   const [isManageFieldsOpen, setIsManageFieldsOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isClearDataConfirmOpen, setIsClearDataConfirmOpen] = useState(false);
+  const [isRenameTabModalOpen, setIsRenameTabModalOpen] = useState(false);
 
   const handleClearData = useCallback(() => {
-    if (window.confirm("Are you sure you want to clear all row data?")) {
-      setGridRowData([]);
-    }
+    setIsClearDataConfirmOpen(true);
   }, []);
   const [, setChangeHistory] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -1630,12 +1714,7 @@ export function Workspace({
             isViewsPanelHidden={isViewsPanelHidden}
             onToggleViewsPanel={toggleViewsPanel}
             onManageFields={() => setIsManageFieldsOpen(true)}
-            onRenameTab={() => {
-              const newName = window.prompt("Rename workspace tab:", effectiveWorkspaceId);
-              if (newName && newName.trim()) {
-                renameWorkspace(newName.trim());
-              }
-            }}
+            onRenameTab={() => setIsRenameTabModalOpen(true)}
             onDuplicateTab={duplicateWorkspace}
             onManageTab={() => setIsManageFieldsOpen(true)}
             onClearData={handleClearData}
@@ -1649,6 +1728,9 @@ export function Workspace({
             renderDropdown={renderDropdown}
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
+            hideGridSelector={hideGridSelector || Boolean(config?.hideGridSelector)}
+            hideViewsPanel={config?.hideViewsPanel}
+            hideManageFields={hideManageFields || Boolean(config?.hideManageFields)}
           />
         </div>
         {effectiveWorkspaceId === "faq" ? (
@@ -1658,7 +1740,7 @@ export function Workspace({
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
-              <WorkspaceViewsPanel isHidden={isViewsPanelHidden} viewsList={viewsList} />
+              <WorkspaceViewsPanel isHidden={isViewsPanelHidden || Boolean(config?.hideViewsPanel)} viewsList={viewsList} />
               <WorkspaceGrid
                 workspaceId={effectiveWorkspaceId}
                 search={searchQuery}
@@ -1668,15 +1750,10 @@ export function Workspace({
                 refreshKey={refreshKey}
                 renderDetailsModal={renderDetailsModal}
                 onExpandRow={onExpandRow}
+                hideAddColumn={hideAddColumn || Boolean(config?.hideAddColumn)}
               />
             </div>
-            <AppCardFooter style={{ justifyContent: "flex-start", gap: T.spacing[2] }}>
-              <Text variant="mutedLabel">{recordsCountText}</Text>
-              <AppButton variant="secondary" compact onClick={() => {}} style={addRecordButtonStyle}>
-                <FiPlus size={T.font.size.sm} color={C.muted} />
-                <Text variant="mutedLabel">Add Record</Text>
-              </AppButton>
-            </AppCardFooter>
+            <AppCardFooter recordsCountText={recordsCountText} onAddRow={() => addRow()} />
           </>
         )}
       </AppCard>

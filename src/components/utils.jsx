@@ -172,7 +172,7 @@ function Avatar({ name, size = 30, color }) {
   );
 }
 
-function AppCard({ children, variant = "default", style, onClick }) {
+function AppCard({ children, variant = "default", style, onClick, ...props }) {
   return (
     <div
       onClick={onClick}
@@ -182,6 +182,7 @@ function AppCard({ children, variant = "default", style, onClick }) {
         ...style,
         cursor: onClick ? "pointer" : "default",
       }}
+      {...props}
     >
       {children}
     </div>
@@ -761,6 +762,122 @@ function Waveform({ playing }) {
   );
 }
 
+function ConfirmationModal({
+  title = "Confirm Action",
+  message = "Are you sure you want to proceed?",
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  variant = "danger",
+  onConfirm,
+  onClose,
+}) {
+  return (
+    <Modal width={400} onClose={onClose}>
+      <div style={{ padding: "18px 20px 14px", borderBottom: `1px solid ${C.border}` }}>
+        <Text variant="sectionTitle" style={{ margin: 0 }}>
+          {title}
+        </Text>
+      </div>
+      <div style={{ padding: "18px 20px" }}>
+        <Text variant="body" color={C.text}>
+          {message}
+        </Text>
+      </div>
+      <div
+        style={{
+          borderTop: `1px solid ${C.border}`,
+          padding: "12px 20px",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+        }}
+      >
+        <AppButton compact onClick={onClose}>
+          {cancelText}
+        </AppButton>
+        <AppButton
+          compact
+          variant={variant === "danger" ? "danger" : "primary"}
+          onClick={() => {
+            if (onConfirm) onConfirm();
+            if (onClose) onClose();
+          }}
+          style={
+            variant === "danger"
+              ? { background: C.hot, color: "#fff", border: "none" }
+              : undefined
+          }
+        >
+          {confirmText}
+        </AppButton>
+      </div>
+    </Modal>
+  );
+}
+
+function RenameModal({
+  title = "Rename Item",
+  initialValue = "",
+  placeholder = "Enter new name...",
+  onSave,
+  onClose,
+}) {
+  const [val, setVal] = React.useState(initialValue);
+  const inputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select?.();
+    }
+  }, []);
+
+  const handleSave = () => {
+    if (val.trim() && onSave) {
+      onSave(val.trim());
+    }
+    if (onClose) onClose();
+  };
+
+  return (
+    <Modal width={400} onClose={onClose}>
+      <div style={{ padding: "18px 20px 14px", borderBottom: `1px solid ${C.border}` }}>
+        <Text variant="sectionTitle" style={{ margin: 0 }}>
+          {title}
+        </Text>
+      </div>
+      <div style={{ padding: "18px 20px" }}>
+        <TextField
+          ref={inputRef}
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          placeholder={placeholder}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSave();
+            if (e.key === "Escape" && onClose) onClose();
+          }}
+        />
+      </div>
+      <div
+        style={{
+          borderTop: `1px solid ${C.border}`,
+          padding: "12px 20px",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+        }}
+      >
+        <AppButton compact onClick={onClose}>
+          Cancel
+        </AppButton>
+        <AppButton variant="primary" compact onClick={handleSave}>
+          Save
+        </AppButton>
+      </div>
+    </Modal>
+  );
+}
+
 export {
   Avatar,
   Waveform,
@@ -777,6 +894,8 @@ export {
   MetricCard,
   SectionHeader,
   Modal,
+  ConfirmationModal,
+  RenameModal,
   IconButton,
   TextField,
   Text,

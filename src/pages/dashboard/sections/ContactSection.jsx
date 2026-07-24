@@ -7,52 +7,46 @@ import CreateCampaignSelectionModal from "../modals/CreateCampaignSelectionModal
 
 export const contactColumns = [
   { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
+  { id: "phone", name: "Phone", type: "Phone Number", value: "Phone" },
   { id: "email", name: "Email", type: "Email", value: "Email" },
-  { id: "phoneNumber", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
-  { id: "callOutcome", name: "Call Outcome", type: "Single Line Text", value: "Call Outcome" },
-  { id: "created", name: "Created", type: "Date Time", value: "14/08/2026 5:00pm" },
   { id: "businessName", name: "Business Name", type: "Single Line Text", value: "Business Name" },
-  { id: "lastActivity", name: "Last Activity", type: "Date Time", value: "14/08/2026 5:00pm" },
-  { id: "assignedAgent", name: "Assigned Agent", type: "User / Assigned Agent", value: "Assigned Agent", options: ["Ramesh Yadav", "Vikash Yadav", "User", "Admin"] },
+  { id: "created", name: "Created", type: "Date Time", value: "Created" },
+  { id: "lastActivity", name: "Last Activity", type: "Single Line Text", value: "Last Activity" },
+  { id: "tags", name: "Tags", type: "Multiple Select", value: "Tags", options: ["Interested", "Follow Up", "Hot Lead", "Cold", "VIP"], editorKind: "tags" },
 ];
 
 export const contactRows = [
   {
     id: "contact-1",
     contactName: "Rakesh Paul",
+    phone: "+91 98987 65432",
     email: "rakeshpaul234@gmail.com",
-    phoneNumber: "0989876543",
-    callOutcome: "Interested",
-    created: "14/08/2026 5:00pm",
     businessName: "Paul Properties",
-    lastActivity: "14/08/2026 5:00pm",
-    assignedAgent: "Vikash Yadav",
+    created: "Nov 7, 2025 06:39 PM",
+    lastActivity: "2 weeks ago",
+    tags: "Interested",
   },
   {
     id: "contact-2",
     contactName: "Sunil Verma",
+    phone: "+91 98765 43210",
     email: "sunil.verma@gmail.com",
-    phoneNumber: "0987654321",
-    callOutcome: "Follow Up",
-    created: "14/08/2026 5:00pm",
     businessName: "Verma Realty",
-    lastActivity: "14/08/2026 5:00pm",
-    assignedAgent: "Ramesh Yadav",
+    created: "Nov 5, 2025 04:15 PM",
+    lastActivity: "3 days ago",
+    tags: "Follow Up",
   },
   {
     id: "contact-3",
     contactName: "Anita Sharma",
+    phone: "+91 91234 56789",
     email: "anita.sharma@gmail.com",
-    phoneNumber: "0912345678",
-    callOutcome: "Meeting Scheduled",
-    created: "14/08/2026 5:00pm",
     businessName: "Sharma Enterprises",
-    lastActivity: "14/08/2026 5:00pm",
-    assignedAgent: "Vikash Yadav",
+    created: "Oct 28, 2025 11:20 AM",
+    lastActivity: "1 week ago",
+    tags: "Hot Lead",
   },
 ];
-
-export const contactViews = ["Grid Name", "Grid Name", "Grid Name", "Grid Name"];
 
 function PageSection({ children, style }) {
   return (
@@ -132,7 +126,6 @@ function ContactSection({ activeTab = "contacts", onTabChange, onCreateCampaign 
           workspaceId="contacts"
           columns={contactColumns}
           rowData={contactRows}
-          views={contactViews}
           activeTab={activeTab}
           onTabChange={onTabChange}
         />
