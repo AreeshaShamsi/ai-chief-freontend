@@ -6,10 +6,11 @@ import StaffMemberForm from "./StaffMemberForm";
 const initialAddForm = {
   firstName: "Filled",
   lastName: "Filled",
+  username: "user.name",
   email: "Filled",
   phone: "Filled",
   role: "admin",
-  access: "access to edit deals",
+  access: "Access To Edit Deals",
   newPassword: "password",
   confirmPassword: "password",
 };

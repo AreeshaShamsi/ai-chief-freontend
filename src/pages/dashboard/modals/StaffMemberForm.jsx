@@ -4,8 +4,8 @@ import { AppCard, C, T, TextField } from "../../../components/utils";
 
 const roleOptions = ["admin", "user"];
 const accessOptions = [
-  { value: "access to edit deals", label: "Access to edit deals" },
-  { value: "access to knowledge base", label: "Access to edit knowledge base" },
+  { value: "Access To Edit Deals", label: "Access To Edit Deals" },
+  { value: "Access To Edit Knowledge Base", label: "Access To Edit Knowledge Base" },
 ];
 
 function FieldLabel({ children }) {
@@ -210,6 +210,7 @@ function StaffMemberForm({ form, setForm }) {
         <FormField label="First Name" value={form.firstName} onChange={(value) => updateField("firstName", value)} />
         <FormField label="Last Name" value={form.lastName} onChange={(value) => updateField("lastName", value)} />
       </div>
+      <FormField label="Username" value={form.username} onChange={(value) => updateField("username", value)} placeholder="username" />
       <FormField label="Email Address" value={form.email} onChange={(value) => updateField("email", value)} />
       <FormField label="Phone Number" value={form.phone} onChange={(value) => updateField("phone", value)} />
 
