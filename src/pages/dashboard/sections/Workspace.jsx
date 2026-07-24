@@ -284,37 +284,11 @@ function ColumnHeaderWrapper(props) {
   const isCheckbox = column.getColId() === "ag-Grid-SelectionColumn" || column.getColId() === "selection";
 
   const colId = column.getColId();
-  const context = props.context || {};
+  const context = props.context || (api?.getGridOption ? api.getGridOption("context") : {}) || {};
+  const currentWorkspaceId = context.workspaceId || column.getColDef()?.workspaceId;
+  const isStaffWorkspace = currentWorkspaceId === "staff" || currentWorkspaceId === "mystaff";
 
-  const onMoveLeft = () => {
-    const allColumns = api.getColumns() || [];
-    const index = allColumns.findIndex((col) => col.getColId() === colId);
-    if (index > 0) {
-      api.moveColumn(colId, index - 1);
-    }
-  };
-
-  const onMoveRight = () => {
-    const allColumns = api.getColumns() || [];
-    const index = allColumns.findIndex((col) => col.getColId() === colId);
-    if (index >= 0 && index < allColumns.length - 1) {
-      api.moveColumn(colId, index + 1);
-    }
-  };
-
-  const onSortAsc = () => {
-    api.applyColumnState({
-      state: [{ colId: colId, sort: "asc" }],
-      defaultState: { sort: null },
-    });
-  };
-
-  const onSortDesc = () => {
-    api.applyColumnState({
-      state: [{ colId: colId, sort: "desc" }],
-      defaultState: { sort: null },
-    });
-  };
+  const showHeaderDropdown = !isAddColumn && !isCheckbox && !isStaffWorkspace;
 
   return (
     <div
@@ -328,7 +302,7 @@ function ColumnHeaderWrapper(props) {
         height: "100%",
         position: "relative",
         cursor: props.enableSorting ? "pointer" : "default",
-        paddingRight: !isAddColumn && !isCheckbox ? 16 : 0,
+        paddingRight: showHeaderDropdown ? 16 : 0,
         boxSizing: "border-box",
         userSelect: "none",
       }}
@@ -348,53 +322,70 @@ function ColumnHeaderWrapper(props) {
         )}
       </div>
 
-      {!isAddColumn && !isCheckbox && (
-        <button
-          ref={triggerRef}
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDropdownOpen((prev) => !prev);
-          }}
-          style={{
-            position: "absolute",
-            right: 2,
-            top: "50%",
-            transform: "translateY(-50%)",
-            border: "none",
-            background: "transparent",
-            padding: 2,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: isHovered || isDropdownOpen ? 1 : 0,
-            transition: "opacity 150ms ease",
-            color: C.muted,
-          }}
-        >
-          <LuChevronDown size={14} />
-        </button>
-      )}
-
-      {!isAddColumn && !isCheckbox && (
-        <ColumnActionsModal
-          isOpen={isDropdownOpen}
-          onClose={() => setIsDropdownOpen(false)}
-          triggerRef={triggerRef}
-          columnId={colId}
-          columnName={displayName}
-          onEditField={() => context.onEditColumn?.(colId)}
-          onRenameField={() => context.onRenameColumn?.(colId)}
-          onDuplicateField={() => context.onDuplicateColumn?.(colId)}
-          onMoveLeft={onMoveLeft}
-          onMoveRight={onMoveRight}
-          onSortAsc={onSortAsc}
-          onSortDesc={onSortDesc}
-          onDeleteField={() => context.onDeleteColumn?.(colId)}
-        />
-      )}
+      {showHeaderDropdown ? (
+        <>
+          <button
+            ref={triggerRef}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDropdownOpen((prev) => !prev);
+            }}
+            style={{
+              position: "absolute",
+              right: 2,
+              top: "50%",
+              transform: "translateY(-50%)",
+              border: "none",
+              background: "transparent",
+              padding: 2,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: isHovered || isDropdownOpen ? 1 : 0,
+              transition: "opacity 150ms ease",
+              color: C.muted,
+            }}
+          >
+            <LuChevronDown size={14} />
+          </button>
+          <ColumnActionsModal
+            isOpen={isDropdownOpen}
+            onClose={() => setIsDropdownOpen(false)}
+            triggerRef={triggerRef}
+            columnId={colId}
+            columnName={displayName}
+            onEditField={() => context.onEditColumn?.(colId)}
+            onRenameField={() => context.onRenameColumn?.(colId)}
+            onDuplicateField={() => context.onDuplicateColumn?.(colId)}
+            onMoveLeft={() => {
+              const allColumns = api.getColumns() || [];
+              const index = allColumns.findIndex((col) => col.getColId() === colId);
+              if (index > 0) api.moveColumn(colId, index - 1);
+            }}
+            onMoveRight={() => {
+              const allColumns = api.getColumns() || [];
+              const index = allColumns.findIndex((col) => col.getColId() === colId);
+              if (index >= 0 && index < allColumns.length - 1) api.moveColumn(colId, index + 1);
+            }}
+            onSortAsc={() => {
+              api.applyColumnState({
+                state: [{ colId: colId, sort: "asc" }],
+                defaultState: { sort: null },
+              });
+            }}
+            onSortDesc={() => {
+              api.applyColumnState({
+                state: [{ colId: colId, sort: "desc" }],
+                defaultState: { sort: null },
+              });
+            }}
+            onDeleteField={() => context.onDeleteColumn?.(colId)}
+          />
+        </>
+      ) : null}
     </div>
   );
 }
@@ -592,7 +583,7 @@ function WorkspaceToolbar({
                 </AppPill>
               </AppButton>
             </>
-          ) : isContactsActive || isStaffActive ? (
+          ) : isStaffActive || (hideGridSelector && !isContactsActive) ? null : isContactsActive ? (
             <AppButton
               ref={dealsButtonRef}
               compact
@@ -918,7 +909,7 @@ GridNameRowItem.propTypes = {
   onToggleFavorite: PropTypes.func,
 };
 
-function WorkspaceViewsPanel({ isHidden, viewsList }) {
+function WorkspaceViewsPanel({ isHidden, viewsList, onOpenImportModal }) {
   const normalizedViews = useMemo(() => {
     return viewsList.map((view, idx) => {
       if (typeof view === "string") {
@@ -955,16 +946,26 @@ function WorkspaceViewsPanel({ isHidden, viewsList }) {
     return [...favs, ...nonFavs];
   }, [normalizedViews, viewSearch, favoriteIds]);
 
-  const handleStartFromScratch = () => {};
-  const handleCsvImport = () => {};
-  const handleExcelImport = () => {};
+  const handleStartFromScratch = () => {
+    setIsCreateMenuOpen(false);
+  };
+
+  const handleCsvImport = () => {
+    setIsCreateMenuOpen(false);
+    if (onOpenImportModal) onOpenImportModal();
+  };
+
+  const handleExcelImport = () => {
+    setIsCreateMenuOpen(false);
+    if (onOpenImportModal) onOpenImportModal();
+  };
 
   return (
     <aside
+      aria-label="Grid views list"
       style={{
-        width: isHidden ? viewsPanelCollapsedWidth : viewsPanelWidth,
-        flex: `0 0 ${isHidden ? viewsPanelCollapsedWidth : viewsPanelWidth}px`,
-        borderRight: isHidden ? T.border.none : `1px solid ${C.border}`,
+        width: isHidden ? 0 : viewsPanelWidth,
+        borderRight: isHidden ? "none" : `1px solid ${C.border}`,
         padding: isHidden ? 0 : viewsPanelPadding,
         boxSizing: "border-box",
         background: C.card,
@@ -1016,7 +1017,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList }) {
             <Text variant="label" color={C.card}>Create New</Text>
           </AppButton>
           <CreateDealSourceModal
-            isOpen={isCreateMenuOpen && !isHidden}
+            isOpen={Boolean(isCreateMenuOpen && !isHidden)}
             onClose={() => setIsCreateMenuOpen(false)}
             onStartFromScratch={handleStartFromScratch}
             onCsvImport={handleCsvImport}
@@ -1047,6 +1048,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList }) {
 WorkspaceViewsPanel.propTypes = {
   isHidden: PropTypes.bool.isRequired,
   viewsList: PropTypes.array.isRequired,
+  onOpenImportModal: PropTypes.func,
 };
 
 function WorkspaceGrid({
@@ -1070,6 +1072,8 @@ function WorkspaceGrid({
     return `${workspaceId.slice(0, -1)}Name`;
   }, [fields, workspaceId]);
 
+  const isStaff = workspaceId === "staff" || workspaceId === "mystaff";
+
   const columnDefs = useMemo(
     () => [
       ...fields.map((field, index) => {
@@ -1077,8 +1081,10 @@ function WorkspaceGrid({
         const isPrimary = field.id === primaryNameKey || index === 0;
         return {
           field: field.id,
+          workspaceId,
           ...createHeader(field.name, typeMeta.icon),
           minWidth: columnWidths[field.id] || 130,
+          ...(isStaff ? { flex: 1, suppressMenu: true, suppressHeaderMenuButton: true } : {}),
           ...(isPrimary
             ? { cellRenderer: PrimaryNameCell }
             : field.id === "createdBy" || field.id === "lastModifiedBy"
@@ -1086,7 +1092,7 @@ function WorkspaceGrid({
             : {}),
         };
       }),
-      ...(hideAddColumn
+      ...(hideAddColumn || isStaff
         ? []
         : [
             {
@@ -1103,7 +1109,7 @@ function WorkspaceGrid({
             },
           ]),
     ],
-    [fields, primaryNameKey, hideAddColumn]
+    [fields, primaryNameKey, hideAddColumn, isStaff, workspaceId]
   );
 
   const defaultColDef = useMemo(
@@ -1113,8 +1119,9 @@ function WorkspaceGrid({
       filter: false,
       cellRenderer: WorkspaceCell,
       headerComponent: ColumnHeaderWrapper,
+      ...(isStaff ? { suppressMenu: true, suppressHeaderMenuButton: true } : {}),
     }),
-    []
+    [isStaff]
   );
 
   const openDetails = useCallback((row) => {
@@ -1414,40 +1421,48 @@ const defaultWorkspaceConfigurations = {
     views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },
   staff: {
+    hideGridSelector: true,
+    hideViewsPanel: true,
+    hideManageFields: true,
+    hideAddColumn: true,
     fields: [
-      { id: "staffMember", name: "Staff Member", type: "Single Line Text", value: "Staff Member" },
-      { id: "email", name: "Email", type: "Email", value: "Email" },
-      { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
-      { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["access to edit deals", "access to knowledge base", "full access"], editorKind: "tags" },
+      { id: "firstName", name: "First Name", type: "Single Line Text", value: "First Name" },
+      { id: "lastName", name: "Last Name", type: "Single Line Text", value: "Last Name" },
+      { id: "email", name: "Email Address", type: "Email", value: "Email Address" },
       { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
+      { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
     ],
     rows: [
-      { id: "staff-1", staffMember: "Rahul Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin", access: "access to edit deals" },
-      { id: "staff-2", staffMember: "Ananya Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin", access: "access to knowledge base" },
-      { id: "staff-3", staffMember: "Rohan Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent", access: "access to edit deals" },
-      { id: "staff-4", staffMember: "Kavya Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager", access: "access to knowledge base" },
-      { id: "staff-5", staffMember: "Vikram Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin", access: "access to edit deals" },
-      { id: "staff-6", staffMember: "Priya Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker", access: "access to knowledge base" },
+      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin" },
+      { id: "staff-2", firstName: "Ananya", lastName: "Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin" },
+      { id: "staff-3", firstName: "Rohan", lastName: "Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent" },
+      { id: "staff-4", firstName: "Kavya", lastName: "Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager" },
+      { id: "staff-5", firstName: "Vikram", lastName: "Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin" },
+      { id: "staff-6", firstName: "Priya", lastName: "Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker" },
     ],
-    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
+    views: ["Grid Name"],
   },
   mystaff: {
+    hideGridSelector: true,
+    hideViewsPanel: true,
+    hideManageFields: true,
+    hideAddColumn: true,
     fields: [
-      { id: "staffMember", name: "Staff Member", type: "Single Line Text", value: "Staff Member" },
-      { id: "email", name: "Email", type: "Email", value: "Email" },
-      { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
-      { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["access to edit deals", "access to knowledge base", "full access"], editorKind: "tags" },
+      { id: "firstName", name: "First Name", type: "Single Line Text", value: "First Name" },
+      { id: "lastName", name: "Last Name", type: "Single Line Text", value: "Last Name" },
+      { id: "email", name: "Email Address", type: "Email", value: "Email Address" },
       { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
+      { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
     ],
     rows: [
-      { id: "staff-1", staffMember: "Rahul Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin", access: "access to edit deals" },
-      { id: "staff-2", staffMember: "Ananya Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin", access: "access to knowledge base" },
-      { id: "staff-3", staffMember: "Rohan Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent", access: "access to edit deals" },
-      { id: "staff-4", staffMember: "Kavya Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager", access: "access to knowledge base" },
-      { id: "staff-5", staffMember: "Vikram Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin", access: "access to edit deals" },
-      { id: "staff-6", staffMember: "Priya Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker", access: "access to knowledge base" },
+      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin" },
+      { id: "staff-2", firstName: "Ananya", lastName: "Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin" },
+      { id: "staff-3", firstName: "Rohan", lastName: "Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent" },
+      { id: "staff-4", firstName: "Kavya", lastName: "Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager" },
+      { id: "staff-5", firstName: "Vikram", lastName: "Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin" },
+      { id: "staff-6", firstName: "Priya", lastName: "Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker" },
     ],
-    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
+    views: ["Grid Name"],
   },
 };
 
@@ -1762,7 +1777,11 @@ export function Workspace({
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
-              <WorkspaceViewsPanel isHidden={isViewsPanelHidden || Boolean(config?.hideViewsPanel)} viewsList={viewsList} />
+              <WorkspaceViewsPanel
+                isHidden={isViewsPanelHidden || Boolean(config?.hideViewsPanel)}
+                viewsList={viewsList}
+                onOpenImportModal={() => setIsImportModalOpen(true)}
+              />
               <WorkspaceGrid
                 workspaceId={effectiveWorkspaceId}
                 search={searchQuery}
@@ -1798,10 +1817,13 @@ export function Workspace({
         open={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
         onMatchExisting={() => {
-          console.log("Matched to existing grid");
+          setIsImportModalOpen(false);
         }}
         onCreateNew={() => {
-          console.log("Created a new grid");
+          setIsImportModalOpen(false);
+          requestAnimationFrame(() => {
+            setIsCreateGridModalOpen(true);
+          });
         }}
       />
       <FieldConfigurationModal

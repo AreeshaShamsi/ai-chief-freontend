@@ -9,6 +9,8 @@ import {
   LuCopy,
   LuTrash2,
   LuCalendarDays,
+  LuEye,
+  LuEyeOff,
 } from "react-icons/lu";
 import { AppButton, AppPill, C, IconButton, Modal, T, Text, TextField } from "../../../components/utils";
 import AddColumnModal from "./AddColumnModal";
@@ -62,6 +64,9 @@ export default function DealDetailsModal({
   fields,
   columns,
   workspaceId,
+  variant,
+  type,
+  editable = true,
   onPrevRow,
   onNextRow,
   onClose,
@@ -71,22 +76,30 @@ export default function DealDetailsModal({
   onDeleteRow,
 }) {
   const [fieldValues, setFieldValues] = useState({});
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(editable);
   const [openDropdownFieldId, setOpenDropdownFieldId] = useState(null);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [showPasswords, setShowPasswords] = useState({});
 
   const actionsMenuRef = useRef(null);
   const itemRefs = useRef([]);
   const fieldRefs = useRef({});
 
+  const togglePasswordVisibility = (fieldId) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [fieldId]: !prev[fieldId],
+    }));
+  };
+
   const effectiveFields = useMemo(() => {
     const rawList = fields || columns;
+    let list = [];
     if (rawList && rawList.length > 0) {
-      return rawList.filter((f) => f.id !== "addColumn");
-    }
-    if (row) {
-      return Object.keys(row)
+      list = rawList.filter((f) => f.id !== "addColumn");
+    } else if (row) {
+      list = Object.keys(row)
         .filter((key) => key !== "id")
         .map((key) => ({
           id: key,
@@ -94,8 +107,27 @@ export default function DealDetailsModal({
           type: "Single Line Text",
         }));
     }
-    return [];
-  }, [fields, columns, row]);
+
+    const isStaff =
+      workspaceId === "staff" ||
+      workspaceId === "mystaff" ||
+      variant === "staff" ||
+      type === "staff";
+
+    if (isStaff) {
+      const hasSecurity = list.some((f) => f.id === "currentPassword");
+      if (!hasSecurity) {
+        list = [
+          ...list,
+          { id: "currentPassword", name: "Current Password", type: "Single Line Text" },
+          { id: "newPassword", name: "New Password", type: "Single Line Text" },
+          { id: "confirmPassword", name: "Confirm Password", type: "Single Line Text" },
+        ];
+      }
+    }
+
+    return list;
+  }, [fields, columns, row, workspaceId, variant, type]);
 
   useEffect(() => {
     if (!row) return;
@@ -104,9 +136,10 @@ export default function DealDetailsModal({
       initial[field.id] = row[field.id] !== undefined ? row[field.id] : row[field.name] !== undefined ? row[field.name] : "";
     });
     setFieldValues(initial);
-    setIsEditing(false);
+    setIsEditing(editable);
     setOpenDropdownFieldId(null);
-  }, [row, effectiveFields]);
+    setShowPasswords({});
+  }, [row, effectiveFields, editable]);
 
   useEffect(() => {
     if (open) {
@@ -182,19 +215,6 @@ export default function DealDetailsModal({
       e.preventDefault();
       setOpenDropdownFieldId(null);
     }
-  };
-
-  const inputContainerStyle = {
-    width: "100%",
-    height: 38,
-    padding: "0 12px",
-    border: `1px solid ${C.border}`,
-    borderRadius: T.radius.sm,
-    background: C.surface,
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    boxSizing: "border-box",
   };
 
   const menuItemStyle = {
@@ -311,50 +331,45 @@ export default function DealDetailsModal({
   const renderFieldValueInput = (field) => {
     const val = fieldValues[field.id] !== undefined ? fieldValues[field.id] : "";
     const meta = getFieldTypeMeta(field.type);
+    const isPassword = field.id.toLowerCase().includes("password");
 
-    if (meta.editorKind === "singleSelect" || meta.editorKind === "multiSelect" || meta.editorKind === "tags") {
-      const valStr = String(val);
-      const tags = valStr.includes(",") ? valStr.split(",") : [valStr];
-      return (
-        <div style={inputContainerStyle}>
-          {tags.map((tag) => {
-            const trimmed = tag.trim();
-            if (!trimmed) return null;
-            let variant = "primary";
-            if (trimmed.toLowerCase() === "hot" || trimmed.toLowerCase() === "pending") variant = "danger";
-            else if (trimmed.toLowerCase() === "completed" || trimmed.toLowerCase() === "won") variant = "success";
-            else if (trimmed.toLowerCase() === "warm" || trimmed.toLowerCase() === "in progress") variant = "neutral";
-            return (
-              <AppPill key={trimmed} size="xs" variant={variant}>
-                {trimmed}
-              </AppPill>
-            );
-          })}
-        </div>
-      );
-    }
+    if (isPassword) {
+      const isVisible = Boolean(showPasswords[field.id]);
+      const PasswordIcon = isVisible ? LuEyeOff : LuEye;
 
-    if (meta.editorKind === "user") {
       return (
-        <div style={inputContainerStyle}>
-          {val ? (
-            <AppPill
-              size="xs"
-              style={{
-                background: C.accentLt,
-                border: `1px solid ${C.accentTrack}`,
-                color: C.accent,
-                fontWeight: T.font.weight.semibold,
-              }}
-            >
-              {String(val)}
-              <LuX
-                size={10}
-                style={{ cursor: "pointer", marginLeft: 4 }}
-                onClick={() => handleUpdate(field.id, "")}
-              />
-            </AppPill>
-          ) : null}
+        <div style={{ position: "relative", width: "100%" }}>
+          <TextField
+            ref={(el) => (fieldRefs.current[field.id] = el)}
+            type={isVisible ? "text" : "password"}
+            value={String(val)}
+            readOnly={!isEditing}
+            onChange={(e) => handleUpdate(field.id, e.target.value)}
+            style={{ paddingRight: 34 }}
+          />
+          <IconButton
+            type="button"
+            aria-label={isVisible ? "Hide password" : "Show password"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              togglePasswordVisibility(field.id);
+            }}
+            style={{
+              position: "absolute",
+              right: 6,
+              top: "50%",
+              transform: "translateY(-50%)",
+              padding: 4,
+              color: C.muted,
+              background: "transparent",
+              border: "none",
+              borderRadius: T.radius.sm,
+              cursor: "pointer",
+            }}
+          >
+            <PasswordIcon size={14} />
+          </IconButton>
         </div>
       );
     }
@@ -479,8 +494,8 @@ export default function DealDetailsModal({
               })}
             </div>
 
-            <AddColumnModal onSelectField={(type) => {
-              if (onAddField) onAddField(type);
+            <AddColumnModal onSelectField={(typeLabel) => {
+              if (onAddField) onAddField(typeLabel);
             }}>
               {({ ref, onClick }) => (
                 <span
@@ -537,6 +552,9 @@ DealDetailsModal.propTypes = {
   fields: PropTypes.array,
   columns: PropTypes.array,
   workspaceId: PropTypes.string,
+  variant: PropTypes.string,
+  type: PropTypes.string,
+  editable: PropTypes.bool,
   onPrevRow: PropTypes.func,
   onNextRow: PropTypes.func,
   onClose: PropTypes.func.isRequired,

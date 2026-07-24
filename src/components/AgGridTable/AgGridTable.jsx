@@ -61,6 +61,9 @@ export default function AgGridTable({
     }
   }, [quickFilterText]);
 
+  const isStaff = context?.workspaceId === "staff" || context?.workspaceId === "mystaff";
+  const effectiveAutoSizeStrategy = rest.autoSizeStrategy || (isStaff ? { type: "fitGridWidth" } : undefined);
+
   return (
     <AgGridReact
       rowData={rowData}
@@ -73,6 +76,7 @@ export default function AgGridTable({
       rowSelection={rowSelection}
       selectionColumnDef={selectionColumnDef}
       suppressCellFocus={suppressCellFocus}
+      autoSizeStrategy={effectiveAutoSizeStrategy}
       context={context}
       onGridReady={onGridReady}
       {...rest}
