@@ -421,64 +421,47 @@ function createHeader(label, icon) {
 }
 
 function AddColumnHeader({ displayName, icon: Icon, context }) {
-  const [selectedType, setSelectedType] = useState(null);
-
   const handleSelectField = (typeLabel) => {
-    setSelectedType(typeLabel);
-  };
-
-  const handleCreateField = (fieldConfig) => {
-    if (context?.addColumn) {
-      context.addColumn(fieldConfig);
+    if (context?.onOpenFieldConfig) {
+      context.onOpenFieldConfig(typeLabel);
     }
-    setSelectedType(null);
   };
 
   return (
-    <>
-      <AddColumnModal onSelectField={handleSelectField}>
-        {({ ref, onClick, ...triggerProps }) => (
-          <button
-            ref={ref}
-            type="button"
-            onClick={onClick}
+    <AddColumnModal onSelectField={handleSelectField}>
+      {({ ref, onClick, ...triggerProps }) => (
+        <button
+          ref={ref}
+          type="button"
+          onClick={onClick}
+          style={{
+            border: T.border.none,
+            background: "transparent",
+            padding: 0,
+            margin: 0,
+            cursor: "pointer",
+            fontFamily: T.font.family,
+            display: "inline-flex",
+            alignItems: "center",
+            minWidth: 0,
+          }}
+          {...triggerProps}
+        >
+          <Text
+            variant="headerCell"
             style={{
-              border: T.border.none,
-              background: "transparent",
-              padding: 0,
-              margin: 0,
-              cursor: "pointer",
-              fontFamily: T.font.family,
               display: "inline-flex",
               alignItems: "center",
+              gap: 6,
               minWidth: 0,
             }}
-            {...triggerProps}
           >
-            <Text
-              variant="headerCell"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                minWidth: 0,
-              }}
-            >
-              {Icon ? <Icon size={12} style={{ flexShrink: 0, color: C.muted }} /> : null}
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
-            </Text>
-          </button>
-        )}
-      </AddColumnModal>
-
-      <FieldConfigurationModal
-        open={Boolean(selectedType)}
-        fieldType={selectedType || "Single Line Text"}
-        mode="create"
-        onClose={() => setSelectedType(null)}
-        onSubmit={handleCreateField}
-      />
-    </>
+            {Icon ? <Icon size={12} style={{ flexShrink: 0, color: C.muted }} /> : null}
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
+          </Text>
+        </button>
+      )}
+    </AddColumnModal>
   );
 }
 
@@ -516,6 +499,7 @@ function WorkspaceToolbar({
   const isKbActive = workspaceId === "kb" || currentTab === "kb" || currentTab === "inventory" || currentTab === "faq";
   const isStaffActive = currentTab === "staff" || currentTab === "mystaff";
   const workspaceTitle = currentTab === "contacts" ? "Contact" : isKbActive ? "Knowledge Base" : isStaffActive ? "My Staff" : currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
+  const isSingleRowToolbar = hideGridSelector && hideViewsPanel;
 
   const [internalKbTab, setInternalKbTab] = useState(currentTab === "faq" ? "faq" : "inventory");
   const activeKbTab = currentTab === "faq" ? "faq" : currentTab === "inventory" ? "inventory" : internalKbTab;
@@ -656,12 +640,27 @@ function WorkspaceToolbar({
             </>
           )}
         </div>
-        {!hideManageFields && (
+        {isSingleRowToolbar ? (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <AppButton compact style={toolbarActionButtonStyle}>
+              <FiLink size={13} />
+              <Text variant="mutedLabel">Sync</Text>
+            </AppButton>
+            <SearchBox
+              value={searchQuery}
+              onChange={(val) => {
+                if (onSearchChange) onSearchChange(val);
+              }}
+              placeholder="Search..."
+              width={170}
+            />
+          </div>
+        ) : !hideManageFields ? (
           <AppButton compact onClick={onManageFields} style={toolbarActionButtonStyle}>
             <FiSliders size={13} />
             <Text variant="mutedLabel">Manage Fields</Text>
           </AppButton>
-        )}
+        ) : null}
       </div>
 
       <DealDropdown
@@ -679,7 +678,7 @@ function WorkspaceToolbar({
         onDeleteField={onDeleteField}
       />
 
-      {activeKbTab !== "faq" && (
+      {activeKbTab !== "faq" && !isSingleRowToolbar && (
         <div
           style={{
             display: "flex",
@@ -1060,6 +1059,7 @@ function WorkspaceGrid({
   renderDetailsModal,
   onExpandRow,
   hideAddColumn = false,
+  context: outerContext,
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -1149,11 +1149,12 @@ function WorkspaceGrid({
 
   const context = useMemo(
     () => ({
+      ...outerContext,
       selectedRowId: selectedRow?.id || null,
       openDetails,
       onExpandRow: openDetails,
     }),
-    [selectedRow, openDetails]
+    [outerContext, selectedRow, openDetails]
   );
 
   const rowData = useMemo(() => {
@@ -1685,6 +1686,26 @@ export function Workspace({
     trackChange("Reorder Columns", fieldId, prev, nextFields);
   }, [fields, trackChange]);
 
+  const [fieldConfigModalState, setFieldConfigModalState] = useState({
+    open: false,
+    fieldType: "Single Line Text",
+    initialData: {},
+    mode: "create",
+  });
+
+  const handleOpenFieldConfig = useCallback((fieldType, initialData = {}, mode = "create") => {
+    setFieldConfigModalState({
+      open: true,
+      fieldType,
+      initialData,
+      mode,
+    });
+  }, []);
+
+  const handleCloseFieldConfig = useCallback(() => {
+    setFieldConfigModalState((prev) => ({ ...prev, open: false }));
+  }, []);
+
   // ==========================
   // Render
   // ==========================
@@ -1703,7 +1724,8 @@ export function Workspace({
     renameWorkspace,
     duplicateWorkspace,
     deleteWorkspace,
-  }), [addRow, deleteRow, duplicateRow, updateRow, addColumn, deleteColumn, duplicateColumn, renameColumn, updateColumn, renameWorkspace, duplicateWorkspace, deleteWorkspace]);
+    onOpenFieldConfig: handleOpenFieldConfig,
+  }), [addRow, deleteRow, duplicateRow, updateRow, addColumn, deleteColumn, duplicateColumn, renameColumn, updateColumn, renameWorkspace, duplicateWorkspace, deleteWorkspace, handleOpenFieldConfig]);
 
   return (
     <>
@@ -1751,6 +1773,7 @@ export function Workspace({
                 renderDetailsModal={renderDetailsModal}
                 onExpandRow={onExpandRow}
                 hideAddColumn={hideAddColumn || Boolean(config?.hideAddColumn)}
+                context={context}
               />
             </div>
             <AppCardFooter recordsCountText={recordsCountText} onAddRow={() => addRow()} />
@@ -1779,6 +1802,17 @@ export function Workspace({
         }}
         onCreateNew={() => {
           console.log("Created a new grid");
+        }}
+      />
+      <FieldConfigurationModal
+        open={fieldConfigModalState.open}
+        fieldType={fieldConfigModalState.fieldType}
+        initialData={fieldConfigModalState.initialData}
+        mode={fieldConfigModalState.mode}
+        onClose={handleCloseFieldConfig}
+        onSubmit={(fieldConfig) => {
+          addColumn(fieldConfig);
+          handleCloseFieldConfig();
         }}
       />
 

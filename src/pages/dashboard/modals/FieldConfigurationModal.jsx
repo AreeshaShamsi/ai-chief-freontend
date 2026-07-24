@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import PropTypes from "prop-types";
 import { LuChevronDown, LuPlus, LuX } from "react-icons/lu";
 import { AppButton, AppCard, C, T, Text, TextField } from "../../../components/utils";
@@ -13,60 +14,89 @@ export default function FieldConfigurationModal({
   initialData = {},
   mode = "create",
 }) {
-  const [currentType, setCurrentType] = useState(fieldType);
-  const [fieldName, setFieldName] = useState(initialData.name || "");
-  const [defaultValue, setDefaultValue] = useState(initialData.value || "");
-  const [options, setOptions] = useState(initialData.options || []);
-  const [newOption, setNewOption] = useState("");
+  const [formData, setFormData] = useState({
+    currentType: fieldType,
+    fieldName: initialData.name || "",
+    defaultValue: initialData.value || "",
+    options: initialData.options || [],
+    newOption: "",
+    description: initialData.description || "",
+  });
 
   useEffect(() => {
     if (open) {
-      setCurrentType(fieldType || initialData.type || "Single Line Text");
-      setFieldName(initialData.name || "");
-      setDefaultValue(initialData.value || "");
-      setOptions(initialData.options || []);
-      setNewOption("");
+      const type = fieldType || initialData.type || "Single Line Text";
+      setFormData({
+        currentType: type,
+        fieldName: initialData.name || "",
+        defaultValue: initialData.value || "",
+        options: Array.isArray(initialData.options) ? [...initialData.options] : [],
+        newOption: "",
+        description: initialData.description || "",
+      });
     }
   }, [open, fieldType, initialData]);
 
   if (!open) return null;
 
-  const typeMeta = getFieldTypeMeta(currentType);
+  const typeMeta = getFieldTypeMeta(formData.currentType);
   const TypeIcon = typeMeta.icon;
-  const isSelectType = currentType === "Single Select" || currentType === "Multiple Select";
-  const isCheckbox = currentType === "Checkbox";
+  const isSelectType = formData.currentType === "Single Select" || formData.currentType === "Multiple Select";
+  const isCheckbox = formData.currentType === "Checkbox";
+  const isLongText = formData.currentType === "Long Text";
+  const isNumberType = formData.currentType === "Number" || formData.currentType === "Currency" || formData.currentType === "Percentage" || formData.currentType === "Rating";
+  const isDateType = formData.currentType === "Date" || formData.currentType === "Date Time";
+
+  const updateFormField = (key, value) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleAddOption = () => {
-    if (newOption.trim()) {
-      setOptions((prev) => [...prev, newOption.trim()]);
-      setNewOption("");
+    if (formData.newOption.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        options: [...prev.options, prev.newOption.trim()],
+        newOption: "",
+      }));
     }
   };
 
   const handleRemoveOption = (index) => {
-    setOptions((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
+      ...prev,
+      options: prev.options.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmitForm = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (onSubmit) {
       onSubmit({
-        id: initialData.id,
-        name: fieldName || currentType,
-        type: currentType,
-        value: defaultValue,
-        ...(isSelectType ? { options } : {}),
+        id: initialData.id || `field_${Date.now()}`,
+        name: formData.fieldName.trim() || formData.currentType,
+        type: formData.currentType,
+        value: formData.defaultValue,
+        description: formData.description.trim(),
+        ...(isSelectType ? { options: formData.options } : {}),
       });
     }
     onClose();
   };
 
-  return (
+  const handleTypeSelect = (selectedLabel) => {
+    setFormData((prev) => ({
+      ...prev,
+      currentType: selectedLabel,
+      fieldName: !prev.fieldName || prev.fieldName === prev.currentType ? selectedLabel : prev.fieldName,
+    }));
+  };
+
+  const modalContent = (
     <div
       style={{
         position: "fixed",
         inset: 0,
-        zIndex: 1100,
+        zIndex: 99999,
         background: "rgba(0, 0, 0, 0.4)",
         display: "flex",
         alignItems: "center",
@@ -74,9 +104,13 @@ export default function FieldConfigurationModal({
         padding: T.spacing[4],
       }}
       onClick={onClose}
+      onMouseDown={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <AppCard
         onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
         style={{
           width: "100%",
           maxWidth: 440,
@@ -87,7 +121,7 @@ export default function FieldConfigurationModal({
         }}
       >
         <Text variant="cardTitle" style={{ marginBottom: T.spacing[4] }}>
-          {mode === "edit" ? "Edit Field Configuration" : `Configure ${currentType} Field`}
+          {mode === "edit" ? "Edit Field Configuration" : `Configure ${formData.currentType} Field`}
         </Text>
 
         <form onSubmit={handleSubmitForm} style={{ display: "grid", gap: T.spacing[4] }}>
@@ -96,9 +130,10 @@ export default function FieldConfigurationModal({
               Field Name
             </Text>
             <TextField
-              value={fieldName}
-              onChange={(e) => setFieldName(e.target.value)}
-              placeholder="Field Name (Optional)"
+              autoFocus
+              value={formData.fieldName}
+              onChange={(e) => updateFormField("fieldName", e.target.value)}
+              placeholder="Field Name (e.g. Client Name)"
               style={{
                 height: 38,
                 borderRadius: T.radius.md,
@@ -112,7 +147,7 @@ export default function FieldConfigurationModal({
               Field Type
             </Text>
 
-            <AddColumnModal onSelectField={(selectedLabel) => setCurrentType(selectedLabel)}>
+            <AddColumnModal onSelectField={handleTypeSelect}>
               {({ ref, onClick, ...triggerProps }) => (
                 <button
                   ref={ref}
@@ -136,7 +171,7 @@ export default function FieldConfigurationModal({
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     {TypeIcon ? <TypeIcon size={16} color={C.muted} /> : null}
                     <Text variant="label" color={C.text}>
-                      {currentType}
+                      {formData.currentType}
                     </Text>
                   </div>
                   <LuChevronDown size={16} color={C.muted} />
@@ -152,9 +187,15 @@ export default function FieldConfigurationModal({
               </Text>
               <div style={{ display: "flex", gap: 8, marginBottom: T.spacing[2] }}>
                 <TextField
-                  value={newOption}
-                  onChange={(e) => setNewOption(e.target.value)}
-                  placeholder="Add Option"
+                  value={formData.newOption}
+                  onChange={(e) => updateFormField("newOption", e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddOption();
+                    }
+                  }}
+                  placeholder="Add Option (e.g. High Priority)"
                   style={{
                     flex: 1,
                     height: 34,
@@ -168,9 +209,9 @@ export default function FieldConfigurationModal({
                 </AppButton>
               </div>
 
-              {options.length > 0 && (
+              {formData.options.length > 0 && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {options.map((opt, idx) => (
+                  {formData.options.map((opt, idx) => (
                     <span
                       key={idx}
                       style={{
@@ -202,18 +243,36 @@ export default function FieldConfigurationModal({
           {!isCheckbox && (
             <div>
               <Text variant="label" style={{ marginBottom: T.spacing[1], display: "block" }}>
-                Default
+                Default Value
               </Text>
               <TextField
-                value={defaultValue}
-                onChange={(e) => setDefaultValue(e.target.value)}
+                value={formData.defaultValue}
+                onChange={(e) => updateFormField("defaultValue", e.target.value)}
+                multiline={isLongText}
+                rows={3}
+                type={isNumberType ? "number" : isDateType ? "date" : "text"}
                 placeholder="Enter Default Value (Optional)"
                 style={{
-                  height: 38,
+                  height: isLongText ? "auto" : 38,
                   borderRadius: T.radius.md,
                   fontSize: T.font.size.bodySmall,
                 }}
               />
+            </div>
+          )}
+
+          {isCheckbox && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="checkbox"
+                id="defaultCheckboxVal"
+                checked={Boolean(formData.defaultValue)}
+                onChange={(e) => updateFormField("defaultValue", e.target.checked ? "Checked" : "")}
+                style={{ width: 16, height: 16, cursor: "pointer" }}
+              />
+              <label htmlFor="defaultCheckboxVal" style={{ color: C.text, fontSize: T.font.size.bodySmall, cursor: "pointer" }}>
+                Default to Checked
+              </label>
             </div>
           )}
 
@@ -230,13 +289,15 @@ export default function FieldConfigurationModal({
               Cancel
             </AppButton>
             <AppButton type="submit" variant="primary" compact>
-              {mode === "edit" ? "Edit" : "Create"}
+              {mode === "edit" ? "Save Changes" : "Create Field"}
             </AppButton>
           </div>
         </form>
       </AppCard>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 
 FieldConfigurationModal.propTypes = {

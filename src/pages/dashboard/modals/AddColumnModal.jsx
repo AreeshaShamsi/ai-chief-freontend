@@ -40,7 +40,7 @@ const fieldTypes = [
 const dropdownWidth = Math.round(T.layout.modalWidth * 0.67);
 const dropdownOffset = T.spacing[2];
 const viewportPadding = T.spacing[2];
-const overlayZIndex = 1000;
+const overlayZIndex = 100000;
 
 function AddColumnModal({ children, onSelectField }) {
   const [open, setOpen] = useState(false);
@@ -102,9 +102,11 @@ function AddColumnModal({ children, onSelectField }) {
   }, [open]);
 
   const handleSelect = (type) => {
-    onSelectField(type);
     setOpen(false);
     setSearch("");
+    if (onSelectField) {
+      onSelectField(type);
+    }
   };
 
   const trigger = children({

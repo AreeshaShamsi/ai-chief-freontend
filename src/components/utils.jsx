@@ -498,9 +498,41 @@ function MetricCard({
   );
 }
 
-function TextField({ value, onChange, placeholder, disabled, type = "text", style, ...props }) {
+const TextField = React.forwardRef(function TextField(
+  { value, onChange, placeholder, disabled, type = "text", multiline = false, rows = 3, style, ...props },
+  ref
+) {
+  if (multiline) {
+    return (
+      <textarea
+        ref={ref}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        disabled={disabled}
+        rows={rows}
+        style={{
+          width: "100%",
+          padding: "8px 12px",
+          border: `1px solid ${C.border}`,
+          borderRadius: T.radius.sm,
+          background: C.surface,
+          color: C.text,
+          fontSize: T.font.size.bodySmall,
+          fontFamily: T.font.family,
+          outline: "none",
+          boxSizing: "border-box",
+          opacity: disabled ? 0.7 : 1,
+          resize: "vertical",
+          ...style,
+        }}
+        {...props}
+      />
+    );
+  }
   return (
     <input
+      ref={ref}
       type={type}
       value={value}
       onChange={onChange}
@@ -524,7 +556,7 @@ function TextField({ value, onChange, placeholder, disabled, type = "text", styl
       {...props}
     />
   );
-}
+});
 
 function Alert({ children, variant = "warning", contentAlign = "start", style }) {
   const tones = {
