@@ -33,7 +33,6 @@ import { getFieldTypeMeta } from "../modals/fieldTypeMeta";
 import CreateDealSourceModal from "../modals/CreateDealSourceModal";
 import DealDetailsModal from "../modals/DealDetailsModal";
 import ImportModal from "../modals/ImportModal";
-import DealDropdown from "../modals/DealDropdown";
 import ColumnActionsModal from "../modals/ColumnActionsModal";
 import GridNameActionsModal from "../modals/GridNameActionsModal";
 import FieldConfigurationModal from "../modals/FieldConfigurationModal";
@@ -149,7 +148,33 @@ const columnWidths = {
   lastModifiedBy: 160,
 };
 
-function WorkspaceCell({ value }) {
+function WorkspaceCell({ value, colDef }) {
+  if (colDef?.field === "username") {
+    return <Text variant="body">{value || "—"}</Text>;
+  }
+
+  if (colDef?.field === "access") {
+    const valStr = Array.isArray(value) ? value[0] : typeof value === "string" ? value : "";
+    if (!valStr) {
+      return <Text variant="body">—</Text>;
+    }
+
+    return (
+      <AppPill
+        size="xs"
+        variant="neutral"
+        style={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          maxWidth: "100%",
+        }}
+      >
+        {valStr}
+      </AppPill>
+    );
+  }
+
   return <Text variant="body">{value}</Text>;
 }
 
@@ -483,15 +508,8 @@ function WorkspaceToolbar({
   isViewsPanelHidden,
   onToggleViewsPanel,
   onManageFields,
-  onRenameTab,
-  onDuplicateTab,
-  onManageTab,
-  onClearData,
-  onDeleteField,
-  onOpenImportModal,
   activeTab,
   onTabChange,
-  renderDropdown,
   searchQuery = "",
   onSearchChange,
   hideGridSelector = false,
@@ -511,39 +529,28 @@ function WorkspaceToolbar({
   const [internalKbTab, setInternalKbTab] = useState(currentTab === "faq" ? "faq" : "inventory");
   const activeKbTab = currentTab === "faq" ? "faq" : currentTab === "inventory" ? "inventory" : internalKbTab;
 
-  const [isActionsOpen, setIsActionsOpen] = useState(false);
-  const dealsButtonRef = useRef(null);
-
   const handleInventoryClick = () => {
-    if (activeKbTab === "inventory") {
-      setIsActionsOpen((prev) => !prev);
-    } else {
+    if (activeKbTab !== "inventory") {
       setInternalKbTab("inventory");
       if (onTabChange) onTabChange("inventory");
     }
   };
 
   const handleFaqClick = () => {
-    if (activeKbTab === "faq") {
-      setIsActionsOpen((prev) => !prev);
-    } else {
+    if (activeKbTab !== "faq") {
       setInternalKbTab("faq");
       if (onTabChange) onTabChange("faq");
     }
   };
 
   const handleDealsClick = () => {
-    if (isDealsActive) {
-      setIsActionsOpen((prev) => !prev);
-    } else if (onTabChange) {
+    if (!isDealsActive && onTabChange) {
       onTabChange("deals");
     }
   };
 
   const handleTasksClick = () => {
-    if (isTasksActive) {
-      setIsActionsOpen((prev) => !prev);
-    } else if (onTabChange) {
+    if (!isTasksActive && onTabChange) {
       onTabChange("tasks");
     }
   };
@@ -555,7 +562,6 @@ function WorkspaceToolbar({
           {isKbActive ? (
             <>
               <AppButton
-                ref={activeKbTab === "inventory" ? dealsButtonRef : null}
                 compact
                 onClick={handleInventoryClick}
                 style={{
@@ -566,10 +572,8 @@ function WorkspaceToolbar({
                 }}
               >
                 <Text variant="label" color={activeKbTab === "inventory" ? C.accent : C.text}>Inventory</Text>
-                <LuChevronDown size={15} style={{ color: activeKbTab === "inventory" ? C.accent : C.muted }} />
               </AppButton>
               <AppButton
-                ref={activeKbTab === "faq" ? dealsButtonRef : null}
                 compact
                 onClick={handleFaqClick}
                 style={{
@@ -601,9 +605,7 @@ function WorkspaceToolbar({
             </>
           ) : isStaffActive || (hideGridSelector && !isContactsActive) ? null : isContactsActive ? (
             <AppButton
-              ref={dealsButtonRef}
               compact
-              onClick={() => setIsActionsOpen((prev) => !prev)}
               style={{
                 ...dealTabButtonStyle,
                 background: C.accentLt,
@@ -612,12 +614,10 @@ function WorkspaceToolbar({
               }}
             >
               <Text variant="label" color={C.accent}>{workspaceTitle}</Text>
-              <FiChevronDown size={15} style={{ color: C.accent }} />
             </AppButton>
           ) : (
             <>
               <AppButton
-                ref={isDealsActive ? dealsButtonRef : null}
                 compact
                 onClick={handleDealsClick}
                 style={{
@@ -628,10 +628,8 @@ function WorkspaceToolbar({
                 }}
               >
                 <Text variant="label" color={isDealsActive ? C.accent : C.text}>Deals</Text>
-                {isDealsActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
               </AppButton>
               <AppButton
-                ref={isTasksActive ? dealsButtonRef : null}
                 compact
                 onClick={handleTasksClick}
                 style={{
@@ -642,7 +640,6 @@ function WorkspaceToolbar({
                 }}
               >
                 <Text variant="label" color={isTasksActive ? C.accent : C.text}>Tasks</Text>
-                {isTasksActive && <FiChevronDown size={15} style={{ color: C.accent }} />}
               </AppButton>
             </>
           )}
@@ -670,40 +667,25 @@ function WorkspaceToolbar({
         ) : null}
       </div>
 
-      <DealDropdown
-        isOpen={isActionsOpen}
-        onClose={() => setIsActionsOpen(false)}
-        triggerRef={dealsButtonRef}
-        onImportData={(importType) => {
-          setIsActionsOpen(false);
-          if (onOpenImportModal) onOpenImportModal(importType);
-        }}
-        onRenameTab={onRenameTab}
-        onDuplicateTab={onDuplicateTab}
-        onManageTab={onManageTab}
-        onClearData={onClearData}
-        onDeleteField={onDeleteField}
-      />
-
       {activeKbTab !== "faq" && !isSingleRowToolbar && (
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 12,
+            marginTop: T.spacing[3],
+            paddingTop: T.spacing[3],
+            borderTop: `1px solid ${C.border}`,
             flexWrap: "wrap",
-            marginTop: 12,
-            paddingTop: 12,
-            borderTop: `1px solid ${C.borderLt}`,
+            gap: 12,
           }}
         >
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "nowrap" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
             {!hideViewsPanel && (
               <IconButton
                 aria-label={isViewsPanelHidden ? "Show grid views panel" : "Hide grid views panel"}
                 onClick={onToggleViewsPanel}
-                style={{ width: 18, height: 40, color: C.muted, borderRadius: T.radius.sm }}
+                style={{ width: 28, height: 28, color: C.muted, borderRadius: T.radius.sm }}
               >
                 <FaBars size={13} style={{ display: "block" }} />
               </IconButton>
@@ -712,7 +694,6 @@ function WorkspaceToolbar({
               <AppButton compact style={gridSelectorButtonStyle}>
                 <FiGrid size={16} style={{ color: C.accent }} />
                 <Text variant="label">Grid Name</Text>
-                <FiChevronDown size={15} style={{ color: C.text }} />
               </AppButton>
             )}
           </div>
@@ -1551,17 +1532,19 @@ const defaultWorkspaceConfigurations = {
     fields: [
       { id: "firstName", name: "First Name", type: "Single Line Text", value: "First Name" },
       { id: "lastName", name: "Last Name", type: "Single Line Text", value: "Last Name" },
+      { id: "username", name: "Username", type: "Single Line Text", value: "Username" },
       { id: "email", name: "Email Address", type: "Email", value: "Email Address" },
       { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
       { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
+      { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["Access To Edit Deals", "Access To Edit Knowledge Base"], editorKind: "tags" },
     ],
     rows: [
-      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin" },
-      { id: "staff-2", firstName: "Ananya", lastName: "Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin" },
-      { id: "staff-3", firstName: "Rohan", lastName: "Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent" },
-      { id: "staff-4", firstName: "Kavya", lastName: "Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager" },
-      { id: "staff-5", firstName: "Vikram", lastName: "Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin" },
-      { id: "staff-6", firstName: "Priya", lastName: "Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker" },
+      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", username: "rahul.sharma", email: "Rahulsharma@14gmail.Com", phone: "+91 98765 43210", role: "Admin", access: "Access To Edit Deals" },
+      { id: "staff-2", firstName: "Ananya", lastName: "Rao", username: "ananya.rao", email: "ananya.rao@gmail.com", phone: "+91 87654 32109", role: "Admin", access: "Access To Edit Deals" },
+      { id: "staff-3", firstName: "Rohan", lastName: "Mehta", username: "rohan.mehta", email: "rohan.mehta@gmail.com", phone: "+91 76543 21098", role: "Agent", access: "Access To Edit Knowledge Base" },
+      { id: "staff-4", firstName: "Kavya", lastName: "Nair", username: "kavya.nair", email: "kavya.nair@gmail.com", phone: "+91 65432 10987", role: "Manager", access: "Access To Edit Deals" },
+      { id: "staff-5", firstName: "Vikram", lastName: "Singh", username: "vikram.singh", email: "vikram.singh@gmail.com", phone: "+91 54321 09876", role: "Admin", access: "Access To Edit Knowledge Base" },
+      { id: "staff-6", firstName: "Priya", lastName: "Menon", username: "priya.menon", email: "priya.menon@gmail.com", phone: "+91 43210 98765", role: "Senior Broker", access: "Access To Edit Knowledge Base" },
     ],
     views: ["Grid Name"],
   },
@@ -1573,17 +1556,19 @@ const defaultWorkspaceConfigurations = {
     fields: [
       { id: "firstName", name: "First Name", type: "Single Line Text", value: "First Name" },
       { id: "lastName", name: "Last Name", type: "Single Line Text", value: "Last Name" },
+      { id: "username", name: "Username", type: "Single Line Text", value: "Username" },
       { id: "email", name: "Email Address", type: "Email", value: "Email Address" },
       { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
       { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
+      { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["Access To Edit Deals", "Access To Edit Knowledge Base"], editorKind: "tags" },
     ],
     rows: [
-      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", phone: "+91 98765 43210", email: "Rahulsharma@14gmail.Com", role: "Admin" },
-      { id: "staff-2", firstName: "Ananya", lastName: "Rao", phone: "+91 87654 32109", email: "ananya.rao@gmail.com", role: "Admin" },
-      { id: "staff-3", firstName: "Rohan", lastName: "Mehta", phone: "+91 76543 21098", email: "rohan.mehta@gmail.com", role: "Agent" },
-      { id: "staff-4", firstName: "Kavya", lastName: "Nair", phone: "+91 65432 10987", email: "kavya.nair@gmail.com", role: "Manager" },
-      { id: "staff-5", firstName: "Vikram", lastName: "Singh", phone: "+91 54321 09876", email: "vikram.singh@gmail.com", role: "Admin" },
-      { id: "staff-6", firstName: "Priya", lastName: "Menon", phone: "+91 43210 98765", email: "priya.menon@gmail.com", role: "Senior Broker" },
+      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", username: "rahul.sharma", email: "Rahulsharma@14gmail.Com", phone: "+91 98765 43210", role: "Admin", access: "Access To Edit Deals" },
+      { id: "staff-2", firstName: "Ananya", lastName: "Rao", username: "ananya.rao", email: "ananya.rao@gmail.com", phone: "+91 87654 32109", role: "Admin", access: "Access To Edit Deals" },
+      { id: "staff-3", firstName: "Rohan", lastName: "Mehta", username: "rohan.mehta", email: "rohan.mehta@gmail.com", phone: "+91 76543 21098", role: "Agent", access: "Access To Edit Knowledge Base" },
+      { id: "staff-4", firstName: "Kavya", lastName: "Nair", username: "kavya.nair", email: "kavya.nair@gmail.com", phone: "+91 65432 10987", role: "Manager", access: "Access To Edit Deals" },
+      { id: "staff-5", firstName: "Vikram", lastName: "Singh", username: "vikram.singh", email: "vikram.singh@gmail.com", phone: "+91 54321 09876", role: "Admin", access: "Access To Edit Knowledge Base" },
+      { id: "staff-6", firstName: "Priya", lastName: "Menon", username: "priya.menon", email: "priya.menon@gmail.com", phone: "+91 43210 98765", role: "Senior Broker", access: "Access To Edit Knowledge Base" },
     ],
     views: ["Grid Name"],
   },

@@ -126,6 +126,8 @@ function ContactSection({ activeTab = "contacts", onTabChange, onCreateCampaign 
           workspaceId="contacts"
           columns={contactColumns}
           rowData={contactRows}
+
+
           activeTab={activeTab}
           onTabChange={onTabChange}
         />

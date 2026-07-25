@@ -14,6 +14,7 @@ import {
 } from "react-icons/lu";
 import { AppButton, AppPill, C, IconButton, Modal, T, Text, TextField } from "../../../components/utils";
 import AddColumnModal from "./AddColumnModal";
+import DetailModalFooter from "../../../components/DetailModalFooter";
 import { getFieldTypeMeta } from "./fieldTypeMeta";
 
 function ConfirmationDialog({ open, onConfirm, onCancel }) {
@@ -76,6 +77,7 @@ export default function DealDetailsModal({
   onDeleteRow,
 }) {
   const [fieldValues, setFieldValues] = useState({});
+  const [initialFieldValues, setInitialFieldValues] = useState({});
   const [isEditing, setIsEditing] = useState(editable);
   const [openDropdownFieldId, setOpenDropdownFieldId] = useState(null);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -135,6 +137,7 @@ export default function DealDetailsModal({
     effectiveFields.forEach((field) => {
       initial[field.id] = row[field.id] !== undefined ? row[field.id] : row[field.name] !== undefined ? row[field.name] : "";
     });
+    setInitialFieldValues(initial);
     setFieldValues(initial);
     setIsEditing(editable);
     setOpenDropdownFieldId(null);
@@ -177,13 +180,23 @@ export default function DealDetailsModal({
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [openDropdownFieldId]);
 
-  if (!open || !row) return null;
+  const hasUnsavedChanges = useMemo(() => {
+    return Object.keys(fieldValues).some((key) => fieldValues[key] !== initialFieldValues[key]);
+  }, [fieldValues, initialFieldValues]);
+
+  const handleSaveChanges = () => {
+    Object.keys(fieldValues).forEach((fieldId) => {
+      if (fieldValues[fieldId] !== initialFieldValues[fieldId]) {
+        if (onUpdateField) {
+          onUpdateField(row.id, fieldId, fieldValues[fieldId]);
+        }
+      }
+    });
+    setInitialFieldValues({ ...fieldValues });
+  };
 
   const handleUpdate = (fieldId, value) => {
     setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
-    if (onUpdateField) {
-      onUpdateField(row.id, fieldId, value);
-    }
   };
 
   const handleEditRow = (fieldId) => {
@@ -510,47 +523,18 @@ export default function DealDetailsModal({
                 );
               })}
             </div>
-
-            <AddColumnModal onSelectField={(typeLabel) => {
-              if (onAddField) onAddField(typeLabel);
-            }}>
-              {({ ref, onClick }) => (
-                <span
-                  ref={ref}
-                  role="button"
-                  tabIndex={0}
-                  className="add-field-link"
-                  onClick={onClick}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      onClick(e);
-                    }
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = C.primaryHover || C.accent;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = C.accent;
-                  }}
-                  style={{
-                    marginTop: 20,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                    cursor: "pointer",
-                    color: C.accent,
-                    fontSize: T.font.size.sm,
-                    fontWeight: T.font.weight.semibold,
-                    userSelect: "none",
-                  }}
-                >
-                  <LuPlus size={14} />
-                  <span>Add new field to this table</span>
-                </span>
-              )}
-            </AddColumnModal>
           </div>
+
+          <DetailModalFooter
+            isEditing={isEditing}
+            onToggleEdit={() => setIsEditing((prev) => !prev)}
+            onDuplicate={() => {
+              if (onDuplicateRow) onDuplicateRow(row);
+            }}
+            onDelete={() => setIsConfirmDeleteOpen(true)}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onSaveChanges={handleSaveChanges}
+          />
         </div>
       </Modal>
 
