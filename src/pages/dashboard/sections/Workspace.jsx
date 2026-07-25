@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import AgGridTable from "../../../components/AgGridTable/AgGridTable";
 import {
-  FiChevronDown,
   FiGrid,
   FiLink,
   FiMoreHorizontal,
@@ -746,12 +745,13 @@ WorkspaceToolbar.propTypes = {
   isViewsPanelHidden: PropTypes.bool.isRequired,
   onToggleViewsPanel: PropTypes.func.isRequired,
   onManageFields: PropTypes.func.isRequired,
-  onRenameTab: PropTypes.func,
-  onDuplicateTab: PropTypes.func,
-  onManageTab: PropTypes.func,
-  onClearData: PropTypes.func,
-  onDeleteField: PropTypes.func,
-  onOpenImportModal: PropTypes.func,
+  activeTab: PropTypes.string,
+  onTabChange: PropTypes.func,
+  searchQuery: PropTypes.string,
+  onSearchChange: PropTypes.func,
+  hideGridSelector: PropTypes.bool,
+  hideViewsPanel: PropTypes.bool,
+  hideManageFields: PropTypes.bool,
 };
 
 function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggleFavorite }) {
@@ -1656,12 +1656,7 @@ export function Workspace({
   const [isManageFieldsOpen, setIsManageFieldsOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isClearDataConfirmOpen, setIsClearDataConfirmOpen] = useState(false);
-  const [isRenameTabModalOpen, setIsRenameTabModalOpen] = useState(false);
 
-  const handleClearData = useCallback(() => {
-    setIsClearDataConfirmOpen(true);
-  }, []);
   const [, setChangeHistory] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -1904,18 +1899,11 @@ export function Workspace({
             isViewsPanelHidden={isViewsPanelHidden}
             onToggleViewsPanel={toggleViewsPanel}
             onManageFields={() => setIsManageFieldsOpen(true)}
-            onRenameTab={() => setIsRenameTabModalOpen(true)}
-            onDuplicateTab={duplicateWorkspace}
-            onManageTab={() => setIsManageFieldsOpen(true)}
-            onClearData={handleClearData}
-            onDeleteField={() => setIsManageFieldsOpen(true)}
-            onOpenImportModal={() => setIsImportModalOpen(true)}
             activeTab={effectiveWorkspaceId}
             onTabChange={(tab) => {
               setInternalTab(tab);
               if (onTabChange) onTabChange(tab);
             }}
-            renderDropdown={renderDropdown}
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
             hideGridSelector={hideGridSelector || Boolean(config?.hideGridSelector)}
