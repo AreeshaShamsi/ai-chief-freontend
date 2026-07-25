@@ -72,6 +72,7 @@ export default function DealDetailsModal({
   onNextRow,
   onClose,
   onUpdateField,
+  onUpdateRow,
   onAddField,
   onDuplicateRow,
   onDeleteRow,
@@ -185,14 +186,28 @@ export default function DealDetailsModal({
   }, [fieldValues, initialFieldValues]);
 
   const handleSaveChanges = () => {
+    if (!row) return;
+    let hasChanges = false;
+    const changedValues = {};
     Object.keys(fieldValues).forEach((fieldId) => {
       if (fieldValues[fieldId] !== initialFieldValues[fieldId]) {
+        hasChanges = true;
+        changedValues[fieldId] = fieldValues[fieldId];
         if (onUpdateField) {
           onUpdateField(row.id, fieldId, fieldValues[fieldId]);
         }
       }
     });
+
+    if (hasChanges && onUpdateRow) {
+      onUpdateRow(row.id, changedValues);
+    }
+
     setInitialFieldValues({ ...fieldValues });
+
+    if (onClose) {
+      onClose();
+    }
   };
 
   const handleUpdate = (fieldId, value) => {
@@ -439,6 +454,8 @@ export default function DealDetailsModal({
     );
   };
 
+  if (!open || !row) return null;
+
   return (
     <>
       <Modal
@@ -560,6 +577,7 @@ DealDetailsModal.propTypes = {
   onNextRow: PropTypes.func,
   onClose: PropTypes.func.isRequired,
   onUpdateField: PropTypes.func,
+  onUpdateRow: PropTypes.func,
   onAddField: PropTypes.func,
   onDuplicateRow: PropTypes.func,
   onDeleteRow: PropTypes.func,

@@ -126,6 +126,8 @@ const columnWidths = {
   dealName: 150,
   leadName: 150,
   contactName: 150,
+  username: 140,
+  access: 210,
   phone: 140,
   email: 180,
   businessName: 160,
@@ -174,7 +176,7 @@ function WorkspaceCell({ value, colDef }) {
     );
   }
 
-  return <Text variant="body">{value}</Text>;
+  return <Text variant="body">{value || "—"}</Text>;
 }
 
 WorkspaceCell.propTypes = {
@@ -1054,6 +1056,7 @@ function WorkspaceGrid({
   fields,
   rowDataProp,
   updateCell,
+  updateRow,
   refreshKey,
   renderDetailsModal,
   onExpandRow,
@@ -1176,12 +1179,18 @@ function WorkspaceGrid({
   );
 
   const openDetails = useCallback((row) => {
+    if (!row) return;
     setSelectedRow(row);
     setIsDetailsOpen(true);
     if (onExpandRow) {
       onExpandRow(row);
     }
   }, [onExpandRow]);
+
+  const handleCloseDetails = useCallback(() => {
+    setIsDetailsOpen(false);
+    setSelectedRow(null);
+  }, []);
 
   const handlePrevRow = useCallback(() => {
     const idx = rowDataProp.findIndex((r) => r.id === selectedRow?.id);
@@ -1198,8 +1207,16 @@ function WorkspaceGrid({
   }, [selectedRow, rowDataProp]);
 
   const handleUpdateField = useCallback((rowId, fieldId, newValue) => {
-    updateCell(rowId, fieldId, newValue);
+    if (updateCell) {
+      updateCell(rowId, fieldId, newValue);
+    }
   }, [updateCell]);
+
+  const handleUpdateRow = useCallback((rowId, updatedFields) => {
+    if (updateRow) {
+      updateRow(rowId, updatedFields);
+    }
+  }, [updateRow]);
 
   const idx = selectedRow ? rowDataProp.findIndex((r) => r.id === selectedRow.id) : -1;
   const hasPrev = idx > 0;
@@ -1237,29 +1254,33 @@ function WorkspaceGrid({
         />
       </div>
 
-      {renderDetailsModal ? (
-        renderDetailsModal({
-          open: isDetailsOpen,
-          row: selectedRow,
-          fields,
-          workspaceId,
-          onPrevRow: hasPrev ? handlePrevRow : null,
-          onNextRow: hasNext ? handleNextRow : null,
-          onClose: () => setIsDetailsOpen(false),
-          onUpdateField: handleUpdateField,
-        })
-      ) : (
-        <DealDetailsModal
-          open={isDetailsOpen}
-          row={selectedRow}
-          fields={fields}
-          workspaceId={workspaceId}
-          onPrevRow={hasPrev ? handlePrevRow : null}
-          onNextRow={hasNext ? handleNextRow : null}
-          onClose={() => setIsDetailsOpen(false)}
-          onUpdateField={handleUpdateField}
-        />
-      )}
+      {isDetailsOpen && selectedRow ? (
+        renderDetailsModal ? (
+          renderDetailsModal({
+            open: true,
+            row: selectedRow,
+            fields,
+            workspaceId,
+            onPrevRow: hasPrev ? handlePrevRow : null,
+            onNextRow: hasNext ? handleNextRow : null,
+            onClose: handleCloseDetails,
+            onUpdateField: handleUpdateField,
+            onUpdateRow: handleUpdateRow,
+          })
+        ) : (
+          <DealDetailsModal
+            open={true}
+            row={selectedRow}
+            fields={fields}
+            workspaceId={workspaceId}
+            onPrevRow={hasPrev ? handlePrevRow : null}
+            onNextRow={hasNext ? handleNextRow : null}
+            onClose={handleCloseDetails}
+            onUpdateField={handleUpdateField}
+            onUpdateRow={handleUpdateRow}
+          />
+        )
+      ) : null}
     </div>
   );
 }
@@ -1533,7 +1554,7 @@ const defaultWorkspaceConfigurations = {
       { id: "firstName", name: "First Name", type: "Single Line Text", value: "First Name" },
       { id: "lastName", name: "Last Name", type: "Single Line Text", value: "Last Name" },
       { id: "username", name: "Username", type: "Single Line Text", value: "Username" },
-      { id: "email", name: "Email Address", type: "Email", value: "Email Address" },
+      { id: "email", name: "Email", type: "Email", value: "Email" },
       { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
       { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
       { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["Access To Edit Deals", "Access To Edit Knowledge Base"], editorKind: "tags" },
@@ -1557,7 +1578,7 @@ const defaultWorkspaceConfigurations = {
       { id: "firstName", name: "First Name", type: "Single Line Text", value: "First Name" },
       { id: "lastName", name: "Last Name", type: "Single Line Text", value: "Last Name" },
       { id: "username", name: "Username", type: "Single Line Text", value: "Username" },
-      { id: "email", name: "Email Address", type: "Email", value: "Email Address" },
+      { id: "email", name: "Email", type: "Email", value: "Email" },
       { id: "phone", name: "Phone Number", type: "Phone Number", value: "Phone Number" },
       { id: "role", name: "Role", type: "Single Select", value: "Role", options: ["Admin", "Manager", "Agent", "Senior Broker"], editorKind: "tags" },
       { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["Access To Edit Deals", "Access To Edit Knowledge Base"], editorKind: "tags" },
@@ -1729,6 +1750,7 @@ export function Workspace({
     const next = prev.map((r) => (r.id === rowId ? { ...r, ...updatedFields, lastModifiedTime: nowFormatted, lastModified: nowFormatted, updatedAt: nowFormatted } : r));
     setGridRowData(next);
     trackChange("Update Row", rowId, prev, next);
+    setRefreshKey((k) => k + 1);
   }, [gridRowData, trackChange]);
 
   // ==========================
@@ -1929,6 +1951,7 @@ export function Workspace({
                 fields={fields}
                 rowDataProp={gridRowData}
                 updateCell={updateCell}
+                updateRow={updateRow}
                 refreshKey={refreshKey}
                 renderDetailsModal={renderDetailsModal}
                 onExpandRow={onExpandRow}
