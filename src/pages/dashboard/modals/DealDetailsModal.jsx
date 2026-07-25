@@ -454,6 +454,15 @@ export default function DealDetailsModal({
     );
   };
 
+  const handleDuplicateRow = () => {
+    if (onDuplicateRow && row) {
+      onDuplicateRow(row.id || row);
+    }
+    if (onClose) {
+      onClose();
+    }
+  };
+
   if (!open || !row) return null;
 
   return (
@@ -543,11 +552,7 @@ export default function DealDetailsModal({
           </div>
 
           <DetailModalFooter
-            isEditing={isEditing}
-            onToggleEdit={() => setIsEditing((prev) => !prev)}
-            onDuplicate={() => {
-              if (onDuplicateRow) onDuplicateRow(row);
-            }}
+            onDuplicate={handleDuplicateRow}
             onDelete={() => setIsConfirmDeleteOpen(true)}
             hasUnsavedChanges={hasUnsavedChanges}
             onSaveChanges={handleSaveChanges}

@@ -1057,6 +1057,8 @@ function WorkspaceGrid({
   rowDataProp,
   updateCell,
   updateRow,
+  duplicateRow,
+  deleteRow,
   refreshKey,
   renderDetailsModal,
   onExpandRow,
@@ -1218,6 +1220,20 @@ function WorkspaceGrid({
     }
   }, [updateRow]);
 
+  const handleDuplicateRow = useCallback((targetRow) => {
+    const rowId = typeof targetRow === "object" ? targetRow?.id : targetRow;
+    if (duplicateRow && rowId) {
+      duplicateRow(rowId);
+    }
+  }, [duplicateRow]);
+
+  const handleDeleteRow = useCallback((targetRow) => {
+    const rowId = typeof targetRow === "object" ? targetRow?.id : targetRow;
+    if (deleteRow && rowId) {
+      deleteRow(rowId);
+    }
+  }, [deleteRow]);
+
   const idx = selectedRow ? rowDataProp.findIndex((r) => r.id === selectedRow.id) : -1;
   const hasPrev = idx > 0;
   const hasNext = idx >= 0 && idx < rowDataProp.length - 1;
@@ -1266,6 +1282,8 @@ function WorkspaceGrid({
             onClose: handleCloseDetails,
             onUpdateField: handleUpdateField,
             onUpdateRow: handleUpdateRow,
+            onDuplicateRow: handleDuplicateRow,
+            onDeleteRow: handleDeleteRow,
           })
         ) : (
           <DealDetailsModal
@@ -1278,6 +1296,8 @@ function WorkspaceGrid({
             onClose={handleCloseDetails}
             onUpdateField={handleUpdateField}
             onUpdateRow={handleUpdateRow}
+            onDuplicateRow={handleDuplicateRow}
+            onDeleteRow={handleDeleteRow}
           />
         )
       ) : null}
@@ -1952,6 +1972,8 @@ export function Workspace({
                 rowDataProp={gridRowData}
                 updateCell={updateCell}
                 updateRow={updateRow}
+                duplicateRow={duplicateRow}
+                deleteRow={deleteRow}
                 refreshKey={refreshKey}
                 renderDetailsModal={renderDetailsModal}
                 onExpandRow={onExpandRow}

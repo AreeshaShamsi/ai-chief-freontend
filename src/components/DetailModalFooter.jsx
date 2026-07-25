@@ -1,10 +1,8 @@
 import PropTypes from "prop-types";
-import { LuPencilLine, LuCopy, LuTrash2 } from "react-icons/lu";
+import { LuCopy, LuTrash2 } from "react-icons/lu";
 import { AppButton, C, T } from "./utils";
 
 export default function DetailModalFooter({
-  isEditing = false,
-  onToggleEdit,
   onDuplicate,
   onDelete,
   hasUnsavedChanges = false,
@@ -24,20 +22,8 @@ export default function DetailModalFooter({
         gap: 12,
       }}
     >
-      {/* Bottom-left: Edit Row, Duplicate Row, Delete Row */}
+      {/* Bottom-left: Duplicate Row, Delete Row */}
       <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <AppButton
-          compact
-          onClick={onToggleEdit}
-          style={{
-            background: isEditing ? C.accentLt : C.card,
-            color: isEditing ? C.accent : C.text,
-            border: `1px solid ${isEditing ? C.accentTrack : C.border}`,
-          }}
-        >
-          <LuPencilLine size={14} />
-          <span>Edit Row</span>
-        </AppButton>
         <AppButton
           compact
           onClick={onDuplicate}
@@ -85,8 +71,6 @@ export default function DetailModalFooter({
 }
 
 DetailModalFooter.propTypes = {
-  isEditing: PropTypes.bool,
-  onToggleEdit: PropTypes.func,
   onDuplicate: PropTypes.func,
   onDelete: PropTypes.func,
   hasUnsavedChanges: PropTypes.bool,
