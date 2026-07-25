@@ -525,7 +525,7 @@ export default function DealDetailsModal({
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "220px 24px 1fr",
+                gridTemplateColumns: "220px 1fr",
                 alignItems: "center",
                 gap: `${T.spacing[3]}px ${T.spacing[4]}px`,
               }}
@@ -543,7 +543,6 @@ export default function DealDetailsModal({
                         {field.name}
                       </Text>
                     </div>
-                    {renderChevronColumn(field.id, field.name)}
                     <div style={{ width: "100%" }}>{renderFieldValueInput(field)}</div>
                   </div>
                 );
