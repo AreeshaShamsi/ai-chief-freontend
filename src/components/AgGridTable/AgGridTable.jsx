@@ -47,8 +47,11 @@ export default function AgGridTable({
           params.api.setQuickFilter(quickFilterText);
         }
       }
+      if (rest.onGridReady) {
+        rest.onGridReady(params);
+      }
     },
-    [quickFilterText]
+    [quickFilterText, rest.onGridReady]
   );
 
   useEffect(() => {

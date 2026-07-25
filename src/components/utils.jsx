@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FiCheck, FiPlus } from "react-icons/fi";
 import { appTheme as T } from "./design-tokens";
 
@@ -239,8 +239,9 @@ function Card(props) {
 }
 
 function AppCardFooter({ children, action, recordsCountText, recordsCount, onAddRow, onAddRecord, style }) {
+  const [isHovered, setIsHovered] = useState(false);
   const countText = recordsCountText || (recordsCount !== undefined ? `${recordsCount} records` : null);
-  const handleAdd = onAddRow || onAddRecord;
+  const handleAdd = onAddRecord || onAddRow;
 
   return (
     <footer
@@ -269,11 +270,13 @@ function AppCardFooter({ children, action, recordsCountText, recordsCount, onAdd
         <AppButton
           compact
           onClick={handleAdd}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           style={{
             height: 30,
             padding: "0 12px",
             borderRadius: T.radius.sm,
-            background: C.card,
+            background: isHovered ? C.surface : C.card,
             color: C.text,
             border: `1px solid ${C.border}`,
             fontSize: T.font.size.bodySmall,
@@ -281,6 +284,7 @@ function AppCardFooter({ children, action, recordsCountText, recordsCount, onAdd
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
+            transition: "background-color 0.15s ease",
           }}
         >
           <FiPlus size={14} style={{ color: C.muted }} />

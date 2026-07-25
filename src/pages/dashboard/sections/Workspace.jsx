@@ -1078,6 +1078,7 @@ function WorkspaceGrid({
   onExpandRow,
   hideAddColumn = false,
   context: outerContext,
+  onDisplayedRowCountChange,
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -1184,6 +1185,15 @@ function WorkspaceGrid({
     [updateCell, fields]
   );
 
+  const handleModelUpdated = useCallback(
+    (params) => {
+      if (params?.api && onDisplayedRowCountChange) {
+        onDisplayedRowCountChange(params.api.getDisplayedRowCount());
+      }
+    },
+    [onDisplayedRowCountChange]
+  );
+
   const openDetails = useCallback((row) => {
     setSelectedRow(row);
     setIsDetailsOpen(true);
@@ -1241,6 +1251,7 @@ function WorkspaceGrid({
           selectionColumnDef={{ width: 44, headerClass: "ag-selection-header" }}
           context={context}
           onCellValueChanged={handleCellValueChanged}
+          onModelUpdated={handleModelUpdated}
           suppressCellFocus={false}
         />
       </div>
@@ -1281,6 +1292,9 @@ WorkspaceGrid.propTypes = {
   refreshKey: PropTypes.number.isRequired,
   renderDetailsModal: PropTypes.func,
   onExpandRow: PropTypes.func,
+  hideAddColumn: PropTypes.bool,
+  context: PropTypes.object,
+  onDisplayedRowCountChange: PropTypes.func,
 };
 
 // ==========================
@@ -1481,6 +1495,54 @@ const defaultWorkspaceConfigurations = {
     ],
     views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },
+  inventory: {
+    fields: [
+      { id: "propertyName", name: "Property Name", type: "Single Line Text", value: "Property Name" },
+      { id: "bhk", name: "BHK", type: "Single Select", value: "BHK", options: ["1 BHK", "2 BHK", "3 BHK", "4 BHK"] },
+      { id: "carpetArea", name: "Carpet Area", type: "Single Line Text", value: "Carpet Area" },
+      { id: "priceRange", name: "Price Range", type: "Currency", value: "Price Range" },
+      { id: "possession", name: "Possession", type: "Single Line Text", value: "Possession" },
+      { id: "unitLeft", name: "Unit Left", type: "Number", value: "Unit Left" },
+      { id: "facing", name: "Facing", type: "Single Select", value: "Facing", options: ["East", "West", "North", "South", "North-East"] },
+      { id: "amenities", name: "Amenities", type: "Multiple Select", value: "Amenities", options: ["Pool", "Gym", "Clubhouse", "Park", "Security"], editorKind: "tags" },
+    ],
+    rows: [
+      {
+        id: "property-1",
+        propertyName: "Green Acres Villa",
+        bhk: "3 BHK",
+        carpetArea: "1550 sqft",
+        priceRange: "1.2 - 1.5 Cr",
+        possession: "Ready to Move",
+        unitLeft: "4",
+        facing: "East",
+        amenities: "Pool, Gym, Clubhouse",
+      },
+      {
+        id: "property-2",
+        propertyName: "Skyline Heights",
+        bhk: "2 BHK",
+        carpetArea: "1100 sqft",
+        priceRange: "85 - 95 Lakhs",
+        possession: "Dec 2026",
+        unitLeft: "12",
+        facing: "North-East",
+        amenities: "Park, Security, Power Backup",
+      },
+      {
+        id: "property-3",
+        propertyName: "Ocean Breeze Apartments",
+        bhk: "4 BHK",
+        carpetArea: "2200 sqft",
+        priceRange: "2.5 - 3.0 Cr",
+        possession: "Ready to Move",
+        unitLeft: "2",
+        facing: "West",
+        amenities: "Sea View, Squash Court, Spa",
+      },
+    ],
+    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
+  },
   staff: {
     hideGridSelector: true,
     hideViewsPanel: true,
@@ -1534,6 +1596,7 @@ export function Workspace({
   workspaceId = "deals",
   columns,
   rowData,
+  rows,
   views,
   activeTab: activeTabProp,
   onTabChange,
@@ -1552,6 +1615,8 @@ export function Workspace({
   onCellClick,
   onRowDoubleClick,
   onExpandRow,
+  onAddRecord,
+  onAddRow,
 }) {
   const [internalTab, setInternalTab] = useState(activeTabProp || workspaceId || "deals");
   const effectiveWorkspaceId = activeTabProp || internalTab;
@@ -1574,14 +1639,22 @@ export function Workspace({
     return defaultWorkspaceConfigurations[effectiveWorkspaceId] || defaultWorkspaceConfigurations.deals;
   }, [effectiveWorkspaceId]);
 
+  const effectiveRowsProp = rows !== undefined ? rows : rowData;
+
   const initialFields = useMemo(() => columns && columns.length > 0 ? columns : config.fields, [columns, config]);
-  const initialRows = useMemo(() => rowData && rowData.length > 0 ? rowData : config.rows, [rowData, config]);
+  const initialRows = useMemo(() => effectiveRowsProp && effectiveRowsProp.length > 0 ? effectiveRowsProp : config.rows, [effectiveRowsProp, config]);
   const initialViews = useMemo(() => views && views.length > 0 ? views : config.views, [views, config]);
 
   const [fields, setFields] = useState(initialFields);
   const [gridRowData, setGridRowData] = useState(initialRows);
   const [viewsList, setViewsList] = useState(initialViews);
   const [isViewsPanelHidden, setIsViewsPanelHidden] = useState(false);
+
+  const [displayedRowCount, setDisplayedRowCount] = useState(null);
+
+  useEffect(() => {
+    setDisplayedRowCount(null);
+  }, [effectiveWorkspaceId]);
 
   useEffect(() => {
     setFields(initialFields);
@@ -1805,10 +1878,21 @@ export function Workspace({
     setFieldConfigModalState((prev) => ({ ...prev, open: false }));
   }, []);
 
+  const handleAddRecordClick = useCallback(() => {
+    if (onAddRecord) {
+      onAddRecord();
+    } else if (onAddRow) {
+      onAddRow();
+    } else {
+      addRow();
+    }
+  }, [onAddRecord, onAddRow, addRow]);
+
   // ==========================
   // Render
   // ==========================
-  const recordsCountText = `${gridRowData.length} records`;
+  const currentCount = displayedRowCount !== null ? displayedRowCount : gridRowData.length;
+  const recordsCountText = `${currentCount} records`;
 
   const context = useMemo(() => ({
     addRow,
@@ -1877,9 +1961,10 @@ export function Workspace({
                 onExpandRow={onExpandRow}
                 hideAddColumn={hideAddColumn || Boolean(config?.hideAddColumn)}
                 context={context}
+                onDisplayedRowCountChange={setDisplayedRowCount}
               />
             </div>
-            <AppCardFooter recordsCountText={recordsCountText} onAddRow={() => addRow()} />
+            <AppCardFooter recordsCountText={recordsCountText} onAddRecord={handleAddRecordClick} />
           </>
         )}
       </AppCard>
@@ -1929,7 +2014,30 @@ export function Workspace({
 }
 
 Workspace.propTypes = {
-  workspaceId: PropTypes.string.isRequired,
+  workspaceId: PropTypes.string,
+  columns: PropTypes.array,
+  rowData: PropTypes.array,
+  rows: PropTypes.array,
+  views: PropTypes.array,
+  activeTab: PropTypes.string,
+  onTabChange: PropTypes.func,
+  search: PropTypes.string,
+  onSearchChange: PropTypes.func,
+  hideGridSelector: PropTypes.bool,
+  hideManageFields: PropTypes.bool,
+  hideAddColumn: PropTypes.bool,
+  renderDropdown: PropTypes.func,
+  renderCreateModal: PropTypes.func,
+  renderDetailsModal: PropTypes.func,
+  renderManageFieldsModal: PropTypes.func,
+  renderEditFieldModal: PropTypes.func,
+  renderImportModal: PropTypes.func,
+  onImportClick: PropTypes.func,
+  onCellClick: PropTypes.func,
+  onRowDoubleClick: PropTypes.func,
+  onExpandRow: PropTypes.func,
+  onAddRecord: PropTypes.func,
+  onAddRow: PropTypes.func,
 };
 
 export default Workspace;
