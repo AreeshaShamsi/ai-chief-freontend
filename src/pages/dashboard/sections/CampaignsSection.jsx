@@ -69,7 +69,6 @@ function CampaignsSection({ data, onShowCreate }) {
           </div>
         </div>
 
-        <ActiveCallsPill count={2} />
       </div>
 
       <section>

@@ -103,7 +103,7 @@ LeadCategoryCard.propTypes = {
 };
 
 function LeadCategorySection() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <AppCard variant="compact" style={{ ...cardFrameStyle, padding: T.spacing[4], marginTop: T.spacing[4] }}>
@@ -152,9 +152,27 @@ function LeadCategorySection() {
   );
 }
 
-function LeadsSection() {
+function LeadsSection({ data }) {
+  if (!data) return null;
   const [activeTab, setActiveTab] = useState("deals");
+  const [dealsData, setDealsData] = useState(data.deals_data);
   const isTasks = activeTab === "tasks";
+
+  const handleTableCreated = (table) => {
+    // Only deals support creating tables
+    setDealsData((prev) => ({
+      ...prev,
+      tables: [...prev.tables, table],
+    }));
+  };
+
+  const handleTableDeleted = (tableId) => {
+    // Only deals support creating tables
+    setDealsData((prev) => ({
+      ...prev,
+      tables: prev.tables.filter((table) => table.id !== tableId),
+    }));
+  };
 
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
@@ -170,8 +188,11 @@ function LeadsSection() {
         <LeadCategorySection />
         <Workspace
           workspaceId={isTasks ? "tasks" : "deals"}
+          workspaceData={isTasks ? data.tasks_data : dealsData}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          onTableCreated={handleTableCreated}
+          onTableDeleted={handleTableDeleted}
         />
       </PageSection>
     </div>

@@ -148,7 +148,11 @@ export default function ColumnActionsModal({
               key={label}
               type="button"
               role="menuitem"
-              onClick={onClick}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClick?.();
+              }}
               onMouseEnter={(event) => {
                 event.currentTarget.style.background = C.surface;
               }}

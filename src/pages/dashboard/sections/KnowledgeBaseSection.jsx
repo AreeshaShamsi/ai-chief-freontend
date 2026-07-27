@@ -73,9 +73,10 @@ PageSection.propTypes = {
   style: PropTypes.object,
 };
 
-function KnowledgeBaseSection({ activeTab = "inventory", onTabChange }) {
+function KnowledgeBaseSection({ data, activeTab = "inventory", onTabChange }) {
+  if (!data) return null;
   const [currentTab, setCurrentTab] = useState(activeTab === "kb" ? "inventory" : activeTab);
-
+  console.log(data);
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
     if (onTabChange) {
@@ -114,9 +115,8 @@ function KnowledgeBaseSection({ activeTab = "inventory", onTabChange }) {
         </header>
         <Workspace
           workspaceId="kb"
-          columns={knowledgeBaseColumns}
-          rowData={knowledgeBaseRows}
-          views={knowledgeBaseViews}
+          workspaceData={data.workspace_data}
+          faqs={data.faqs}
           activeTab={currentTab}
           onTabChange={handleTabChange}
         />

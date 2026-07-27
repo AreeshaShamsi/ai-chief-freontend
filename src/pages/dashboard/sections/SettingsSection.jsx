@@ -3,19 +3,7 @@ import { FiLock, FiUser, FiUsers } from "react-icons/fi";
 import { AppButton, AppCard, C, T, TextField } from "../../../components/utils";
 import { Workspace } from "./Workspace";
 
-const profileFields = [
-  { label: "First Name", value: "Ramesh", half: true },
-  { label: "last name", value: "yadav", half: true },
-  { label: "Email Address", value: "delhi , noida" },
-  { label: "Phone Number", value: "987654321" },
-  { label: "role", value: "senior broker" },
-];
 
-const securityFields = [
-  { label: "Current Password", value: "currentpassword", type: "password" },
-  { label: "New Password", value: "set new password" },
-  { label: "Confirm New Password", value: "rewrite the new password" },
-];
 
 function SettingsField({ label, value, type = "text" }) {
   return (
@@ -49,7 +37,6 @@ function SettingsField({ label, value, type = "text" }) {
 function SettingsTab({ active, icon: Icon, children, onClick }) {
   const [hovered, setHovered] = useState(false);
   const showIndicator = active || hovered;
-
   return (
     <button
       type="button"
@@ -97,9 +84,55 @@ function SettingsTab({ active, icon: Icon, children, onClick }) {
   );
 }
 
-function SettingsSection() {
+function SettingsSection({ data }) {
+  if (!data) return null;
+  console.log(data);
   const [activeTab, setActiveTab] = useState("staff");
   const isProfile = activeTab === "profile";
+  const is_admin = localStorage.getItem("role") === "admin";
+  const user_id = localStorage.getItem("user_id");
+
+  const profileData = data.data.find(
+    (item) => item.id == user_id
+  );
+
+  const staffData = data.data.map((user) => ({
+    id: user.id,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    username: user.user_name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
+    access: user.access,
+    currentPassword: user.password,
+  }));
+
+  const profileFields = [
+    { label: "First Name", value: profileData?.first_name || "", half: true },
+    { label: "Last Name", value: profileData?.last_name || "", half: true },
+    { label: "Email Address", value: profileData?.email || "" },
+    { label: "Phone Number", value: profileData?.phone || "" },
+    { label: "Role", value: profileData?.role || "" },
+  ];
+
+  const securityFields = [
+    {
+      label: "Current Password",
+      value: profileData?.password || "",
+      type: "password",
+    },
+    {
+      label: "New Password",
+      value: "",
+      type: "password",
+    },
+    {
+      label: "Confirm New Password",
+      value: "",
+      type: "password",
+    },
+  ];
 
   return (
     <div
@@ -142,9 +175,9 @@ function SettingsSection() {
         <SettingsTab active={isProfile} icon={FiUser} onClick={() => setActiveTab("profile")}>
           My Profile
         </SettingsTab>
-        <SettingsTab active={!isProfile} icon={FiUsers} onClick={() => setActiveTab("staff")}>
+        {is_admin && <SettingsTab active={!isProfile} icon={FiUsers} onClick={() => setActiveTab("staff")}>
           My Staff
-        </SettingsTab>
+        </SettingsTab>}
       </div>
 
       {isProfile ? (

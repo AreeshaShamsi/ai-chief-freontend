@@ -42,7 +42,7 @@ const dropdownOffset = T.spacing[2];
 const viewportPadding = T.spacing[2];
 const overlayZIndex = 100000;
 
-function AddColumnModal({ children, onSelectField }) {
+function AddColumnModal({ children, onSelectField = () => { } }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [position, setPosition] = useState({ top: 0, left: 0, maxHeight: "none" });
@@ -102,6 +102,7 @@ function AddColumnModal({ children, onSelectField }) {
   }, [open]);
 
   const handleSelect = (type) => {
+    console.log("Selected:", type);
     setOpen(false);
     setSearch("");
     if (onSelectField) {
@@ -110,7 +111,6 @@ function AddColumnModal({ children, onSelectField }) {
   };
 
   const trigger = children({
-    isOpen: open,
     ref: triggerRef,
     onClick: (event) => {
       event.preventDefault();
@@ -126,104 +126,104 @@ function AddColumnModal({ children, onSelectField }) {
       {trigger}
       {open
         ? createPortal(
-            <div
-              ref={panelRef}
-              role="menu"
-              aria-label="Add column field types"
-              style={{
-                position: "fixed",
-                top: position.top,
-                left: position.left,
-                zIndex: overlayZIndex,
-                width: dropdownWidth,
-                maxHeight: position.maxHeight,
-                overflowY: "auto",
-                borderRadius: T.radius.xl,
-                border: `1px solid ${C.border}`,
-                background: C.card,
-                boxShadow: T.shadow.soft,
-                padding: T.spacing[3],
-                boxSizing: "border-box",
-                opacity: open ? 1 : 0,
-                transform: open ? "translateY(0)" : "translateY(-4px)",
-                transition: "opacity 180ms ease, transform 180ms ease",
-              }}
-            >
-              <div style={{ position: "relative" }}>
-                <FiSearch
-                  size={T.font.size.cardTitle}
-                  style={{
-                    position: "absolute",
-                    left: T.spacing[3],
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: C.muted,
-                    pointerEvents: "none",
-                  }}
-                />
-                <TextField
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Find A Field Type"
-                  autoFocus
-                  style={{
-                    height: T.spacing[5] * 2,
-                    borderRadius: T.radius.lg,
-                    background: C.surface,
-                    paddingLeft: T.spacing[6] + T.spacing[2],
-                    fontSize: T.font.size.bodySmall,
-                  }}
-                />
-              </div>
-
-              <div
+          <div
+            ref={panelRef}
+            role="menu"
+            aria-label="Add column field types"
+            style={{
+              position: "fixed",
+              top: position.top,
+              left: position.left,
+              zIndex: overlayZIndex,
+              width: dropdownWidth,
+              maxHeight: position.maxHeight,
+              overflowY: "auto",
+              borderRadius: T.radius.xl,
+              border: `1px solid ${C.border}`,
+              background: C.card,
+              boxShadow: T.shadow.soft,
+              padding: T.spacing[3],
+              boxSizing: "border-box",
+              opacity: open ? 1 : 0,
+              transform: open ? "translateY(0)" : "translateY(-4px)",
+              transition: "opacity 180ms ease, transform 180ms ease",
+            }}
+          >
+            <div style={{ position: "relative" }}>
+              <FiSearch
+                size={T.font.size.cardTitle}
                 style={{
-                  height: 1,
-                  background: C.borderLt,
-                  margin: `${T.spacing[3]}px 0 ${T.spacing[2]}px`,
+                  position: "absolute",
+                  left: T.spacing[3],
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: C.muted,
+                  pointerEvents: "none",
                 }}
               />
+              <TextField
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Find A Field Type"
+                autoFocus
+                style={{
+                  height: T.spacing[5] * 2,
+                  borderRadius: T.radius.lg,
+                  background: C.surface,
+                  paddingLeft: T.spacing[6] + T.spacing[2],
+                  fontSize: T.font.size.bodySmall,
+                }}
+              />
+            </div>
 
-              <div style={{ display: "grid", gap: T.spacing[1] }}>
-                {filteredTypes.map(({ label, icon: Icon }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => handleSelect(label)}
-                    onMouseEnter={(event) => {
-                      event.currentTarget.style.background = C.surface;
-                    }}
-                    onMouseLeave={(event) => {
-                      event.currentTarget.style.background = C.card;
-                    }}
-                    style={{
-                      width: "100%",
-                      minHeight: T.spacing[5] * 2,
-                      border: T.border.none,
-                      borderRadius: T.radius.md,
-                      background: C.card,
-                      color: C.text,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: T.spacing[3],
-                      padding: `0 ${T.spacing[3]}px`,
-                      cursor: "pointer",
-                      fontFamily: T.font.family,
-                      textAlign: "left",
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    <Icon size={T.font.size.sectionTitle} color={C.muted} style={{ flexShrink: 0 }} />
-                    <Text variant="label" color={C.text}>
-                      {label}
-                    </Text>
-                  </button>
-                ))}
-              </div>
-            </div>,
-            document.body
-          )
+            <div
+              style={{
+                height: 1,
+                background: C.borderLt,
+                margin: `${T.spacing[3]}px 0 ${T.spacing[2]}px`,
+              }}
+            />
+
+            <div style={{ display: "grid", gap: T.spacing[1] }}>
+              {filteredTypes.map(({ label, icon: Icon }) => (
+                <button
+                  key={label}
+                  type="button"
+                  role="menuitem"
+                  onClick={() => handleSelect(label)}
+                  onMouseEnter={(event) => {
+                    event.currentTarget.style.background = C.surface;
+                  }}
+                  onMouseLeave={(event) => {
+                    event.currentTarget.style.background = C.card;
+                  }}
+                  style={{
+                    width: "100%",
+                    minHeight: T.spacing[5] * 2,
+                    border: T.border.none,
+                    borderRadius: T.radius.md,
+                    background: C.card,
+                    color: C.text,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: T.spacing[3],
+                    padding: `0 ${T.spacing[3]}px`,
+                    cursor: "pointer",
+                    fontFamily: T.font.family,
+                    textAlign: "left",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <Icon size={T.font.size.sectionTitle} color={C.muted} style={{ flexShrink: 0 }} />
+                  <Text variant="label" color={C.text}>
+                    {label}
+                  </Text>
+                </button>
+              ))}
+            </div>
+          </div>,
+          document.body
+        )
         : null}
     </>
   );
@@ -234,8 +234,5 @@ AddColumnModal.propTypes = {
   onSelectField: PropTypes.func,
 };
 
-AddColumnModal.defaultProps = {
-  onSelectField: () => {},
-};
 
 export default AddColumnModal;

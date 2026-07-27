@@ -84,10 +84,10 @@ export default function GridNameActionsModal({
   };
 
   const menuItems = [
-    { label: isFavorite ? "Remove From Favorites" : "Add To My Favorites", icon: LuStar, onClick: () => handleAction(onFavorite) },
-    { label: "Rename Grid Name", icon: LuPencil, onClick: () => handleAction(onRenameGrid) },
-    { label: "Duplicate Grid Name", icon: LuCopy, onClick: () => handleAction(onDuplicateGrid) },
-    { label: "Delete Grid Name", icon: LuTrash2, onClick: () => handleAction(onDeleteGrid), isDanger: true },
+    // { label: isFavorite ? "Remove From Favorites" : "Add To My Favorites", icon: LuStar, onClick: () => handleAction(onFavorite) },
+    { label: "Rename Grid", icon: LuPencil, onClick: () => handleAction(onRenameGrid) },
+    { label: "Duplicate Grid", icon: LuCopy, onClick: () => handleAction(onDuplicateGrid) },
+    { label: "Delete Grid", icon: LuTrash2, onClick: () => handleAction(onDeleteGrid), isDanger: true },
   ];
 
   return createPortal(

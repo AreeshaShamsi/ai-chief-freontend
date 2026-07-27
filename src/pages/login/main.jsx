@@ -11,7 +11,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const handle = async () => {
 
-    
+
     if (!email.trim() || !pass.trim()) {
       setErr("Please enter both email and password.");
       return;
@@ -21,7 +21,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/company/verify`, {
+      const res = await fetch(`${API_URL}/user/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,10 +34,14 @@ function LoginPage() {
 
       const data = await res.json();
 
-      localStorage.setItem("name", data.name);
+      console.log(data);
+      localStorage.setItem("first_name", data.data.first_name);
 
-      localStorage.setItem("user_name", data.user_name);
-      localStorage.setItem("company_id", data.id);
+      localStorage.setItem("user_name", data.data.user_name);
+      localStorage.setItem("company_id", data.data.company_id);
+      localStorage.setItem("user_id", data.data.id);
+      localStorage.setItem("role", data.data.role);
+      localStorage.setItem("access", data.data.access);
       if (!res.ok) {
         throw new Error(data.message || "Login failed");
       }

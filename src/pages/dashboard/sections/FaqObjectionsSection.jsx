@@ -11,6 +11,7 @@ import {
   Text,
 } from "../../../components/utils";
 import FaqModal from "../modals/FaqModal";
+import { addFAQ, updateFAQ, deleteFAQ } from "../../../api/faq";
 
 export const initialFaqItems = [
   {
@@ -155,8 +156,8 @@ FaqCardItem.propTypes = {
   onDelete: PropTypes.func.isRequired,
 };
 
-function FaqObjectionsSection({ onAddFaq: externalOnAddFaq }) {
-  const [faqs, setFaqs] = useState(initialFaqItems);
+function FaqObjectionsSection({ data, onAddFaq: externalOnAddFaq }) {
+  const [faqs, setFaqs] = useState(data || []);
   const [modalState, setModalState] = useState({
     open: false,
     mode: "add",
@@ -182,7 +183,7 @@ function FaqObjectionsSection({ onAddFaq: externalOnAddFaq }) {
     setModalState((prev) => ({ ...prev, open: false }));
   };
 
-  const handleSaveFaq = (faqData) => {
+  const handleSaveFaq = async (faqData) => {
     if (modalState.mode === "add") {
       const nextId = faqs.length > 0 ? Math.max(...faqs.map((f) => f.id)) + 1 : 1;
       let qText = faqData.question;
@@ -199,6 +200,8 @@ function FaqObjectionsSection({ onAddFaq: externalOnAddFaq }) {
         answer: aText,
       };
       setFaqs((prev) => [...prev, newFaq]);
+      const payload = { company_id: localStorage.getItem("company_id"), question: qText, answer: aText };
+      await addFAQ(payload);
     } else if (modalState.mode === "edit" && faqData.id) {
       setFaqs((prev) =>
         prev.map((item) =>
@@ -207,11 +210,15 @@ function FaqObjectionsSection({ onAddFaq: externalOnAddFaq }) {
             : item
         )
       );
+      const payload = { company_id: localStorage.getItem("company_id"), question: faqData.question, answer: faqData.answer };
+
+      await updateFAQ(faqData.id, payload);
     }
   };
 
-  const handleDeleteFaq = (faqId) => {
+  const handleDeleteFaq = async (faqId) => {
     setFaqs((prev) => prev.filter((item) => item.id !== faqId));
+    await deleteFAQ(faqId);
   };
 
   return (

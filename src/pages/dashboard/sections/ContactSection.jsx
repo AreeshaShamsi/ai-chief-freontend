@@ -68,7 +68,10 @@ PageSection.propTypes = {
   style: PropTypes.object,
 };
 
-function ContactSection({ activeTab = "contacts", onTabChange, onCreateCampaign }) {
+function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCampaign }) {
+  if (!data) {
+    return null;
+  }
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleCreateClick = () => {
@@ -78,6 +81,10 @@ function ContactSection({ activeTab = "contacts", onTabChange, onCreateCampaign 
       setShowCreateModal(true);
     }
   };
+
+  const addRecord = () => {
+    console.log("Add record");
+  }
 
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
@@ -124,12 +131,14 @@ function ContactSection({ activeTab = "contacts", onTabChange, onCreateCampaign 
         </header>
         <Workspace
           workspaceId="contacts"
-          columns={contactColumns}
-          rowData={contactRows}
+          workspaceData={data}
+          columns={data.tables[0].fields}
+          rowData={data.tables[0].rows}
 
 
           activeTab={activeTab}
           onTabChange={onTabChange}
+
         />
       </PageSection>
     </div>

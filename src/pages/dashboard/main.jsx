@@ -13,6 +13,7 @@ import KnowledgeBaseSection from "./sections/KnowledgeBaseSection";
 import { API_URL } from "../../config/main";
 import Loader from "../../components/Loader";
 import { C, T } from "../../components/utils";
+import { getActivity, getContact, getSummary, getUser, getKnowledgeBase, getDeals } from "../../api/dashboard";
 
 const pathToTab = {
     "/dashboard": "dashboard",
@@ -44,16 +45,73 @@ export default function DashboardMain() {
 
     const [summaryData, setSummaryData] = useState(null);
     const [activityData, setActivityData] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [contactData, setContactData] = useState(null);
+    const [knowledgeBaseData, setKnowledgeBaseData] = useState(null);
+    const [dealsData, setDealsData] = useState(null);
+
     const [loading, setLoading] = useState(false);
 
     const fetchSummaryData = async () => {
         const company_id = localStorage.getItem("company_id");
-        const res = await fetch(`${API_URL}/dashboard/summary?company_id=${company_id}`);
-        const data = await res.json();
+        if (!company_id) return;
+        const res = await getSummary(company_id);
+        const data = res
         setSummaryData(data);
         console.log(data);
         return data;
     };
+
+    const fetchUserData = async () => {
+        const company_id = localStorage.getItem("company_id");
+        const user_id = localStorage.getItem("user_id");
+        const is_admin = localStorage.getItem("role") === "admin";
+        if (!company_id) return;
+        const payload = {
+            "company_id": company_id,
+            "user_id": user_id,
+            "is_admin": is_admin
+        }
+        const res = await getUser(payload);
+        const data = res
+        setUserData(data);
+        console.log(data);
+        return data;
+    };
+
+    const fetchContactData = async () => {
+        const company_id = localStorage.getItem("company_id");
+        if (!company_id) return;
+        const res = await getContact(company_id);
+        const data = res
+        setContactData(data);
+        console.log(data);
+        return data;
+    };
+
+    const fetchKnowledgeBaseData = async () => {
+        const company_id = localStorage.getItem("company_id");
+        if (!company_id) return;
+        const params = { "company_id": company_id, "name": "kb" };
+        const res = await getKnowledgeBase(params);
+        const data = res
+        setKnowledgeBaseData(data);
+        console.log(data);
+        return data;
+    };
+
+    const fetchDeals = async () => {
+        const company_id = localStorage.getItem("company_id");
+        if (!company_id) return;
+        const params = { "company_id": company_id };
+        const res = await getDeals(params);
+        const data = res
+        setDealsData(data);
+        console.log(data);
+        return data;
+    };
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,9 +127,33 @@ export default function DashboardMain() {
 
                 if (tab === "calls") {
                     if (!activityData) {
-                        const res = await fetch(`${API_URL}/dashboard/activity?company_id=${company_id}`);
-                        const data = await res.json();
+                        const res = await getActivity(company_id);
+                        const data = res
                         setActivityData(data);
+                    }
+                }
+
+                if (tab === "settings") {
+                    if (!userData) {
+                        await fetchUserData();
+                    }
+                }
+
+                if (tab === "contact") {
+                    if (!contactData) {
+                        await fetchContactData();
+                    }
+                }
+
+                if (tab === "kb") {
+                    if (!knowledgeBaseData) {
+                        await fetchKnowledgeBaseData();
+                    }
+                }
+
+                if (tab === "deals") {
+                    if (!dealsData) {
+                        await fetchDeals();
                     }
                 }
             } catch (err) {
@@ -95,13 +177,12 @@ export default function DashboardMain() {
             <main style={{ width: "100%", minWidth: 0 }}>
                 {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => navigate("/campaigns")} />}
                 {tab === "campaigns" && <CampaignsSection data={summaryData} onShowCreate={() => setShowModal(true)} />}
-                {tab === "deals" && <LeadsSection />}
+                {tab === "deals" && <LeadsSection data={dealsData} />}
                 {tab === "calls" && <CallLogSection data={activityData} />}
-                {tab === "kb" && <KnowledgeBaseSection />}
-                {tab === "tasks" && <TasksSection />}
-                {tab === "contact" && <ContactSection />}
+                {tab === "kb" && <KnowledgeBaseSection data={knowledgeBaseData} />}
+                {tab === "contact" && <ContactSection data={contactData} />}
                 {tab === "integration" && <IntegrationSection />}
-                {tab === "settings" && <SettingsSection />}
+                {tab === "settings" && <SettingsSection data={userData} />}
             </main>
         </div>
     );

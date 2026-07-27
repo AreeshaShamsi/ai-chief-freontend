@@ -38,6 +38,7 @@ import FieldConfigurationModal from "../modals/FieldConfigurationModal";
 import FaqObjectionsSection from "./FaqObjectionsSection";
 import { LuChevronDown, LuBookOpen, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertical } from "react-icons/lu";
 import { FaStar } from "react-icons/fa";
+import { updateCellValue, addColumnValue, addRowValue, deleteRowValue, deleteRowsValue, duplicateRowValue, updateColumnValue, createBlankTable, importTable, renameTable, deleteTable, duplicateTable } from "../../../api/workspace";
 
 export function formatTimestamp(date = new Date()) {
   const d = date instanceof Date ? date : new Date(date);
@@ -117,7 +118,7 @@ const cardFrameStyle = {
   boxShadow: T.shadow.xs,
 };
 
-const viewsPanelWidth = 198;
+const viewsPanelWidth = 298;
 const viewsPanelCollapsedWidth = 0;
 const viewsPanelPadding = T.spacing[3];
 const layoutTransition = "width 260ms ease, flex-basis 260ms ease, padding 260ms ease";
@@ -355,7 +356,7 @@ function ColumnHeaderWrapper(props) {
         ) : (
           <Text variant="headerCell">{displayName}</Text>
         )}
-        
+
         {sortState === "asc" && (
           <LuArrowUpAZ size={12} color={C.accent} style={{ flexShrink: 0 }} />
         )}
@@ -399,24 +400,47 @@ function ColumnHeaderWrapper(props) {
             triggerRef={triggerRef}
             columnId={colId}
             columnName={displayName}
-            onEditField={() => context.onEditColumn?.(colId)}
-            onRenameField={() => context.onRenameColumn?.(colId)}
+            onEditField={() => {
+              console.log("Edit field");
+              context.updateColumn?.(colId)
+            }}
+            onRenameField={() => context.renameColumn?.(colId)}
             onDuplicateField={() => context.onDuplicateColumn?.(colId)}
             onMoveLeft={() => {
-              const allColumns = api.getColumns() || [];
-              const index = allColumns.findIndex((col) => col.getColId() === colId);
-              if (index > 0) api.moveColumn(colId, index - 1);
+              const state = api.getColumnState();
+
+              const index = state.findIndex(col => col.colId === colId);
+
+              if (index > 0) {
+                const newState = [...state];
+                [newState[index - 1], newState[index]] = [
+                  newState[index],
+                  newState[index - 1],
+                ];
+
+                api.applyColumnState({
+                  state: newState,
+                  applyOrder: true,
+                });
+              }
             }}
             onMoveRight={() => {
-              const allColumns = api.getColumns() || [];
-              const index = allColumns.findIndex((col) => col.getColId() === colId);
-              if (index >= 0 && index < allColumns.length - 1) api.moveColumn(colId, index + 1);
-            }}
-            onSortAsc={() => {
-              api.applyColumnState({
-                state: [{ colId: colId, sort: "asc" }],
-                defaultState: { sort: null },
-              });
+              const state = api.getColumnState();
+
+              const index = state.findIndex(col => col.colId === colId);
+
+              if (index >= 0 && index < state.length - 1) {
+                const newState = [...state];
+                [newState[index], newState[index + 1]] = [
+                  newState[index + 1],
+                  newState[index],
+                ];
+
+                api.applyColumnState({
+                  state: newState,
+                  applyOrder: true,
+                });
+              }
             }}
             onSortDesc={() => {
               api.applyColumnState({
@@ -424,7 +448,13 @@ function ColumnHeaderWrapper(props) {
                 defaultState: { sort: null },
               });
             }}
-            onDeleteField={() => context.onDeleteColumn?.(colId)}
+            onSortAsc={() => {
+              api.applyColumnState({
+                state: [{ colId: colId, sort: "asc" }],
+                defaultState: { sort: null },
+              });
+            }}
+            onDeleteField={() => context.deleteColumn?.(colId)}
           />
         </>
       ) : null}
@@ -454,6 +484,7 @@ function createHeader(label, icon) {
 }
 
 function AddColumnHeader({ displayName, icon: Icon, context }) {
+  console.log("context", context);
   const handleSelectField = (typeLabel) => {
     if (context?.onOpenFieldConfig) {
       context.onOpenFieldConfig(typeLabel);
@@ -586,22 +617,7 @@ function WorkspaceToolbar({
               >
                 <LuBookOpen size={15} style={{ color: activeKbTab === "faq" ? C.accent : C.muted }} />
                 <Text variant="label" color={activeKbTab === "faq" ? C.accent : C.text}>FAQ & Objections</Text>
-                <AppPill
-                  variant={activeKbTab === "faq" ? "primary" : "neutral"}
-                  size="xs"
-                  style={{
-                    height: 18,
-                    padding: "0 6px",
-                    fontSize: 10,
-                    fontWeight: T.font.weight.bold,
-                    borderRadius: T.radius.pill,
-                    background: activeKbTab === "faq" ? C.accentLt : C.surface,
-                    color: activeKbTab === "faq" ? C.accent : C.muted,
-                    border: `1px solid ${activeKbTab === "faq" ? C.accentTrack : C.border}`,
-                  }}
-                >
-                  4
-                </AppPill>
+
               </AppButton>
             </>
           ) : isStaffActive || (hideGridSelector && !isContactsActive) ? null : isContactsActive ? (
@@ -694,12 +710,13 @@ function WorkspaceToolbar({
             {!hideGridSelector && (
               <AppButton compact style={gridSelectorButtonStyle}>
                 <FiGrid size={16} style={{ color: C.accent }} />
-                <Text variant="label">Grid Name</Text>
+                <Text variant="label">{workspaceId}</Text>
               </AppButton>
             )}
           </div>
 
           <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
+
             <AppButton compact style={toolbarActionButtonStyle}>
               <FiLink size={13} />
               <Text variant="mutedLabel">Sync</Text>
@@ -756,7 +773,7 @@ WorkspaceToolbar.propTypes = {
   hideManageFields: PropTypes.bool,
 };
 
-function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggleFavorite }) {
+function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggleFavorite, onTableCreated, onTableDeleted }) {
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(viewItem.name);
@@ -777,22 +794,29 @@ function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggl
   const handleRename = () => {
     setIsEditing(true);
   };
-  const handleSaveRename = () => {
+  const handleSaveRename = async () => {
+    console.log("Renamed:", viewItem.id);
+    console.log("To:", editName);
     if (editName.trim()) {
       viewItem.name = editName.trim();
     } else {
       setEditName(viewItem.name);
     }
+    const payload = { name: viewItem.name, tableId: viewItem.id };
+    await renameTable(payload);
     setIsEditing(false);
   };
   const handleCancelRename = () => {
     setEditName(viewItem.name);
     setIsEditing(false);
   };
-  const handleDuplicate = () => {
-    console.log("Duplicated:", viewItem.id);
+  const handleDuplicate = async () => {
+    const payload = { tableId: viewItem.id, userId: localStorage.getItem("user_id") };
+    const table = await duplicateTable(payload);
+    onTableCreated?.(table);
   };
-  const handleDelete = () => {
+  const handleDelete = async () => {
+
     setShowDeleteConfirm(true);
   };
 
@@ -804,8 +828,11 @@ function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggl
           message={`Are you sure you want to delete grid "${viewItem.name}"?`}
           confirmText="Delete"
           variant="danger"
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Deleted:", viewItem.id);
+            const payload = { tableId: viewItem.id };
+            await deleteTable(payload);
+            onTableDeleted?.(viewItem.id);
             setShowDeleteConfirm(false);
           }}
           onClose={() => setShowDeleteConfirm(false)}
@@ -895,6 +922,7 @@ function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggl
           onDuplicateGrid={handleDuplicate}
           onDeleteGrid={handleDelete}
         />
+
       </div>
     </>
   );
@@ -908,7 +936,11 @@ GridNameRowItem.propTypes = {
   onToggleFavorite: PropTypes.func,
 };
 
-function WorkspaceViewsPanel({ isHidden, viewsList, onOpenImportModal }) {
+function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenImportModal, onActiveViewChange, onTableCreated, onTableDeleted }) {
+  console.log(viewsList);
+  const fileInputRef = useRef(null);
+  const [importType, setImportType] = useState(null);
+
   const normalizedViews = useMemo(() => {
     return viewsList.map((view, idx) => {
       if (typeof view === "string") {
@@ -945,19 +977,51 @@ function WorkspaceViewsPanel({ isHidden, viewsList, onOpenImportModal }) {
     return [...favs, ...nonFavs];
   }, [normalizedViews, viewSearch, favoriteIds]);
 
-  const handleStartFromScratch = () => {
+  const handleStartFromScratch = async () => {
+    const payload = { userId: localStorage.getItem("user_id"), workspaceId: workspaceIdentifier, name: "New Grid" };
+    const res = await createBlankTable(payload);
+    onTableCreated?.(res);
     setIsCreateMenuOpen(false);
   };
 
+
   const handleCsvImport = () => {
     setIsCreateMenuOpen(false);
-    if (onOpenImportModal) onOpenImportModal();
+    fileInputRef.current?.click();
+    //if (onOpenImportModal) onOpenImportModal();
+
   };
 
   const handleExcelImport = () => {
     setIsCreateMenuOpen(false);
-    if (onOpenImportModal) onOpenImportModal();
+    fileInputRef.current?.click();
+    //if (onOpenImportModal) onOpenImportModal();
+
   };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("workspaceId", workspaceIdentifier);
+    formData.append("name", file.name.replace(/\.[^/.]+$/, ""));
+    formData.append("userId", localStorage.getItem("user_id"));
+
+    const table = await importTable(formData);
+
+    onTableCreated?.(table);
+
+    e.target.value = "";
+  };
+
+  const handleViewChange = (viewId) => {
+    console.log("View changed:", viewId);
+    setActiveViewId(viewId);
+    onActiveViewChange?.(viewId);
+  };
+  console.log(activeViewId);
 
   return (
     <aside
@@ -1023,6 +1087,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList, onOpenImportModal }) {
             onExcelImport={handleExcelImport}
             triggerRef={createButtonRef}
           />
+
         </div>
         <div style={{ marginTop: 11 }}>
           <SearchBox value={viewSearch} onChange={setViewSearch} placeholder="Find A View" width="100%" />
@@ -1034,11 +1099,20 @@ function WorkspaceViewsPanel({ isHidden, viewsList, onOpenImportModal }) {
               viewItem={viewItem}
               isActive={viewItem.id === activeViewId}
               isFavorite={favoriteIds.has(viewItem.id)}
-              onSelectView={setActiveViewId}
+              onSelectView={handleViewChange}
               onToggleFavorite={toggleFavorite}
+              onTableCreated={onTableCreated}
+              onTableDeleted={onTableDeleted}
             />
           ))}
         </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={importType === "csv" ? ".csv" : ".xlsx,.xls"}
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+        />
       </div>
     </aside>
   );
@@ -1047,7 +1121,11 @@ function WorkspaceViewsPanel({ isHidden, viewsList, onOpenImportModal }) {
 WorkspaceViewsPanel.propTypes = {
   isHidden: PropTypes.bool.isRequired,
   viewsList: PropTypes.array.isRequired,
+  workspaceIdentifier: PropTypes.string,
   onOpenImportModal: PropTypes.func,
+  onActiveViewChange: PropTypes.func,
+  onTableCreated: PropTypes.func,
+  onTableDeleted: PropTypes.func,
 };
 
 function WorkspaceGrid({
@@ -1091,26 +1169,26 @@ function WorkspaceGrid({
           ...(isPrimary
             ? { cellRenderer: PrimaryNameCell }
             : field.id === "createdBy" || field.id === "lastModifiedBy"
-            ? { cellRenderer: UserBadgeCell }
-            : {}),
+              ? { cellRenderer: UserBadgeCell }
+              : {}),
         };
       }),
       ...(hideAddColumn || isStaff
         ? []
         : [
-            {
-              field: "addColumn",
-              headerName: "Add Column",
-              headerComponentParams: {
-                innerHeaderComponent: AddColumnHeader,
-                innerHeaderComponentParams: { icon: FiPlus },
-              },
-              minWidth: 135,
-              sortable: false,
-              resizable: false,
-              valueGetter: () => "",
+          {
+            field: "addColumn",
+            headerName: "Add Column",
+            headerComponentParams: {
+              innerHeaderComponent: AddColumnHeader,
+              innerHeaderComponentParams: { icon: FiPlus },
             },
-          ]),
+            minWidth: 135,
+            sortable: false,
+            resizable: false,
+            valueGetter: () => "",
+          },
+        ]),
     ],
     [fields, primaryNameKey, hideAddColumn, isStaff, workspaceId]
   );
@@ -1253,6 +1331,8 @@ function WorkspaceGrid({
     return rowDataProp;
   }, [refreshKey, rowDataProp]);
 
+  console.log(fields);
+  console.log(selectedRow);
   return (
     <div style={{ flex: "1 1 620px", minWidth: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <div style={{ height: 318, minWidth: 0, flex: "0 0 auto" }}>
@@ -1393,7 +1473,12 @@ const defaultWorkspaceConfigurations = {
   deals: {
     fields: initialDealFields,
     rows: dealRows,
-    views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
+    views: [
+      { id: 1, name: "Grid Name 1" },
+      { id: 2, name: "Grid Name 2" },
+      { id: 3, name: "Grid Name 3" },
+      { id: 4, name: "Grid Name 4" },
+    ],
   },
   leads: {
     fields: [
@@ -1434,6 +1519,7 @@ const defaultWorkspaceConfigurations = {
     views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },
   tasks: {
+    hideViewsPanel: true,
     fields: [
       { id: "taskName", name: "Task Name", type: "Single Line Text", value: "Task Name" },
       { id: "description", name: "Description", type: "Single Line Text", value: "Description" },
@@ -1470,6 +1556,8 @@ const defaultWorkspaceConfigurations = {
     views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },
   kb: {
+    hideViewsPanel: true,
+    hideGridSelector: true,
     fields: [
       { id: "propertyName", name: "Property Name", type: "Single Line Text", value: "Property Name" },
       { id: "bhk", name: "BHK", type: "Single Select", value: "BHK", options: ["1 BHK", "2 BHK", "3 BHK", "4 BHK"] },
@@ -1518,6 +1606,7 @@ const defaultWorkspaceConfigurations = {
     views: ["Grid Name", "Grid Name", "Grid Name", "Grid Name"],
   },
   inventory: {
+    hideViewsPanel: true,
     fields: [
       { id: "propertyName", name: "Property Name", type: "Single Line Text", value: "Property Name" },
       { id: "bhk", name: "BHK", type: "Single Select", value: "BHK", options: ["1 BHK", "2 BHK", "3 BHK", "4 BHK"] },
@@ -1580,7 +1669,7 @@ const defaultWorkspaceConfigurations = {
       { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["Access To Edit Deals", "Access To Edit Knowledge Base"], editorKind: "tags" },
     ],
     rows: [
-      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", username: "rahul.sharma", email: "Rahulsharma@14gmail.Com", phone: "+91 98765 43210", role: "Admin", access: "Access To Edit Deals" },
+      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", username: "rahul.sharma", email: "Rahulsharma@14gmail.Com", phone: "+91 98765 43210", role: "Admin", access: "Access To Edit Deals", currentPassword: "123456" },
       { id: "staff-2", firstName: "Ananya", lastName: "Rao", username: "ananya.rao", email: "ananya.rao@gmail.com", phone: "+91 87654 32109", role: "Admin", access: "Access To Edit Deals" },
       { id: "staff-3", firstName: "Rohan", lastName: "Mehta", username: "rohan.mehta", email: "rohan.mehta@gmail.com", phone: "+91 76543 21098", role: "Agent", access: "Access To Edit Knowledge Base" },
       { id: "staff-4", firstName: "Kavya", lastName: "Nair", username: "kavya.nair", email: "kavya.nair@gmail.com", phone: "+91 65432 10987", role: "Manager", access: "Access To Edit Deals" },
@@ -1604,7 +1693,7 @@ const defaultWorkspaceConfigurations = {
       { id: "access", name: "Access", type: "Single Select", value: "Access", options: ["Access To Edit Deals", "Access To Edit Knowledge Base"], editorKind: "tags" },
     ],
     rows: [
-      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", username: "rahul.sharma", email: "Rahulsharma@14gmail.Com", phone: "+91 98765 43210", role: "Admin", access: "Access To Edit Deals" },
+      { id: "staff-1", firstName: "Rahul", lastName: "Sharma", username: "rahul.sharma", email: "Rahulsharma@14gmail.Com", phone: "+91 98765 43210", role: "Admin", access: "Access To Edit Deals", currentPassword: "123456" },
       { id: "staff-2", firstName: "Ananya", lastName: "Rao", username: "ananya.rao", email: "ananya.rao@gmail.com", phone: "+91 87654 32109", role: "Admin", access: "Access To Edit Deals" },
       { id: "staff-3", firstName: "Rohan", lastName: "Mehta", username: "rohan.mehta", email: "rohan.mehta@gmail.com", phone: "+91 76543 21098", role: "Agent", access: "Access To Edit Knowledge Base" },
       { id: "staff-4", firstName: "Kavya", lastName: "Nair", username: "kavya.nair", email: "kavya.nair@gmail.com", phone: "+91 65432 10987", role: "Manager", access: "Access To Edit Deals" },
@@ -1620,10 +1709,7 @@ const defaultWorkspaceConfigurations = {
 // ==========================
 export function Workspace({
   workspaceId = "deals",
-  columns,
-  rowData,
-  rows,
-  views,
+  workspaceData,
   activeTab: activeTabProp,
   onTabChange,
   search: externalSearch,
@@ -1631,6 +1717,7 @@ export function Workspace({
   hideGridSelector = false,
   hideManageFields = false,
   hideAddColumn = false,
+  faqs = [],
   renderDropdown,
   renderCreateModal,
   renderDetailsModal,
@@ -1643,9 +1730,25 @@ export function Workspace({
   onExpandRow,
   onAddRecord,
   onAddRow,
+  onTableCreated,
+  onTableDeleted
 }) {
+  if (!workspaceData) return null;
   const [internalTab, setInternalTab] = useState(activeTabProp || workspaceId || "deals");
   const effectiveWorkspaceId = activeTabProp || internalTab;
+  const workspaceIdentifier = workspaceData.id;
+
+  const [activeViewId, setActiveViewId] = useState(
+    workspaceData.tables?.[0]?.id
+  );
+
+  const activeTable =
+    workspaceData.tables?.find((table) => table.id === activeViewId) ??
+    workspaceData.tables?.[0];
+
+  const columns = activeTable?.fields ?? [];
+  const rowData = activeTable?.rows ?? [];
+
 
   const [internalSearchQuery, setInternalSearchQuery] = useState("");
   const searchQuery = externalSearch !== undefined ? externalSearch : internalSearchQuery;
@@ -1665,11 +1768,26 @@ export function Workspace({
     return defaultWorkspaceConfigurations[effectiveWorkspaceId] || defaultWorkspaceConfigurations.deals;
   }, [effectiveWorkspaceId]);
 
-  const effectiveRowsProp = rows !== undefined ? rows : rowData;
+  console.log(effectiveWorkspaceId);
+  console.log(config);
+  const effectiveRowsProp = rowData;
 
-  const initialFields = useMemo(() => columns && columns.length > 0 ? columns : config.fields, [columns, config]);
-  const initialRows = useMemo(() => effectiveRowsProp && effectiveRowsProp.length > 0 ? effectiveRowsProp : config.rows, [effectiveRowsProp, config]);
-  const initialViews = useMemo(() => views && views.length > 0 ? views : config.views, [views, config]);
+  const initialFields = useMemo(
+    () => (columns.length > 0 ? columns : config.fields),
+    [columns, config.fields]
+  );
+
+  const initialRows = useMemo(
+    () => (rowData.length > 0 ? rowData : config.rows),
+    [rowData, config.rows]
+  ); const initialViews = useMemo(
+    () =>
+      (workspaceData?.tables ?? []).map((table) => ({
+        id: table.id,
+        name: table.name,
+      })),
+    [workspaceData]
+  );
 
   const [fields, setFields] = useState(initialFields);
   const [gridRowData, setGridRowData] = useState(initialRows);
@@ -1725,9 +1843,9 @@ export function Workspace({
   // ==========================
   // Row Operations
   // ==========================
-  const addRow = useCallback((newRow) => {
+  const addRow = useCallback(async (newRow) => {
     const nowFormatted = formatTimestamp();
-    const row = newRow || { id: `row-${Date.now()}` };
+    const row = newRow;
     const initializedRow = {
       createdTime: nowFormatted,
       created: nowFormatted,
@@ -1743,16 +1861,19 @@ export function Workspace({
     const next = [...prev, initializedRow];
     setGridRowData(next);
     trackChange("Add Row", initializedRow.id, prev, next);
+    const user_id = localStorage.getItem("user_id");
+    await addRowValue(activeViewId, user_id);
   }, [gridRowData, trackChange]);
 
-  const deleteRow = useCallback((rowId) => {
+  const deleteRow = useCallback(async (rowId) => {
     const prev = [...gridRowData];
     const next = prev.filter((r) => r.id !== rowId);
     setGridRowData(next);
     trackChange("Delete Row", rowId, prev, next);
+    await deleteRowValue(rowId);
   }, [gridRowData, trackChange]);
 
-  const duplicateRow = useCallback((rowId) => {
+  const duplicateRow = useCallback(async (rowId) => {
     const prev = [...gridRowData];
     const targetRow = prev.find((r) => r.id === rowId);
     if (!targetRow) return;
@@ -1762,6 +1883,11 @@ export function Workspace({
     next.splice(idx + 1, 0, duplicated);
     setGridRowData(next);
     trackChange("Duplicate Row", duplicated.id, prev, next);
+    const user_id = localStorage.getItem("user_id");
+    const payload = { "userId": user_id };
+    console.log(rowId, payload);
+    const res = await duplicateRowValue(rowId, payload);
+    console.log(res);
   }, [gridRowData, trackChange]);
 
   const updateRow = useCallback((rowId, updatedFields) => {
@@ -1776,11 +1902,21 @@ export function Workspace({
   // ==========================
   // Column Operations
   // ==========================
-  const addColumn = useCallback((newField) => {
+  const addColumn = useCallback(async (newField) => {
     const prev = [...fields];
     const next = [...prev, newField];
     setFields(next);
     trackChange("Add Column", newField.id, prev, next);
+    console.log("Add Column:", newField);
+    const user_id = localStorage.getItem("user_id");
+    const table_id = activeViewId;
+    const payload = {
+      "name": newField.name,
+      "type": newField.type,
+      "defaultValue": newField.value,
+      "config": { "options": newField.options || [] },
+    }
+    await addColumnValue(table_id, user_id, payload);
   }, [fields, trackChange]);
 
   const deleteColumn = useCallback((columnId) => {
@@ -1806,29 +1942,48 @@ export function Workspace({
     trackChange("Duplicate Column", duplicated.id, prev, next);
   }, [fields, trackChange]);
 
-  const renameColumn = useCallback((columnId, newName) => {
+  const renameColumn = useCallback(async (columnId, newName) => {
     const prev = [...fields];
     const next = prev.map((f) => (f.id === columnId ? { ...f, name: newName } : f));
     setFields(next);
     trackChange("Rename Column", columnId, prev, next);
+    const user_id = localStorage.getItem("user_id");
+    const column_id = columnId;
+    const payload = {
+      "name": newName,
+    }
+    await updateColumnValue(column_id, user_id, payload);
   }, [fields, trackChange]);
 
-  const updateColumn = useCallback((updatedField) => {
+  const updateColumn = useCallback(async (updatedField) => {
     const prev = [...fields];
     const next = prev.map((f) => (f.id === updatedField.id ? { ...f, ...updatedField } : f));
     setFields(next);
     trackChange("Update Column", updatedField.id, prev, next);
+    console.log("Update Column:", updatedField);
+    const user_id = localStorage.getItem("user_id");
+    const column_id = updatedField.id;
+    const payload = {
+      "name": updatedField.name,
+      "type": updatedField.type,
+      "defaultValue": updatedField.defaultValue,
+      "config": { "options": updatedField.options || [] },
+    }
+    await updateColumnValue(column_id, user_id, payload);
   }, [fields, trackChange]);
 
   // ==========================
   // Cell Operations
   // ==========================
-  const updateCell = useCallback((rowId, columnId, newValue) => {
+  const updateCell = useCallback(async (rowId, columnId, newValue) => {
     const prev = [...gridRowData];
+    console.log("updateCell", rowId, columnId, newValue);
     const row = prev.find((r) => r.id === rowId);
     if (row) {
       const prevVal = row[columnId];
-      if (prevVal === newValue) return;
+      console.log("prevVal", prevVal);
+      console.log("newValue", newValue);
+      //if (prevVal === newValue) return;
 
       const nowFormatted = formatTimestamp();
       const next = prev.map((r) => {
@@ -1847,6 +2002,14 @@ export function Workspace({
       setGridRowData(next);
       trackChange("Update Cell", `${rowId}:${columnId}`, prevVal, newValue);
       setRefreshKey((k) => k + 1);
+      const user_id = localStorage.getItem("user_id");
+      console.log("updateCellValue", rowId, columnId, newValue, user_id);
+      await updateCellValue({
+        rowId,
+        columnId,
+        value: newValue,
+        userId: user_id,
+      });
     }
   }, [gridRowData, trackChange]);
 
@@ -1909,6 +2072,7 @@ export function Workspace({
       addRow();
     }
   }, [onAddRecord, onAddRow, addRow]);
+  console.log(config);
 
   // ==========================
   // Render
@@ -1944,6 +2108,7 @@ export function Workspace({
             activeTab={effectiveWorkspaceId}
             onTabChange={(tab) => {
               setInternalTab(tab);
+              console.log("Tab changed:", tab);
               if (onTabChange) onTabChange(tab);
             }}
             searchQuery={searchQuery}
@@ -1955,7 +2120,7 @@ export function Workspace({
         </div>
         {effectiveWorkspaceId === "faq" ? (
           <div style={{ padding: T.spacing[4], width: "100%", boxSizing: "border-box" }}>
-            <FaqObjectionsSection />
+            <FaqObjectionsSection data={faqs} />
           </div>
         ) : (
           <>
@@ -1963,8 +2128,13 @@ export function Workspace({
               <WorkspaceViewsPanel
                 isHidden={isViewsPanelHidden || Boolean(config?.hideViewsPanel)}
                 viewsList={viewsList}
+                workspaceIdentifier={workspaceIdentifier}
                 onOpenImportModal={() => setIsImportModalOpen(true)}
+                onActiveViewChange={setActiveViewId}
+                onTableCreated={onTableCreated}
+                onTableDeleted={onTableDeleted}
               />
+
               <WorkspaceGrid
                 workspaceId={effectiveWorkspaceId}
                 search={searchQuery}
@@ -1998,6 +2168,7 @@ export function Workspace({
         field={selectedField}
         fields={fields}
         onClose={() => setSelectedFieldId(null)}
+        onSave={updateColumn}
         onMoveField={handleMoveField}
       />
       <ImportModal
@@ -2055,7 +2226,7 @@ Workspace.propTypes = {
   onRowDoubleClick: PropTypes.func,
   onExpandRow: PropTypes.func,
   onAddRecord: PropTypes.func,
-  onAddRow: PropTypes.func,
+  onAddRow: PropTypes.func
 };
 
 export default Workspace;

@@ -20,79 +20,10 @@ import {
   T,
 } from "../../../components/utils";
 
-const topMetrics = [
-  {
-    key: "minutes",
-    label: "347 min remaining",
-    subtitle: "853 min used, 71% remaining of 1,200 purchased",
-    icon: <FiMic size={14} />,
-    progress: 58,
-  },
-  {
-    key: "rate",
-    label: "base rate",
-    icon: <span style={{ fontSize: 14, fontWeight: 800 }}>₹</span>,
-    valueNode: (
-      <>
-        <span style={{ fontSize: 24, fontWeight: 800 }}>₹7</span>
-        <span style={{ fontSize: 10, fontWeight: 700 }}>/min</span>
-      </>
-    ),
-  },
-  {
-    key: "balance",
-    label: "Balance value",
-    value: "₹16.4K",
-    icon: <span style={{ fontSize: 14, fontWeight: 800, color: C.accentStrong }}>₹</span>,
-    featured: true,
-  },
-];
 
-const middleMetrics = [
-  {
-    label: "call today",
-    value: "94",
-    icon: <FiPhoneCall size={14} />,
-    badge: "23%",
-    badgeTone: "green",
-  },
-  {
-    label: "Hot leads",
-    subtitle: "action needed",
-    value: "8%",
-    icon: <FaFire size={13} />,
-    iconColor: C.hot,
-    badge: "2",
-    badgeTone: "green",
-  },
-];
 
-const bottomMetrics = [
-  {
-    label: "Qualified",
-    subtitle: "ready for sales",
-    value: "4",
-    icon: <FiCheck size={15} />,
-    iconColor: C.greenText,
-  },
-  {
-    label: "Warm leads",
-    subtitle: "needs follow up",
-    value: "2",
-    icon: <FiZap size={15} />,
-    iconColor: C.warm,
-    badge: "2",
-    badgeTone: "red",
-  },
-  {
-    label: "Junk",
-    subtitle: "not interested",
-    value: "2",
-    icon: <FiX size={15} />,
-    iconColor: C.muted,
-    background: C.sectionBg,
-  },
-];
+
+
 
 const hotLeads = [
   {
@@ -366,7 +297,101 @@ function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }
   );
 }
 
-function DashboardSection({ onLeadClick, openCampaign }) {
+function DashboardSection({ data, onLeadClick, openCampaign }) {
+  if (!data) return null;
+  const topMetrics = [
+    {
+      key: "minutes",
+      label: `${data.billing.minutes_left} min remaining`,
+      subtitle: `${data.billing.total_minutes_used ?? 0} min used, ${data.billing.total_minutes_purchased
+        ? (
+          100 -
+          (100 * (data.billing.minutes_used ?? 0)) /
+          data.billing.total_minutes_purchased
+        ).toFixed(0)
+        : 0
+        }% remaining of ${data.billing.total_minutes_purchased ?? 0} purchased`,
+      icon: <FiMic size={14} />,
+      progress:
+        (data.billing.minutes_used / data.billing.total_minutes_purchased) * 100,
+    },
+    {
+      key: "rate",
+      label: "Base rate",
+      icon: <span style={{ fontSize: 14, fontWeight: 800 }}>₹</span>,
+      valueNode: (
+        <>
+          <span style={{ fontSize: 24, fontWeight: 800 }}>₹7</span>
+          <span style={{ fontSize: 10, fontWeight: 700 }}>/min</span>
+        </>
+      ),
+    },
+    {
+      key: "balance",
+      label: "Balance value",
+      value: `₹${data.billing.balance_value}`,
+      icon: (
+        <span
+          style={{ fontSize: 14, fontWeight: 800, color: C.accentStrong }}
+        >
+          ₹
+        </span>
+      ),
+      featured: true,
+    },
+  ];
+
+  const middleMetrics = [
+    {
+      label: "Call today",
+      value: `${data.calls_today}`,
+      icon: <FiPhoneCall size={14} />,
+      badgeTone: "green",
+    },
+    {
+      label: "Hot leads",
+      subtitle: "action needed",
+      value: `${(
+        ((data.leads_summary.hot || 0) /
+          ((data.leads_summary.hot || 0) +
+            (data.leads_summary.warm || 0) +
+            (data.leads_summary.cold || 0) || 1)) *
+        100
+      ).toFixed(0)
+        }%`,
+      icon: <FaFire size={13} />,
+      iconColor: C.hot,
+      badge: `${data.hot_leads.length}`,
+      badgeTone: "green",
+    },
+  ];
+
+  const bottomMetrics = [
+    {
+      label: "Qualified",
+      subtitle: "ready for sales",
+      value: `${data.leads_summary.hot}`,
+      icon: <FiCheck size={15} />,
+      iconColor: C.greenText,
+    },
+    {
+      label: "Warm leads",
+      subtitle: "needs follow up",
+      value: `${data.leads_summary.warm}`,
+      icon: <FiZap size={15} />,
+      iconColor: C.warm,
+      badgeTone: "red",
+    },
+    {
+      label: "Junk",
+      subtitle: "not interested",
+      value: `${data.leads_summary.cold}`,
+      icon: <FiX size={15} />,
+      iconColor: C.muted,
+      background: C.sectionBg,
+    },
+  ];
+  const first_name = localStorage.getItem("first_name");
   return (
     <div style={{ minHeight: "100%", width: "100%", minWidth: 0, background: C.pageBg }}>
       <div style={pageStyle}>
@@ -388,14 +413,13 @@ function DashboardSection({ onLeadClick, openCampaign }) {
                 color: C.text,
               }}
             >
-              Good morning, Himanshu
+              Good morning, {first_name}
             </h1>
             <div style={{ marginTop: 4, fontSize: 9, fontWeight: 500, color: C.muted }}>
-              Wednesday, 20 Dec 2024&nbsp;&nbsp; 2 campaigns active
+              {data.date}&nbsp;&nbsp; {data.active_campaigns} campaigns active
             </div>
           </div>
 
-          <ActiveCallsPill />
         </header>
 
         <section
@@ -472,12 +496,12 @@ function DashboardSection({ onLeadClick, openCampaign }) {
                 </h2>
               </div>
               <AppPill style={{ color: C.accentStrong, fontSize: 10, fontWeight: 800, height: 24 }}>
-                2 leads
+                {data.hot_leads.length} leads
               </AppPill>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {hotLeads.map((lead) => (
+              {data.hot_leads.map((lead) => (
                 <div
                   key={lead.name}
                   onClick={() => onLeadClick?.(lead)}
@@ -489,7 +513,7 @@ function DashboardSection({ onLeadClick, openCampaign }) {
             </div>
           </AppCard>
 
-          <ActiveCampaignsCard campaigns={campaigns} onViewAll={openCampaign} />
+          <ActiveCampaignsCard campaigns={data.campaigns} onViewAll={openCampaign} />
         </section>
       </div>
     </div>
