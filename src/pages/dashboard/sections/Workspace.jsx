@@ -333,6 +333,18 @@ function ColumnHeaderWrapper(props) {
 
   const showHeaderDropdown = !isAddColumn && !isCheckbox && !isStaffWorkspace;
 
+  const colState = api?.getColumnState ? api.getColumnState() : [];
+  const movableCols = colState.filter(
+    (col) =>
+      col.colId !== "addColumn" &&
+      col.colId !== "ag-Grid-SelectionColumn" &&
+      col.colId !== "selection" &&
+      !col.hide
+  );
+  const colIndex = movableCols.findIndex((col) => col.colId === colId);
+  const isMoveLeftDisabled = colIndex <= 0;
+  const isMoveRightDisabled = colIndex < 0 || colIndex >= movableCols.length - 1;
+
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
@@ -400,24 +412,25 @@ function ColumnHeaderWrapper(props) {
             triggerRef={triggerRef}
             columnId={colId}
             columnName={displayName}
-            onEditField={() => {
-              console.log("Edit field");
-              context.updateColumn?.(colId)
+            onEditField={(id, newName) => {
+              if (context.renameColumn && newName) {
+                context.renameColumn(id, newName);
+              }
             }}
-            onRenameField={() => context.renameColumn?.(colId)}
-            onDuplicateField={() => context.onDuplicateColumn?.(colId)}
+            onDuplicateField={(id) => {
+              if (context.duplicateColumn) {
+                context.duplicateColumn(id);
+              }
+            }}
             onMoveLeft={() => {
               const state = api.getColumnState();
-
-              const index = state.findIndex(col => col.colId === colId);
-
+              const index = state.findIndex((col) => col.colId === colId);
               if (index > 0) {
                 const newState = [...state];
                 [newState[index - 1], newState[index]] = [
                   newState[index],
                   newState[index - 1],
                 ];
-
                 api.applyColumnState({
                   state: newState,
                   applyOrder: true,
@@ -426,16 +439,13 @@ function ColumnHeaderWrapper(props) {
             }}
             onMoveRight={() => {
               const state = api.getColumnState();
-
-              const index = state.findIndex(col => col.colId === colId);
-
+              const index = state.findIndex((col) => col.colId === colId);
               if (index >= 0 && index < state.length - 1) {
                 const newState = [...state];
                 [newState[index], newState[index + 1]] = [
                   newState[index + 1],
                   newState[index],
                 ];
-
                 api.applyColumnState({
                   state: newState,
                   applyOrder: true,
@@ -454,7 +464,7 @@ function ColumnHeaderWrapper(props) {
                 defaultState: { sort: null },
               });
             }}
-            onDeleteField={() => context.deleteColumn?.(colId)}
+            onDeleteField={(id) => context.deleteColumn?.(id)}
           />
         </>
       ) : null}

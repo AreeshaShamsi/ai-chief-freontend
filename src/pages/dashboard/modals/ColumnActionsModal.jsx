@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import PropTypes from "prop-types";
 import {
   LuPencil,
-  LuType,
   LuCopy,
   LuArrowLeft,
   LuArrowRight,
@@ -12,6 +11,7 @@ import {
   LuTrash2,
 } from "react-icons/lu";
 import { C, T, Text } from "../../../components/utils";
+import FieldActionModal from "./FieldActionModal";
 
 const dropdownWidth = 200;
 const dropdownOffset = 4;
@@ -25,7 +25,6 @@ export default function ColumnActionsModal({
   columnId,
   columnName,
   onEditField,
-  onRenameField,
   onDuplicateField,
   onMoveLeft,
   onMoveRight,
@@ -34,6 +33,7 @@ export default function ColumnActionsModal({
   onDeleteField,
 }) {
   const [position, setPosition] = useState({ top: 0, left: 0, maxHeight: "none" });
+  const [activeAction, setActiveAction] = useState(null);
   const panelRef = useRef(null);
 
   const updatePosition = () => {
@@ -57,7 +57,13 @@ export default function ColumnActionsModal({
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!isOpen) {
+      setActiveAction(null);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || activeAction !== null) return undefined;
 
     const handlePointerDown = (event) => {
       const target = event.target;
@@ -82,7 +88,7 @@ export default function ColumnActionsModal({
       window.removeEventListener("resize", handleViewportChange);
       window.removeEventListener("scroll", handleViewportChange, true);
     };
-  }, [isOpen]);
+  }, [isOpen, activeAction, onClose, triggerRef]);
 
   if (!isOpen) return null;
 
@@ -91,18 +97,58 @@ export default function ColumnActionsModal({
     onClose();
   };
 
+  const handleCloseModal = () => {
+    setActiveAction(null);
+    onClose();
+  };
+
+  if (activeAction) {
+    return (
+      <FieldActionModal
+        isOpen={Boolean(activeAction)}
+        action={activeAction}
+        columnId={columnId}
+        columnName={columnName}
+        onClose={handleCloseModal}
+        onEditField={onEditField}
+        onDuplicateField={onDuplicateField}
+        onDeleteField={onDeleteField}
+      />
+    );
+  }
+
   const menuItems = [
-    { label: "Edit Field", icon: LuPencil, onClick: () => handleAction(onEditField) },
-    { label: "Rename Field", icon: LuType, onClick: () => handleAction(onRenameField) },
-    { label: "Duplicate Field", icon: LuCopy, onClick: () => handleAction(onDuplicateField) },
+    {
+      label: "Edit Field",
+      icon: LuPencil,
+      onClick: () => setActiveAction("edit"),
+    },
+    {
+      label: "Duplicate Field",
+      icon: LuCopy,
+      onClick: () => setActiveAction("duplicate"),
+    },
     { isDivider: true },
-    { label: "Move Left", icon: LuArrowLeft, onClick: () => handleAction(onMoveLeft) },
-    { label: "Move Right", icon: LuArrowRight, onClick: () => handleAction(onMoveRight) },
+    {
+      label: "Move Left",
+      icon: LuArrowLeft,
+      onClick: () => handleAction(onMoveLeft),
+    },
+    {
+      label: "Move Right",
+      icon: LuArrowRight,
+      onClick: () => handleAction(onMoveRight),
+    },
     { isDivider: true },
     { label: "Sort Ascending", icon: LuArrowUpAZ, onClick: () => handleAction(onSortAsc) },
     { label: "Sort Descending", icon: LuArrowDownZA, onClick: () => handleAction(onSortDesc) },
     { isDivider: true },
-    { label: "Delete Field", icon: LuTrash2, onClick: () => handleAction(onDeleteField), isDanger: true },
+    {
+      label: "Delete Field",
+      icon: LuTrash2,
+      onClick: () => setActiveAction("delete"),
+      isDanger: true,
+    },
   ];
 
   return createPortal(
@@ -180,7 +226,13 @@ export default function ColumnActionsModal({
                 color={isDanger ? C.hot : C.muted}
                 style={{ flexShrink: 0 }}
               />
-              <Text variant="label" color={isDanger ? C.hot : C.text} style={{ fontSize: T.font.size.bodySmall }}>
+              <Text
+                variant="label"
+                color={isDanger ? C.hot : C.text}
+                style={{
+                  fontSize: T.font.size.bodySmall,
+                }}
+              >
                 {label}
               </Text>
             </button>
@@ -199,7 +251,6 @@ ColumnActionsModal.propTypes = {
   columnId: PropTypes.string,
   columnName: PropTypes.string,
   onEditField: PropTypes.func,
-  onRenameField: PropTypes.func,
   onDuplicateField: PropTypes.func,
   onMoveLeft: PropTypes.func,
   onMoveRight: PropTypes.func,
