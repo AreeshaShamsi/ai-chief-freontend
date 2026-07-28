@@ -341,9 +341,20 @@ function ColumnHeaderWrapper(props) {
       col.colId !== "selection" &&
       !col.hide
   );
-  const colIndex = movableCols.findIndex((col) => col.colId === colId);
-  const isMoveLeftDisabled = colIndex <= 0;
-  const isMoveRightDisabled = colIndex < 0 || colIndex >= movableCols.length - 1;
+
+  let colIndex = movableCols.findIndex((col) => col.colId === colId);
+  let totalCount = movableCols.length;
+
+  if (colIndex === -1 && context.fields) {
+    colIndex = context.fields.findIndex((f) => f.id === colId);
+    totalCount = context.fields.length;
+  }
+
+  const isFirstColumn = colIndex === 0;
+  const isLastColumn = colIndex >= 0 && colIndex === totalCount - 1;
+
+  const isMoveLeftDisabled = colIndex < 0 ? false : isFirstColumn;
+  const isMoveRightDisabled = colIndex < 0 ? false : isLastColumn;
 
   return (
     <div
@@ -412,6 +423,8 @@ function ColumnHeaderWrapper(props) {
             triggerRef={triggerRef}
             columnId={colId}
             columnName={displayName}
+            isMoveLeftDisabled={isMoveLeftDisabled}
+            isMoveRightDisabled={isMoveRightDisabled}
             onEditField={(id, newName) => {
               if (context.renameColumn && newName) {
                 context.renameColumn(id, newName);
@@ -423,6 +436,7 @@ function ColumnHeaderWrapper(props) {
               }
             }}
             onMoveLeft={() => {
+              if (isMoveLeftDisabled) return;
               const state = api.getColumnState();
               const index = state.findIndex((col) => col.colId === colId);
               if (index > 0) {
@@ -438,6 +452,7 @@ function ColumnHeaderWrapper(props) {
               }
             }}
             onMoveRight={() => {
+              if (isMoveRightDisabled) return;
               const state = api.getColumnState();
               const index = state.findIndex((col) => col.colId === colId);
               if (index >= 0 && index < state.length - 1) {

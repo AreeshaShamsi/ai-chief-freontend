@@ -24,6 +24,8 @@ export default function ColumnActionsModal({
   triggerRef,
   columnId,
   columnName,
+  isMoveLeftDisabled = false,
+  isMoveRightDisabled = false,
   onEditField,
   onDuplicateField,
   onMoveLeft,
@@ -132,12 +134,14 @@ export default function ColumnActionsModal({
     {
       label: "Move Left",
       icon: LuArrowLeft,
-      onClick: () => handleAction(onMoveLeft),
+      onClick: () => !isMoveLeftDisabled && handleAction(onMoveLeft),
+      isDisabled: isMoveLeftDisabled,
     },
     {
       label: "Move Right",
       icon: LuArrowRight,
-      onClick: () => handleAction(onMoveRight),
+      onClick: () => !isMoveRightDisabled && handleAction(onMoveRight),
+      isDisabled: isMoveRightDisabled,
     },
     { isDivider: true },
     { label: "Sort Ascending", icon: LuArrowUpAZ, onClick: () => handleAction(onSortAsc) },
@@ -187,20 +191,23 @@ export default function ColumnActionsModal({
             );
           }
 
-          const { label, icon: Icon, onClick, isDanger } = item;
+          const { label, icon: Icon, onClick, isDanger, isDisabled } = item;
 
           return (
             <button
               key={label}
               type="button"
               role="menuitem"
+              disabled={isDisabled}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onClick?.();
+                if (!isDisabled) onClick?.();
               }}
               onMouseEnter={(event) => {
-                event.currentTarget.style.background = C.surface;
+                if (!isDisabled) {
+                  event.currentTarget.style.background = C.surface;
+                }
               }}
               onMouseLeave={(event) => {
                 event.currentTarget.style.background = "transparent";
@@ -210,12 +217,13 @@ export default function ColumnActionsModal({
                 height: 32,
                 border: "none",
                 background: "transparent",
-                color: isDanger ? C.hot : C.text,
+                color: isDisabled ? C.muted : isDanger ? C.hot : C.text,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
                 padding: "0 12px",
-                cursor: "pointer",
+                cursor: isDisabled ? "not-allowed" : "pointer",
+                opacity: isDisabled ? 0.45 : 1,
                 fontFamily: T.font.family,
                 textAlign: "left",
                 boxSizing: "border-box",
@@ -223,12 +231,12 @@ export default function ColumnActionsModal({
             >
               <Icon
                 size={14}
-                color={isDanger ? C.hot : C.muted}
+                color={isDisabled ? C.muted : isDanger ? C.hot : C.muted}
                 style={{ flexShrink: 0 }}
               />
               <Text
                 variant="label"
-                color={isDanger ? C.hot : C.text}
+                color={isDisabled ? C.muted : isDanger ? C.hot : C.text}
                 style={{
                   fontSize: T.font.size.bodySmall,
                 }}
@@ -250,6 +258,8 @@ ColumnActionsModal.propTypes = {
   triggerRef: PropTypes.shape({ current: PropTypes.any }).isRequired,
   columnId: PropTypes.string,
   columnName: PropTypes.string,
+  isMoveLeftDisabled: PropTypes.bool,
+  isMoveRightDisabled: PropTypes.bool,
   onEditField: PropTypes.func,
   onDuplicateField: PropTypes.func,
   onMoveLeft: PropTypes.func,
