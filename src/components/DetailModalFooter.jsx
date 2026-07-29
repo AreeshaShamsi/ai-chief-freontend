@@ -3,6 +3,7 @@ import { LuCopy, LuTrash2 } from "react-icons/lu";
 import { AppButton, C, T } from "./utils";
 
 export default function DetailModalFooter({
+  workspaceId,
   onDuplicate,
   onDelete,
   hasUnsavedChanges = false,
@@ -24,7 +25,7 @@ export default function DetailModalFooter({
     >
       {/* Bottom-left: Duplicate Row, Delete Row */}
       <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <AppButton
+        {workspaceId !== "staff" && <AppButton
           compact
           onClick={onDuplicate}
           style={{
@@ -35,7 +36,7 @@ export default function DetailModalFooter({
         >
           <LuCopy size={14} />
           <span>Duplicate Row</span>
-        </AppButton>
+        </AppButton>}
         <AppButton
           compact
           onClick={onDelete}

@@ -108,6 +108,98 @@ function SettingsSection({ data }) {
     currentPassword: user.password,
   }));
 
+  const fieldIds = {
+    firstName: crypto.randomUUID(),
+    lastName: crypto.randomUUID(),
+    username: crypto.randomUUID(),
+    email: crypto.randomUUID(),
+    phone: crypto.randomUUID(),
+    role: crypto.randomUUID(),
+    access: crypto.randomUUID(),
+    currentPassword: crypto.randomUUID(),
+  };
+
+  const workspaceData = {
+    id: crypto.randomUUID(),
+    name: "Staff",
+    tables: [
+      {
+        id: crypto.randomUUID(),
+        name: "Staff",
+        fields: [
+          {
+            id: fieldIds.firstName,
+            name: "First Name",
+            type: "Single Line Text",
+            value: "",
+            options: [],
+            editorKind: null,
+          },
+          {
+            id: fieldIds.lastName,
+            name: "Last Name",
+            type: "Single Line Text",
+            value: "",
+            options: [],
+            editorKind: null,
+          },
+          {
+            id: fieldIds.username,
+            name: "Username",
+            type: "Single Line Text",
+            value: "",
+            options: [],
+            editorKind: null,
+          },
+          {
+            id: fieldIds.email,
+            name: "Email",
+            type: "Email",
+            value: "",
+            options: [],
+            editorKind: null,
+          },
+          {
+            id: fieldIds.phone,
+            name: "Phone",
+            type: "Phone",
+            value: "",
+            options: [],
+            editorKind: null,
+          },
+          {
+            id: fieldIds.role,
+            name: "Role",
+            type: "Single Select",
+            value: "",
+            options: ["Admin", "Manager", "Staff"],
+            editorKind: null,
+          },
+          {
+            id: fieldIds.access,
+            name: "Access",
+            type: "Single Line Text",
+            value: "",
+            options: [],
+            editorKind: null,
+          },
+        ],
+        rows: staffData.map((staff) => ({
+          id: staff.id,
+          [fieldIds.firstName]: staff.firstName,
+          [fieldIds.lastName]: staff.lastName,
+          [fieldIds.username]: staff.username,
+          [fieldIds.email]: staff.email,
+          [fieldIds.phone]: staff.phone,
+          [fieldIds.role]: staff.role,
+          [fieldIds.access]: staff.access,
+          "currentPassword": staff.currentPassword,
+
+        })),
+      },
+    ],
+  };
+
   const profileFields = [
     { label: "First Name", value: profileData?.first_name || "", half: true },
     { label: "Last Name", value: profileData?.last_name || "", half: true },
@@ -289,7 +381,7 @@ function SettingsSection({ data }) {
         </div>
       ) : (
         /* Reusing the exact Workspace AG Grid & Sidebar Component without duplicating code */
-        <Workspace workspaceId="staff" />
+        <Workspace workspaceId="staff" workspaceData={workspaceData} />
       )}
     </div>
   );

@@ -38,7 +38,8 @@ import FieldConfigurationModal from "../modals/FieldConfigurationModal";
 import FaqObjectionsSection from "./FaqObjectionsSection";
 import { LuChevronDown, LuBookOpen, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertical } from "react-icons/lu";
 import { FaStar } from "react-icons/fa";
-import { updateCellValue, addColumnValue, addRowValue, deleteRowValue, deleteRowsValue, duplicateRowValue, updateColumnValue, createBlankTable, importTable, renameTable, deleteTable, duplicateTable } from "../../../api/workspace";
+import { updateCellValue, addColumnValue, addRowValue, deleteRowValue, deleteRowsValue, duplicateRowValue, updateColumnValue, createBlankTable, importTable, renameTable, deleteTable, duplicateTable, deleteColumnValue, duplicateColumnValue, addUser, deleteUser, updateUser, appendTable } from "../../../api/workspace";
+import AddStaffMemberModal from "../modals/AddStaffMemberModal";
 
 export function formatTimestamp(date = new Date()) {
   const d = date instanceof Date ? date : new Date(date);
@@ -118,7 +119,7 @@ const cardFrameStyle = {
   boxShadow: T.shadow.xs,
 };
 
-const viewsPanelWidth = 298;
+const viewsPanelWidth = 198;
 const viewsPanelCollapsedWidth = 0;
 const viewsPanelPadding = T.spacing[3];
 const layoutTransition = "width 260ms ease, flex-basis 260ms ease, padding 260ms ease";
@@ -562,9 +563,12 @@ AddColumnHeader.propTypes = {
 
 function WorkspaceToolbar({
   workspaceId,
+  workspaceIdentifier,
+  activeViewId,
   isViewsPanelHidden,
   onToggleViewsPanel,
   onManageFields,
+  onTableUpdated,
   activeTab,
   onTabChange,
   searchQuery = "",
@@ -585,7 +589,7 @@ function WorkspaceToolbar({
 
   const [internalKbTab, setInternalKbTab] = useState(currentTab === "faq" ? "faq" : "inventory");
   const activeKbTab = currentTab === "faq" ? "faq" : currentTab === "inventory" ? "inventory" : internalKbTab;
-
+  const fileInputRef = useRef(null);
   const handleInventoryClick = () => {
     if (activeKbTab !== "inventory") {
       setInternalKbTab("inventory");
@@ -610,6 +614,24 @@ function WorkspaceToolbar({
     if (!isTasksActive && onTabChange) {
       onTabChange("tasks");
     }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("workspaceId", workspaceIdentifier);
+    formData.append("tableId", activeViewId);
+    formData.append("userId", localStorage.getItem("user_id"));
+
+    console.log(formData.get("workspaceId"), formData.get("tableId"), formData.get("userId"));
+    const table = await appendTable(formData);
+
+    onTableUpdated?.(table);
+
+    e.target.value = "";
   };
 
   return (
@@ -688,9 +710,16 @@ function WorkspaceToolbar({
         </div>
         {isSingleRowToolbar ? (
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <AppButton compact style={toolbarActionButtonStyle}>
+            <AppButton onClick={() => fileInputRef.current?.click()} compact style={toolbarActionButtonStyle}>
               <FiLink size={13} />
-              <Text variant="mutedLabel">Sync</Text>
+              <Text variant="mutedLabel">Import</Text>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              />
             </AppButton>
             <SearchBox
               value={searchQuery}
@@ -789,6 +818,7 @@ WorkspaceToolbar.propTypes = {
   isViewsPanelHidden: PropTypes.bool.isRequired,
   onToggleViewsPanel: PropTypes.func.isRequired,
   onManageFields: PropTypes.func.isRequired,
+  onTableUpdated: PropTypes.func,
   activeTab: PropTypes.string,
   onTabChange: PropTypes.func,
   searchQuery: PropTypes.string,
@@ -1146,6 +1176,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
 WorkspaceViewsPanel.propTypes = {
   isHidden: PropTypes.bool.isRequired,
   viewsList: PropTypes.array.isRequired,
+  activeViewId: PropTypes.string,
   workspaceIdentifier: PropTypes.string,
   onOpenImportModal: PropTypes.func,
   onActiveViewChange: PropTypes.func,
@@ -1179,7 +1210,7 @@ function WorkspaceGrid({
   }, [fields, workspaceId]);
 
   const isStaff = workspaceId === "staff" || workspaceId === "mystaff";
-
+  const hideDropdown = ["staff", "mystaff", "contacts"].includes(workspaceId);
   const columnDefs = useMemo(
     () => [
       ...fields.map((field, index) => {
@@ -1243,9 +1274,9 @@ function WorkspaceGrid({
       filter: false,
       cellRenderer: WorkspaceCell,
       headerComponent: ColumnHeaderWrapper,
-      ...(isStaff ? { suppressMenu: true, suppressHeaderMenuButton: true } : {}),
+      ...((workspaceId === "staff" || workspaceId === "mystaff" || workspaceId === "contacts") ? { suppressMenu: true, suppressHeaderMenuButton: true } : {}),
     }),
-    [isStaff]
+    [workspaceId]
   );
 
   const handleCellValueChanged = useCallback(
@@ -1312,6 +1343,7 @@ function WorkspaceGrid({
   }, [selectedRow, rowDataProp]);
 
   const handleUpdateField = useCallback((rowId, fieldId, newValue) => {
+    console.log("Update field:", rowId, fieldId, newValue);
     if (updateCell) {
       updateCell(rowId, fieldId, newValue);
     }
@@ -1362,6 +1394,7 @@ function WorkspaceGrid({
     <div style={{ flex: "1 1 620px", minWidth: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <div style={{ height: 318, minWidth: 0, flex: "0 0 auto" }}>
         <AgGridTable
+          workspaceId={workspaceId}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
@@ -1756,7 +1789,8 @@ export function Workspace({
   onAddRecord,
   onAddRow,
   onTableCreated,
-  onTableDeleted
+  onTableDeleted,
+  onTableUpdated,
 }) {
   if (!workspaceData) return null;
   const [internalTab, setInternalTab] = useState(activeTabProp || workspaceId || "deals");
@@ -1818,6 +1852,7 @@ export function Workspace({
   const [gridRowData, setGridRowData] = useState(initialRows);
   const [viewsList, setViewsList] = useState(initialViews);
   const [isViewsPanelHidden, setIsViewsPanelHidden] = useState(false);
+  const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
 
   const [displayedRowCount, setDisplayedRowCount] = useState(null);
 
@@ -1868,6 +1903,27 @@ export function Workspace({
   // ==========================
   // Row Operations
   // ==========================
+  const addNewUser = useCallback(async (form) => {
+    const companyId = localStorage.getItem("company_id");
+    const payload = {
+      id: crypto.randomUUID(), // or generate on the backend
+      company_id: companyId,   // your company ID
+
+      first_name: form.firstName,
+      last_name: form.lastName,
+      user_name: form.username,
+      email: form.email,
+      phone: form.phone,
+      password: form.newPassword,
+      role: form.role,
+      access: form.access,
+    };
+
+    console.log(payload);
+    await addUser(payload);
+    setIsAddStaffModalOpen(false);
+  }, [gridRowData, trackChange])
+
   const addRow = useCallback(async (newRow) => {
     const nowFormatted = formatTimestamp();
     const row = newRow;
@@ -1886,8 +1942,15 @@ export function Workspace({
     const next = [...prev, initializedRow];
     setGridRowData(next);
     trackChange("Add Row", initializedRow.id, prev, next);
-    const user_id = localStorage.getItem("user_id");
-    await addRowValue(activeViewId, user_id);
+    if (workspaceId == "staff") {
+      console.log(workspaceId);
+      setIsAddStaffModalOpen(true);
+
+    } else {
+      const user_id = localStorage.getItem("user_id");
+      await addRowValue(activeViewId, user_id);
+    }
+
   }, [gridRowData, trackChange]);
 
   const deleteRow = useCallback(async (rowId) => {
@@ -1895,7 +1958,12 @@ export function Workspace({
     const next = prev.filter((r) => r.id !== rowId);
     setGridRowData(next);
     trackChange("Delete Row", rowId, prev, next);
-    await deleteRowValue(rowId);
+    if (workspaceId == "staff") {
+      await deleteUser(rowId);
+    } else {
+      await deleteRowValue(rowId);
+    }
+
   }, [gridRowData, trackChange]);
 
   const duplicateRow = useCallback(async (rowId) => {
@@ -1944,14 +2012,15 @@ export function Workspace({
     await addColumnValue(table_id, user_id, payload);
   }, [fields, trackChange]);
 
-  const deleteColumn = useCallback((columnId) => {
+  const deleteColumn = useCallback(async (columnId) => {
     const prev = [...fields];
     const next = prev.filter((f) => f.id !== columnId);
     setFields(next);
     trackChange("Delete Column", columnId, prev, next);
+    await deleteColumnValue(columnId);
   }, [fields, trackChange]);
 
-  const duplicateColumn = useCallback((columnId) => {
+  const duplicateColumn = useCallback(async (columnId) => {
     const prev = [...fields];
     const target = prev.find((f) => f.id === columnId);
     if (!target) return;
@@ -1965,6 +2034,8 @@ export function Workspace({
     next.splice(idx + 1, 0, duplicated);
     setFields(next);
     trackChange("Duplicate Column", duplicated.id, prev, next);
+    const payload = { "userId": localStorage.getItem("user_id") };
+    await duplicateColumnValue(columnId, payload);
   }, [fields, trackChange]);
 
   const renameColumn = useCallback(async (columnId, newName) => {
@@ -2029,12 +2100,41 @@ export function Workspace({
       setRefreshKey((k) => k + 1);
       const user_id = localStorage.getItem("user_id");
       console.log("updateCellValue", rowId, columnId, newValue, user_id);
-      await updateCellValue({
-        rowId,
-        columnId,
-        value: newValue,
-        userId: user_id,
-      });
+      if (workspaceId === "staff" || workspaceId === "mystaff") {
+        const table = workspaceData.tables[0];
+
+        // Create a lookup: "First Name" -> field id
+
+        const getFieldId = (name) =>
+          workspaceData.tables[0].fields.find(field => field.name === name)?.id;
+
+        const fieldToApiKey = {
+          [getFieldId("First Name")]: "first_name",
+          [getFieldId("Last Name")]: "last_name",
+          [getFieldId("Username")]: "user_name",
+          [getFieldId("Email")]: "email",
+          [getFieldId("Phone")]: "phone",
+          [getFieldId("Role")]: "role",
+          [getFieldId("Access")]: "access",
+          [getFieldId("Current Password")]: "password",
+        };
+        const updatedUser = {
+          [fieldToApiKey[columnId]]:
+            fieldToApiKey[columnId] === "role"
+              ? newValue.toLowerCase()
+              : newValue,
+        };
+        await updateUser(rowId, updatedUser);
+        console.log("updatedUser", updatedUser);
+      } else {
+        await updateCellValue({
+          rowId,
+          columnId,
+          value: newValue,
+          userId: user_id,
+        });
+      }
+
     }
   }, [gridRowData, trackChange]);
 
@@ -2127,9 +2227,12 @@ export function Workspace({
         <div style={{ padding: T.spacing[4], borderBottom: `1px solid ${C.border}` }}>
           <WorkspaceToolbar
             workspaceId={effectiveWorkspaceId}
+            workspaceIdentifier={workspaceIdentifier}
+            activeViewId={activeViewId}
             isViewsPanelHidden={isViewsPanelHidden}
             onToggleViewsPanel={toggleViewsPanel}
             onManageFields={() => setIsManageFieldsOpen(true)}
+            onTableUpdated={onTableUpdated}
             activeTab={effectiveWorkspaceId}
             onTabChange={(tab) => {
               setInternalTab(tab);
@@ -2153,6 +2256,7 @@ export function Workspace({
               <WorkspaceViewsPanel
                 isHidden={isViewsPanelHidden || Boolean(config?.hideViewsPanel)}
                 viewsList={viewsList}
+                activeViewId={activeViewId}
                 workspaceIdentifier={workspaceIdentifier}
                 onOpenImportModal={() => setIsImportModalOpen(true)}
                 onActiveViewChange={setActiveViewId}
@@ -2209,6 +2313,8 @@ export function Workspace({
           });
         }}
       />
+      <AddStaffMemberModal open={isAddStaffModalOpen} onClose={() => setIsAddStaffModalOpen(false)} onSave={addNewUser} />
+
       <FieldConfigurationModal
         open={fieldConfigModalState.open}
         fieldType={fieldConfigModalState.fieldType}

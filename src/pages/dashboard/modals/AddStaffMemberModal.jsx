@@ -4,15 +4,15 @@ import { AppButton, C, IconButton, Modal, T } from "../../../components/utils";
 import StaffMemberForm from "./StaffMemberForm";
 
 const initialAddForm = {
-  firstName: "Filled",
-  lastName: "Filled",
-  username: "user.name",
-  email: "Filled",
-  phone: "Filled",
+  firstName: "",
+  lastName: "",
+  username: "",
+  email: "",
+  phone: "",
   role: "admin",
   access: "Access To Edit Deals",
-  newPassword: "password",
-  confirmPassword: "password",
+  newPassword: "",
+  confirmPassword: "",
 };
 
 function AddStaffMemberModal({ open, onClose, onSave }) {
@@ -26,7 +26,7 @@ function AddStaffMemberModal({ open, onClose, onSave }) {
   };
 
   const handleSave = () => {
-    if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim()) return;
+    if (!form.firstName.trim() || !form.newPassword.trim() || !form.username.trim()) return;
     onSave(form);
     setForm(initialAddForm);
   };

@@ -174,6 +174,15 @@ function LeadsSection({ data }) {
     }));
   };
 
+  const handleTableUpdated = (updatedTable) => {
+    setDealsData((prev) => ({
+      ...prev,
+      tables: prev.tables.map((table) =>
+        table.id === updatedTable.id ? updatedTable : table
+      ),
+    }));
+  };
+
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       <PageSection>
@@ -193,6 +202,7 @@ function LeadsSection({ data }) {
           onTabChange={setActiveTab}
           onTableCreated={handleTableCreated}
           onTableDeleted={handleTableDeleted}
+          onTableUpdated={handleTableUpdated}
         />
       </PageSection>
     </div>

@@ -84,7 +84,6 @@ export default function DealDetailsModal({
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [showPasswords, setShowPasswords] = useState({});
-
   const actionsMenuRef = useRef(null);
   const itemRefs = useRef([]);
   const fieldRefs = useRef({});
@@ -551,6 +550,7 @@ export default function DealDetailsModal({
           </div>
 
           <DetailModalFooter
+            workspaceId={workspaceId}
             onDuplicate={handleDuplicateRow}
             onDelete={() => setIsConfirmDeleteOpen(true)}
             hasUnsavedChanges={hasUnsavedChanges}

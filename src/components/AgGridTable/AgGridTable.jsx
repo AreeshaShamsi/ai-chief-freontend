@@ -25,6 +25,7 @@ const agGridTheme = themeQuartz.withParams({
 });
 
 export default function AgGridTable({
+  workspaceId,
   rowData,
   columnDefs,
   defaultColDef,
@@ -72,6 +73,7 @@ export default function AgGridTable({
       rowData={rowData}
       columnDefs={columnDefs}
       defaultColDef={defaultColDef}
+      suppressClickEdit={workspaceId === "staff" || workspaceId === "mystaff"}
       theme={agGridTheme}
       rowHeight={36}
       headerHeight={34}
