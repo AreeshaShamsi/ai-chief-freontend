@@ -3,8 +3,9 @@ import { FiX } from "react-icons/fi";
 import { FaEdit } from "react-icons/fa";
 import { Modal, IconButton, C, T, Text } from "../../../components/utils";
 import { getFieldTypeMeta } from "./fieldTypeMeta";
+import { canModifyColumn } from "../utils/columnPermissions";
 
-function ManageFieldsModal({ open, fields, onClose, onEditField }) {
+function ManageFieldsModal({ open, fields, workspaceId, activeTable, onClose, onEditField }) {
   if (!open) return null;
 
   return (
@@ -137,14 +138,21 @@ function ManageFieldsModal({ open, fields, onClose, onEditField }) {
               {fields.map((field, index) => {
                 const typeMeta = getFieldTypeMeta(field.type);
                 const FieldTypeIcon = typeMeta.icon;
+                const canModifyField = canModifyColumn({
+                  workspaceId,
+                  columnId: field.id,
+                  fields,
+                  table: activeTable,
+                });
                 const handleEdit = () => onEditField(field);
 
                 return (
                   <tr
                     key={field.id}
-                    onClick={handleEdit}
-                    tabIndex={0}
+                    onClick={canModifyField ? handleEdit : undefined}
+                    tabIndex={canModifyField ? 0 : undefined}
                     onKeyDown={(event) => {
+                      if (!canModifyField) return;
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
                         handleEdit();
@@ -152,7 +160,7 @@ function ManageFieldsModal({ open, fields, onClose, onEditField }) {
                     }}
                     style={{
                       height: 36,
-                      cursor: "pointer",
+                      cursor: canModifyField ? "pointer" : "default",
                       transition: "background 150ms ease",
                     }}
                     onMouseEnter={(event) => {
@@ -171,13 +179,15 @@ function ManageFieldsModal({ open, fields, onClose, onEditField }) {
                         boxSizing: "border-box",
                       }}
                     >
-                      <input
-                        type="checkbox"
-                        defaultChecked={false}
-                        aria-label={`Select ${field.name}`}
-                        onClick={(event) => event.stopPropagation()}
-                        style={{ width: 13, height: 13, accentColor: C.accent, cursor: "pointer", display: "block" }}
-                      />
+                      {canModifyField ? (
+                        <input
+                          type="checkbox"
+                          defaultChecked={false}
+                          aria-label={`Select ${field.name}`}
+                          onClick={(event) => event.stopPropagation()}
+                          style={{ width: 13, height: 13, accentColor: C.accent, cursor: "pointer", display: "block" }}
+                        />
+                      ) : null}
                     </td>
 
                     <td
@@ -237,33 +247,35 @@ function ManageFieldsModal({ open, fields, onClose, onEditField }) {
                         boxSizing: "border-box",
                       }}
                     >
-                      <IconButton
-                        aria-label={`Edit ${field.name}`}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleEdit();
-                        }}
-                        onMouseEnter={(event) => {
-                          event.currentTarget.style.background = C.surface;
-                          event.currentTarget.style.borderColor = C.border;
-                        }}
-                        onMouseLeave={(event) => {
-                          event.currentTarget.style.color = C.muted;
-                          event.currentTarget.style.background = C.card;
-                          event.currentTarget.style.borderColor = C.borderLt;
-                        }}
-                        style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: T.radius.sm,
-                          border: `1px solid ${C.borderLt}`,
-                          background: C.card,
-                          color: C.muted,
-                          transition: "background 150ms ease, border-color 150ms ease, color 150ms ease",
-                        }}
-                      >
-                        <FaEdit size={13} />
-                      </IconButton>
+                      {canModifyField ? (
+                        <IconButton
+                          aria-label={`Edit ${field.name}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleEdit();
+                          }}
+                          onMouseEnter={(event) => {
+                            event.currentTarget.style.background = C.surface;
+                            event.currentTarget.style.borderColor = C.border;
+                          }}
+                          onMouseLeave={(event) => {
+                            event.currentTarget.style.color = C.muted;
+                            event.currentTarget.style.background = C.card;
+                            event.currentTarget.style.borderColor = C.borderLt;
+                          }}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: T.radius.sm,
+                            border: `1px solid ${C.borderLt}`,
+                            background: C.card,
+                            color: C.muted,
+                            transition: "background 150ms ease, border-color 150ms ease, color 150ms ease",
+                          }}
+                        >
+                          <FaEdit size={13} />
+                        </IconButton>
+                      ) : null}
                     </td>
                   </tr>
                 );
@@ -279,6 +291,8 @@ function ManageFieldsModal({ open, fields, onClose, onEditField }) {
 ManageFieldsModal.propTypes = {
   open: PropTypes.bool.isRequired,
   fields: PropTypes.array.isRequired,
+  workspaceId: PropTypes.string,
+  activeTable: PropTypes.object,
   onClose: PropTypes.func.isRequired,
   onEditField: PropTypes.func.isRequired,
 };

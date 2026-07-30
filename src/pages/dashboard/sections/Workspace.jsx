@@ -41,6 +41,7 @@ import { FaStar } from "react-icons/fa";
 import { updateCellValue, addColumnValue, addRowValue, deleteRowValue, deleteRowsValue, duplicateRowValue, updateColumnValue, createBlankTable, importTable, renameTable, deleteTable, duplicateTable, deleteColumnValue, duplicateColumnValue, addUser, deleteUser, updateUser, appendTable } from "../../../api/workspace";
 import AddStaffMemberModal from "../modals/AddStaffMemberModal";
 import BulkActionToolbar from "../components/BulkActionToolbar";
+import { canModifyColumn } from "../utils/columnPermissions";
 
 export function formatTimestamp(date = new Date()) {
   const d = date instanceof Date ? date : new Date(date);
@@ -124,41 +125,6 @@ const viewsPanelWidth = 198;
 const viewsPanelCollapsedWidth = 0;
 const viewsPanelPadding = T.spacing[3];
 const layoutTransition = "width 260ms ease, flex-basis 260ms ease, padding 260ms ease";
-
-const fieldActionRestrictionBoundaries = {
-  inventory: "priority",
-  tasks: "status",
-};
-
-function normalizeFieldLabel(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function shouldShowColumnFieldActions(workspaceId, columnId, fields = []) {
-  const normalizedWorkspaceId = normalizeFieldLabel(workspaceId);
-
-  if (normalizedWorkspaceId === "contacts") {
-    return false;
-  }
-
-  const boundaryFieldName = fieldActionRestrictionBoundaries[normalizedWorkspaceId];
-  if (!boundaryFieldName) {
-    return true;
-  }
-
-  const columnIndex = fields.findIndex((field) => field.id === columnId);
-  const boundaryIndex = fields.findIndex(
-    (field) =>
-      normalizeFieldLabel(field.name) === boundaryFieldName ||
-      normalizeFieldLabel(field.id) === boundaryFieldName
-  );
-
-  if (columnIndex < 0 || boundaryIndex < 0) {
-    return true;
-  }
-
-  return columnIndex > boundaryIndex;
-}
 
 const columnWidths = {
   dealName: 150,
@@ -367,11 +333,12 @@ function ColumnHeaderWrapper(props) {
   const context = props.context || (api?.getGridOption ? api.getGridOption("context") : {}) || {};
   const currentWorkspaceId = context.workspaceId || column.getColDef()?.workspaceId;
   const isStaffWorkspace = currentWorkspaceId === "staff" || currentWorkspaceId === "mystaff";
-  const showFieldActions = shouldShowColumnFieldActions(
-    currentWorkspaceId,
-    colId,
-    context.fields || []
-  );
+  const showFieldActions = canModifyColumn({
+    workspaceId: currentWorkspaceId,
+    columnId: colId,
+    fields: context.fields || [],
+    table: context.activeTable,
+  });
 
   const showHeaderDropdown = !isAddColumn && !isCheckbox && !isStaffWorkspace;
 
@@ -2000,6 +1967,16 @@ export function Workspace({
 
   const toggleViewsPanel = () => setIsViewsPanelHidden((isHidden) => !isHidden);
   const selectedField = fields.find((field) => field.id === selectedFieldId) || null;
+  const canModifyCurrentColumn = useCallback(
+    (columnId) =>
+      canModifyColumn({
+        workspaceId: effectiveWorkspaceId,
+        columnId,
+        fields,
+        table: activeTable,
+      }),
+    [activeTable, effectiveWorkspaceId, fields]
+  );
 
   // ==========================
   // Change Tracking
@@ -2163,14 +2140,16 @@ export function Workspace({
   }, [fields, trackChange]);
 
   const deleteColumn = useCallback(async (columnId) => {
+    if (!canModifyCurrentColumn(columnId)) return;
     const prev = [...fields];
     const next = prev.filter((f) => f.id !== columnId);
     setFields(next);
     trackChange("Delete Column", columnId, prev, next);
     await deleteColumnValue(columnId);
-  }, [fields, trackChange]);
+  }, [canModifyCurrentColumn, fields, trackChange]);
 
   const duplicateColumn = useCallback(async (columnId) => {
+    if (!canModifyCurrentColumn(columnId)) return;
     const prev = [...fields];
     const target = prev.find((f) => f.id === columnId);
     if (!target) return;
@@ -2186,9 +2165,10 @@ export function Workspace({
     trackChange("Duplicate Column", duplicated.id, prev, next);
     const payload = { "userId": localStorage.getItem("user_id") };
     await duplicateColumnValue(columnId, payload);
-  }, [fields, trackChange]);
+  }, [canModifyCurrentColumn, fields, trackChange]);
 
   const renameColumn = useCallback(async (columnId, newName) => {
+    if (!canModifyCurrentColumn(columnId)) return;
     const prev = [...fields];
     const next = prev.map((f) => (f.id === columnId ? { ...f, name: newName } : f));
     setFields(next);
@@ -2199,9 +2179,10 @@ export function Workspace({
       "name": newName,
     }
     await updateColumnValue(column_id, user_id, payload);
-  }, [fields, trackChange]);
+  }, [canModifyCurrentColumn, fields, trackChange]);
 
   const updateColumn = useCallback(async (updatedField) => {
+    if (!canModifyCurrentColumn(updatedField.id)) return;
     const prev = [...fields];
     const next = prev.map((f) => (f.id === updatedField.id ? { ...f, ...updatedField } : f));
     setFields(next);
@@ -2216,7 +2197,7 @@ export function Workspace({
       "config": { "options": updatedField.options || [] },
     }
     await updateColumnValue(column_id, user_id, payload);
-  }, [fields, trackChange]);
+  }, [canModifyCurrentColumn, fields, trackChange]);
 
   // ==========================
   // Cell Operations
@@ -2348,6 +2329,7 @@ export function Workspace({
   const context = useMemo(() => ({
     workspaceId: effectiveWorkspaceId,
     fields,
+    activeTable,
     addRow,
     deleteRow,
     duplicateRow,
@@ -2361,7 +2343,7 @@ export function Workspace({
     duplicateWorkspace,
     deleteWorkspace,
     onOpenFieldConfig: handleOpenFieldConfig,
-  }), [effectiveWorkspaceId, fields, addRow, deleteRow, duplicateRow, updateRow, addColumn, deleteColumn, duplicateColumn, renameColumn, updateColumn, renameWorkspace, duplicateWorkspace, deleteWorkspace, handleOpenFieldConfig]);
+  }), [effectiveWorkspaceId, fields, activeTable, addRow, deleteRow, duplicateRow, updateRow, addColumn, deleteColumn, duplicateColumn, renameColumn, updateColumn, renameWorkspace, duplicateWorkspace, deleteWorkspace, handleOpenFieldConfig]);
 
   return (
     <>
@@ -2432,8 +2414,14 @@ export function Workspace({
       <ManageFieldsModal
         open={isManageFieldsOpen}
         fields={fields}
+        workspaceId={effectiveWorkspaceId}
+        activeTable={activeTable}
         onClose={() => setIsManageFieldsOpen(false)}
-        onEditField={(field) => setSelectedFieldId(field.id)}
+        onEditField={(field) => {
+          if (canModifyCurrentColumn(field.id)) {
+            setSelectedFieldId(field.id);
+          }
+        }}
       />
       <EditFieldModal
         open={Boolean(selectedField)}
