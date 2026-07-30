@@ -40,6 +40,7 @@ import { LuChevronDown, LuBookOpen, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertic
 import { FaStar } from "react-icons/fa";
 import { updateCellValue, addColumnValue, addRowValue, deleteRowValue, deleteRowsValue, duplicateRowValue, updateColumnValue, createBlankTable, importTable, renameTable, deleteTable, duplicateTable, deleteColumnValue, duplicateColumnValue, addUser, deleteUser, updateUser, appendTable } from "../../../api/workspace";
 import AddStaffMemberModal from "../modals/AddStaffMemberModal";
+import BulkActionToolbar from "../components/BulkActionToolbar";
 
 export function formatTimestamp(date = new Date()) {
   const d = date instanceof Date ? date : new Date(date);
@@ -1193,6 +1194,7 @@ function WorkspaceGrid({
   updateRow,
   duplicateRow,
   deleteRow,
+  deleteRows,
   refreshKey,
   renderDetailsModal,
   onExpandRow,
@@ -1202,6 +1204,46 @@ function WorkspaceGrid({
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedGridRows, setSelectedGridRows] = useState([]);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+  const gridApiRef = useRef(null);
+
+  const handleGridReady = useCallback(
+    (params) => {
+      gridApiRef.current = params.api;
+    },
+    []
+  );
+
+  const handleSelectionChanged = useCallback(
+    (event) => {
+      if (event?.api) {
+        setSelectedGridRows(event.api.getSelectedRows());
+      }
+    },
+    []
+  );
+
+  const handleClearSelection = useCallback(() => {
+    if (gridApiRef.current) {
+      gridApiRef.current.deselectAll();
+    }
+    setSelectedGridRows([]);
+  }, []);
+
+  const handleConfirmBulkDelete = useCallback(() => {
+    if (!selectedGridRows || selectedGridRows.length === 0) return;
+    const selectedIds = selectedGridRows.map((r) => r.id).filter(Boolean);
+    if (deleteRows && selectedIds.length > 0) {
+      deleteRows(selectedIds);
+    } else if (deleteRow && selectedIds.length > 0) {
+      selectedIds.forEach((id) => {
+        deleteRow(id);
+      });
+    }
+    handleClearSelection();
+    setIsBulkDeleteModalOpen(false);
+  }, [selectedGridRows, deleteRows, deleteRow, handleClearSelection]);
 
   const primaryNameKey = useMemo(() => {
     const found = fields.find((f) => f.id.toLowerCase().includes("name"))?.id;
@@ -1392,6 +1434,24 @@ function WorkspaceGrid({
   console.log(selectedRow);
   return (
     <div style={{ flex: "1 1 620px", minWidth: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <BulkActionToolbar
+        selectedCount={selectedGridRows.length}
+        onDelete={() => setIsBulkDeleteModalOpen(true)}
+        onClearSelection={handleClearSelection}
+      />
+
+      {isBulkDeleteModalOpen && (
+        <ConfirmationModal
+          title="Delete Selected Rows"
+          message="Are you sure you want to delete the selected row(s)? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+          onConfirm={handleConfirmBulkDelete}
+          onClose={() => setIsBulkDeleteModalOpen(false)}
+        />
+      )}
+
       <div style={{ height: 318, minWidth: 0, flex: "0 0 auto" }}>
         <AgGridTable
           workspaceId={workspaceId}
@@ -1399,9 +1459,12 @@ function WorkspaceGrid({
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           quickFilterText={search}
-          rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true }}
+          rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true, enableClickSelection: false }}
+          suppressRowClickSelection={true}
           selectionColumnDef={{ width: 44, headerClass: "ag-selection-header" }}
           context={context}
+          onGridReady={handleGridReady}
+          onSelectionChanged={handleSelectionChanged}
           onCellValueChanged={handleCellValueChanged}
           onModelUpdated={handleModelUpdated}
           suppressCellFocus={false}
@@ -1762,6 +1825,21 @@ const defaultWorkspaceConfigurations = {
   },
 };
 
+function ensureUniqueRowIds(rows) {
+  const seen = new Set();
+  return (rows || []).map((row, index) => {
+    let id = row?.id ?? row?._id ?? row?.uuid;
+    if (id === undefined || id === null || id === "" || seen.has(String(id))) {
+      id = `row-${index}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    }
+    seen.add(String(id));
+    return {
+      ...JSON.parse(JSON.stringify(row || {})),
+      id: String(id),
+    };
+  });
+}
+
 // ==========================
 // Workspace State
 // ==========================
@@ -1837,7 +1915,7 @@ export function Workspace({
   );
 
   const initialRows = useMemo(
-    () => (rowData.length > 0 ? rowData : config.rows),
+    () => ensureUniqueRowIds(rowData.length > 0 ? rowData : config.rows),
     [rowData, config.rows]
   ); const initialViews = useMemo(
     () =>
@@ -1865,8 +1943,8 @@ export function Workspace({
   }, [initialFields]);
 
   useEffect(() => {
-    setGridRowData(initialRows);
-  }, [initialRows]);
+    setGridRowData(ensureUniqueRowIds(initialRows));
+  }, [activeViewId, effectiveWorkspaceId]);
 
   useEffect(() => {
     setViewsList(initialViews);
@@ -1924,10 +2002,11 @@ export function Workspace({
     setIsAddStaffModalOpen(false);
   }, [gridRowData, trackChange])
 
-  const addRow = useCallback(async (newRow) => {
+  const addRow = useCallback(async (newRow = {}) => {
     const nowFormatted = formatTimestamp();
-    const row = newRow;
+    const newRowId = `row-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const initializedRow = {
+      id: newRowId,
       createdTime: nowFormatted,
       created: nowFormatted,
       createdAt: nowFormatted,
@@ -1936,61 +2015,91 @@ export function Workspace({
       updatedAt: nowFormatted,
       createdBy: "Ramesh Yadav",
       lastModifiedBy: "Ramesh Yadav",
-      ...row,
+      ...JSON.parse(JSON.stringify(newRow || {})),
     };
-    const prev = [...gridRowData];
-    const next = [...prev, initializedRow];
-    setGridRowData(next);
-    trackChange("Add Row", initializedRow.id, prev, next);
-    if (workspaceId == "staff") {
-      console.log(workspaceId);
-      setIsAddStaffModalOpen(true);
 
+    setGridRowData((prev) => [...prev, initializedRow]);
+    trackChange("Add Row", newRowId, null, initializedRow);
+
+    if (workspaceId == "staff") {
+      setIsAddStaffModalOpen(true);
     } else {
       const user_id = localStorage.getItem("user_id");
       await addRowValue(activeViewId, user_id);
     }
-
-  }, [gridRowData, trackChange]);
+  }, [activeViewId, trackChange, workspaceId]);
 
   const deleteRow = useCallback(async (rowId) => {
-    const prev = [...gridRowData];
-    const next = prev.filter((r) => r.id !== rowId);
-    setGridRowData(next);
-    trackChange("Delete Row", rowId, prev, next);
+    if (!rowId) return;
+    const stringRowId = String(rowId);
+    setGridRowData((prev) => prev.filter((r) => String(r.id) !== stringRowId));
+    trackChange("Delete Row", stringRowId, null, null);
     if (workspaceId == "staff") {
-      await deleteUser(rowId);
+      await deleteUser(stringRowId);
     } else {
-      await deleteRowValue(rowId);
+      await deleteRowValue(stringRowId);
     }
+  }, [trackChange, workspaceId]);
 
-  }, [gridRowData, trackChange]);
+  const deleteRows = useCallback(async (rowIds) => {
+    if (!rowIds || rowIds.length === 0) return;
+    const stringIds = new Set(rowIds.map((id) => String(id)));
+    setGridRowData((prev) => prev.filter((r) => !stringIds.has(String(r.id))));
+    trackChange("Delete Rows", Array.from(stringIds).join(","), null, null);
+    for (const id of stringIds) {
+      if (workspaceId == "staff") {
+        deleteUser(id).catch(console.error);
+      } else {
+        deleteRowValue(id).catch(console.error);
+      }
+    }
+  }, [trackChange, workspaceId]);
 
   const duplicateRow = useCallback(async (rowId) => {
-    const prev = [...gridRowData];
-    const targetRow = prev.find((r) => r.id === rowId);
-    if (!targetRow) return;
-    const duplicated = { ...targetRow, id: `row-copy-${Date.now()}` };
-    const idx = prev.findIndex((r) => r.id === rowId);
-    const next = [...prev];
-    next.splice(idx + 1, 0, duplicated);
-    setGridRowData(next);
-    trackChange("Duplicate Row", duplicated.id, prev, next);
+    if (!rowId) return;
+    const targetIdStr = String(rowId);
+    let duplicatedId = null;
+
+    setGridRowData((prev) => {
+      const targetRow = prev.find((r) => String(r.id) === targetIdStr);
+      if (!targetRow) return prev;
+      duplicatedId = `row-copy-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const cloned = {
+        ...JSON.parse(JSON.stringify(targetRow)),
+        id: duplicatedId,
+      };
+      const idx = prev.findIndex((r) => String(r.id) === targetIdStr);
+      const next = [...prev];
+      next.splice(idx + 1, 0, cloned);
+      trackChange("Duplicate Row", duplicatedId, targetRow, cloned);
+      return next;
+    });
+
     const user_id = localStorage.getItem("user_id");
-    const payload = { "userId": user_id };
-    console.log(rowId, payload);
-    const res = await duplicateRowValue(rowId, payload);
-    console.log(res);
-  }, [gridRowData, trackChange]);
+    const payload = { userId: user_id };
+    await duplicateRowValue(targetIdStr, payload);
+  }, [trackChange]);
 
   const updateRow = useCallback((rowId, updatedFields) => {
+    if (!rowId) return;
+    const targetIdStr = String(rowId);
     const nowFormatted = formatTimestamp();
-    const prev = [...gridRowData];
-    const next = prev.map((r) => (r.id === rowId ? { ...r, ...updatedFields, lastModifiedTime: nowFormatted, lastModified: nowFormatted, updatedAt: nowFormatted } : r));
-    setGridRowData(next);
-    trackChange("Update Row", rowId, prev, next);
+    setGridRowData((prev) =>
+      prev.map((r) =>
+        String(r.id) === targetIdStr
+          ? {
+              ...r,
+              ...updatedFields,
+              lastModifiedTime: nowFormatted,
+              lastModified: nowFormatted,
+              updatedAt: nowFormatted,
+            }
+          : r
+      )
+    );
+    trackChange("Update Row", targetIdStr, null, updatedFields);
     setRefreshKey((k) => k + 1);
-  }, [gridRowData, trackChange]);
+  }, [trackChange]);
 
   // ==========================
   // Column Operations
@@ -2072,18 +2181,13 @@ export function Workspace({
   // Cell Operations
   // ==========================
   const updateCell = useCallback(async (rowId, columnId, newValue) => {
-    const prev = [...gridRowData];
-    console.log("updateCell", rowId, columnId, newValue);
-    const row = prev.find((r) => r.id === rowId);
-    if (row) {
-      const prevVal = row[columnId];
-      console.log("prevVal", prevVal);
-      console.log("newValue", newValue);
-      //if (prevVal === newValue) return;
+    if (rowId === undefined || rowId === null || rowId === "") return;
+    const targetIdStr = String(rowId);
+    const nowFormatted = formatTimestamp();
 
-      const nowFormatted = formatTimestamp();
-      const next = prev.map((r) => {
-        if (r.id === rowId) {
+    setGridRowData((prev) =>
+      prev.map((r) => {
+        if (String(r.id) === targetIdStr) {
           return {
             ...r,
             [columnId]: newValue,
@@ -2094,49 +2198,44 @@ export function Workspace({
           };
         }
         return r;
+      })
+    );
+
+    trackChange("Update Cell", `${targetIdStr}:${columnId}`, null, newValue);
+    setRefreshKey((k) => k + 1);
+
+    const user_id = localStorage.getItem("user_id");
+    if (workspaceId === "staff" || workspaceId === "mystaff") {
+      const getFieldId = (name) =>
+        workspaceData?.tables?.[0]?.fields?.find((field) => field.name === name)?.id;
+
+      const fieldToApiKey = {
+        [getFieldId("First Name")]: "first_name",
+        [getFieldId("Last Name")]: "last_name",
+        [getFieldId("Username")]: "user_name",
+        [getFieldId("Email")]: "email",
+        [getFieldId("Phone")]: "phone",
+        [getFieldId("Role")]: "role",
+        [getFieldId("Access")]: "access",
+        [getFieldId("Current Password")]: "password",
+      };
+      const updatedUser = {
+        [fieldToApiKey[columnId]]:
+          fieldToApiKey[columnId] === "role"
+            ? (newValue || "").toLowerCase()
+            : newValue,
+      };
+      await updateUser(targetIdStr, updatedUser);
+    } else {
+
+      await updateCellValue({
+        rowId: targetIdStr,
+        columnId,
+        value: newValue,
+        userId: user_id,
       });
-      setGridRowData(next);
-      trackChange("Update Cell", `${rowId}:${columnId}`, prevVal, newValue);
-      setRefreshKey((k) => k + 1);
-      const user_id = localStorage.getItem("user_id");
-      console.log("updateCellValue", rowId, columnId, newValue, user_id);
-      if (workspaceId === "staff" || workspaceId === "mystaff") {
-        const table = workspaceData.tables[0];
-
-        // Create a lookup: "First Name" -> field id
-
-        const getFieldId = (name) =>
-          workspaceData.tables[0].fields.find(field => field.name === name)?.id;
-
-        const fieldToApiKey = {
-          [getFieldId("First Name")]: "first_name",
-          [getFieldId("Last Name")]: "last_name",
-          [getFieldId("Username")]: "user_name",
-          [getFieldId("Email")]: "email",
-          [getFieldId("Phone")]: "phone",
-          [getFieldId("Role")]: "role",
-          [getFieldId("Access")]: "access",
-          [getFieldId("Current Password")]: "password",
-        };
-        const updatedUser = {
-          [fieldToApiKey[columnId]]:
-            fieldToApiKey[columnId] === "role"
-              ? newValue.toLowerCase()
-              : newValue,
-        };
-        await updateUser(rowId, updatedUser);
-        console.log("updatedUser", updatedUser);
-      } else {
-        await updateCellValue({
-          rowId,
-          columnId,
-          value: newValue,
-          userId: user_id,
-        });
-      }
-
     }
-  }, [gridRowData, trackChange]);
+  }, [trackChange, workspaceId, workspaceData]);
 
   // ==========================
   // Workspace Operations
@@ -2273,6 +2372,7 @@ export function Workspace({
                 updateRow={updateRow}
                 duplicateRow={duplicateRow}
                 deleteRow={deleteRow}
+                deleteRows={deleteRows}
                 refreshKey={refreshKey}
                 renderDetailsModal={renderDetailsModal}
                 onExpandRow={onExpandRow}

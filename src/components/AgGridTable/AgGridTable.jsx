@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { AgGridReact } from "ag-grid-react";
 import { themeQuartz } from "ag-grid-community";
 import "../../config/agGridCommunity";
-import { C } from "../utils";
+import { C, Text } from "../utils";
 
 const agGridTheme = themeQuartz.withParams({
   accentColor: C.accent,
@@ -24,6 +24,14 @@ const agGridTheme = themeQuartz.withParams({
   wrapperBorderRadius: 0,
 });
 
+function DefaultNoRowsOverlay() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+      <Text variant="subtitle">No rows to show</Text>
+    </div>
+  );
+}
+
 export default function AgGridTable({
   workspaceId,
   rowData,
@@ -34,6 +42,8 @@ export default function AgGridTable({
   selectionColumnDef,
   suppressCellFocus,
   context,
+  getRowId,
+  noRowsOverlayComponent,
   ...rest
 }) {
   const gridApiRef = useRef(null);
@@ -65,37 +75,51 @@ export default function AgGridTable({
     }
   }, [quickFilterText]);
 
+  const defaultGetRowId = useCallback((params) => {
+    return String(params.data?.id || params.data?._id || params.data?.uuid || "");
+  }, []);
+
+  const effectiveGetRowId = getRowId || defaultGetRowId;
   const isStaff = context?.workspaceId === "staff" || context?.workspaceId === "mystaff";
   const effectiveAutoSizeStrategy = rest.autoSizeStrategy || (isStaff ? { type: "fitGridWidth" } : undefined);
+  const effectiveRowSelection = rowSelection || { mode: "multiRow", checkboxes: true, headerCheckbox: true, selectAll: "all", enableClickSelection: false };
+  const effectiveSelectionColumnDef = selectionColumnDef || { width: 44, headerClass: "ag-selection-header" };
+  const effectiveNoRowsOverlayComponent = noRowsOverlayComponent || DefaultNoRowsOverlay;
 
   return (
     <AgGridReact
       rowData={rowData}
       columnDefs={columnDefs}
       defaultColDef={defaultColDef}
+      getRowId={effectiveGetRowId}
       suppressClickEdit={workspaceId === "staff" || workspaceId === "mystaff"}
+      suppressRowClickSelection={true}
       theme={agGridTheme}
       rowHeight={36}
       headerHeight={34}
       quickFilterText={quickFilterText}
-      rowSelection={rowSelection}
-      selectionColumnDef={selectionColumnDef}
+      rowSelection={effectiveRowSelection}
+      selectionColumnDef={effectiveSelectionColumnDef}
       suppressCellFocus={suppressCellFocus}
       autoSizeStrategy={effectiveAutoSizeStrategy}
       context={context}
       onGridReady={onGridReady}
+      noRowsOverlayComponent={effectiveNoRowsOverlayComponent}
       {...rest}
     />
   );
 }
 
 AgGridTable.propTypes = {
+  workspaceId: PropTypes.string,
   rowData: PropTypes.array,
   columnDefs: PropTypes.array,
   defaultColDef: PropTypes.object,
   quickFilterText: PropTypes.string,
-  rowSelection: PropTypes.object,
+  rowSelection: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   selectionColumnDef: PropTypes.object,
   suppressCellFocus: PropTypes.bool,
   context: PropTypes.object,
+  getRowId: PropTypes.func,
+  noRowsOverlayComponent: PropTypes.any,
 };
