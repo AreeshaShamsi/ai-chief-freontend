@@ -24,6 +24,7 @@ export default function ColumnActionsModal({
   triggerRef,
   columnId,
   columnName,
+  showFieldActions = true,
   isMoveLeftDisabled = false,
   isMoveRightDisabled = false,
   onEditField,
@@ -119,41 +120,54 @@ export default function ColumnActionsModal({
     );
   }
 
-  const menuItems = [
-    {
-      label: "Edit Field",
-      icon: LuPencil,
-      onClick: () => setActiveAction("edit"),
-    },
-    {
-      label: "Duplicate Field",
-      icon: LuCopy,
-      onClick: () => setActiveAction("duplicate"),
-    },
-    { isDivider: true },
-    {
-      label: "Move Left",
-      icon: LuArrowLeft,
-      onClick: () => !isMoveLeftDisabled && handleAction(onMoveLeft),
-      isDisabled: isMoveLeftDisabled,
-    },
-    {
-      label: "Move Right",
-      icon: LuArrowRight,
-      onClick: () => !isMoveRightDisabled && handleAction(onMoveRight),
-      isDisabled: isMoveRightDisabled,
-    },
-    { isDivider: true },
-    { label: "Sort Ascending", icon: LuArrowUpAZ, onClick: () => handleAction(onSortAsc) },
-    { label: "Sort Descending", icon: LuArrowDownZA, onClick: () => handleAction(onSortDesc) },
-    { isDivider: true },
-    {
-      label: "Delete Field",
-      icon: LuTrash2,
-      onClick: () => setActiveAction("delete"),
-      isDanger: true,
-    },
-  ];
+  const menuGroups = [
+    showFieldActions
+      ? [
+        {
+          label: "Edit Field",
+          icon: LuPencil,
+          onClick: () => setActiveAction("edit"),
+        },
+        {
+          label: "Duplicate Field",
+          icon: LuCopy,
+          onClick: () => setActiveAction("duplicate"),
+        },
+      ]
+      : [],
+    [
+      {
+        label: "Move Left",
+        icon: LuArrowLeft,
+        onClick: () => !isMoveLeftDisabled && handleAction(onMoveLeft),
+        isDisabled: isMoveLeftDisabled,
+      },
+      {
+        label: "Move Right",
+        icon: LuArrowRight,
+        onClick: () => !isMoveRightDisabled && handleAction(onMoveRight),
+        isDisabled: isMoveRightDisabled,
+      },
+    ],
+    [
+      { label: "Sort Ascending", icon: LuArrowUpAZ, onClick: () => handleAction(onSortAsc) },
+      { label: "Sort Descending", icon: LuArrowDownZA, onClick: () => handleAction(onSortDesc) },
+    ],
+    showFieldActions
+      ? [
+        {
+          label: "Delete Field",
+          icon: LuTrash2,
+          onClick: () => setActiveAction("delete"),
+          isDanger: true,
+        },
+      ]
+      : [],
+  ].filter((group) => group.length > 0);
+
+  const menuItems = menuGroups.flatMap((group, groupIndex) => (
+    groupIndex === 0 ? group : [{ isDivider: true }, ...group]
+  ));
 
   return createPortal(
     <div
@@ -258,6 +272,7 @@ ColumnActionsModal.propTypes = {
   triggerRef: PropTypes.shape({ current: PropTypes.any }).isRequired,
   columnId: PropTypes.string,
   columnName: PropTypes.string,
+  showFieldActions: PropTypes.bool,
   isMoveLeftDisabled: PropTypes.bool,
   isMoveRightDisabled: PropTypes.bool,
   onEditField: PropTypes.func,

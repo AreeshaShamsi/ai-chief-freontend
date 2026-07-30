@@ -125,6 +125,41 @@ const viewsPanelCollapsedWidth = 0;
 const viewsPanelPadding = T.spacing[3];
 const layoutTransition = "width 260ms ease, flex-basis 260ms ease, padding 260ms ease";
 
+const fieldActionRestrictionBoundaries = {
+  inventory: "priority",
+  tasks: "status",
+};
+
+function normalizeFieldLabel(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function shouldShowColumnFieldActions(workspaceId, columnId, fields = []) {
+  const normalizedWorkspaceId = normalizeFieldLabel(workspaceId);
+
+  if (normalizedWorkspaceId === "contacts") {
+    return false;
+  }
+
+  const boundaryFieldName = fieldActionRestrictionBoundaries[normalizedWorkspaceId];
+  if (!boundaryFieldName) {
+    return true;
+  }
+
+  const columnIndex = fields.findIndex((field) => field.id === columnId);
+  const boundaryIndex = fields.findIndex(
+    (field) =>
+      normalizeFieldLabel(field.name) === boundaryFieldName ||
+      normalizeFieldLabel(field.id) === boundaryFieldName
+  );
+
+  if (columnIndex < 0 || boundaryIndex < 0) {
+    return true;
+  }
+
+  return columnIndex > boundaryIndex;
+}
+
 const columnWidths = {
   dealName: 150,
   leadName: 150,
@@ -332,6 +367,11 @@ function ColumnHeaderWrapper(props) {
   const context = props.context || (api?.getGridOption ? api.getGridOption("context") : {}) || {};
   const currentWorkspaceId = context.workspaceId || column.getColDef()?.workspaceId;
   const isStaffWorkspace = currentWorkspaceId === "staff" || currentWorkspaceId === "mystaff";
+  const showFieldActions = shouldShowColumnFieldActions(
+    currentWorkspaceId,
+    colId,
+    context.fields || []
+  );
 
   const showHeaderDropdown = !isAddColumn && !isCheckbox && !isStaffWorkspace;
 
@@ -425,6 +465,7 @@ function ColumnHeaderWrapper(props) {
             triggerRef={triggerRef}
             columnId={colId}
             columnName={displayName}
+            showFieldActions={showFieldActions}
             isMoveLeftDisabled={isMoveLeftDisabled}
             isMoveRightDisabled={isMoveRightDisabled}
             onEditField={(id, newName) => {
@@ -2305,6 +2346,8 @@ export function Workspace({
   const recordsCountText = `${currentCount} records`;
 
   const context = useMemo(() => ({
+    workspaceId: effectiveWorkspaceId,
+    fields,
     addRow,
     deleteRow,
     duplicateRow,
@@ -2318,7 +2361,7 @@ export function Workspace({
     duplicateWorkspace,
     deleteWorkspace,
     onOpenFieldConfig: handleOpenFieldConfig,
-  }), [addRow, deleteRow, duplicateRow, updateRow, addColumn, deleteColumn, duplicateColumn, renameColumn, updateColumn, renameWorkspace, duplicateWorkspace, deleteWorkspace, handleOpenFieldConfig]);
+  }), [effectiveWorkspaceId, fields, addRow, deleteRow, duplicateRow, updateRow, addColumn, deleteColumn, duplicateColumn, renameColumn, updateColumn, renameWorkspace, duplicateWorkspace, deleteWorkspace, handleOpenFieldConfig]);
 
   return (
     <>
