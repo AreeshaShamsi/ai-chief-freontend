@@ -193,7 +193,7 @@ function DashboardMetricCard({
 }
 
 function CampaignCard({ campaign }) {
-  const isLive = campaign.status === "live";
+  const isLive = campaign.status !== "completed";
 
   return (
     <div
@@ -206,7 +206,7 @@ function CampaignCard({ campaign }) {
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.2 }}>
-          {campaign.title}
+          {campaign.campaign_name}
         </div>
         <AppPill
           variant={isLive ? "success" : "dark"}
@@ -240,9 +240,9 @@ function CampaignCard({ campaign }) {
           valueStyle={{ color: C.hot, marginTop: 24, fontSize: 25, fontWeight: 700, lineHeight: 1 }}
         />
         <AppMetricCard
-          label="Qualified"
-          value={campaign.qualified}
-          variant="qualified"
+          label="Warm"
+          value={campaign.warm}
+          variant="warm"
           height={96}
           style={{ border: "none", borderRadius: 12, padding: 14 }}
           labelStyle={{ color: C.accent, fontSize: 10, fontWeight: 500, lineHeight: 1 }}
@@ -267,7 +267,7 @@ function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }
             <FiBarChart2 size={14} />
           </AppIconCircle>
           <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.text, lineHeight: 1.1 }}>
-            active campaigns
+            Active campaigns
           </h2>
         </div>
         <AppButton
@@ -291,7 +291,7 @@ function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }
       </div>
 
       {campaignItems.map((campaign) => (
-        <CampaignCard key={campaign.title} campaign={campaign} />
+        <CampaignCard key={campaign.campaign_id} campaign={campaign} />
       ))}
     </AppCard>
   );
@@ -306,14 +306,14 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
       subtitle: `${data.billing.total_minutes_used ?? 0} min used, ${data.billing.total_minutes_purchased
         ? (
           100 -
-          (100 * (data.billing.minutes_used ?? 0)) /
+          (100 * (data.billing.total_minutes_used ?? 0)) /
           data.billing.total_minutes_purchased
-        ).toFixed(0)
+        ).toFixed(1)
         : 0
         }% remaining of ${data.billing.total_minutes_purchased ?? 0} purchased`,
       icon: <FiMic size={14} />,
       progress:
-        (data.billing.minutes_used / data.billing.total_minutes_purchased) * 100,
+        (data.billing.total_minutes_used / data.billing.total_minutes_purchased) * 100,
     },
     {
       key: "rate",
@@ -500,12 +500,15 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
               </AppPill>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            <div style={{
+              display: "flex", flexDirection: "column", gap: 0, maxHeight: "350px", overflowY: "auto",
+              overflowX: "hidden", padding: "8px 0", scrollbarWidth: "none",
+            }}>
               {data.hot_leads.map((lead) => (
                 <div
                   key={lead.name}
                   onClick={() => onLeadClick?.(lead)}
-                  style={{ cursor: onLeadClick ? "pointer" : "default", width: "100%" }}
+                  style={{ cursor: onLeadClick ? "pointer" : "default", width: "100%", height: "auto" }}
                 >
                   <LeadFollowUpCard {...lead} compact />
                 </div>

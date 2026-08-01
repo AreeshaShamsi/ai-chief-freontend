@@ -112,10 +112,16 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
   const [recordType, setRecordType] = useState("all");
   const [startRow, setStartRow] = useState("1");
   const [endRow, setEndRow] = useState("100");
+  const [campaignName, setCampaignName] = useState("");
 
   const handleContinue = () => {
     if (onContinue) {
-      onContinue({ recordType, startRow, endRow });
+      onContinue({
+        campaignName: campaignName.trim(),
+        recordType,
+        startRow,
+        endRow,
+      });
     }
     onClose?.();
   };
@@ -123,73 +129,105 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
   return (
     <Modal width={T.layout.modalWidth}>
       <ModalHeader title="Select Records" onClose={() => onClose?.()} />
-      <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: T.spacing[3] }}>
-        <SelectRecordOption
-          label="All Records In View (4,500 Total)"
-          selected={recordType === "all"}
-          onSelect={() => setRecordType("all")}
-        />
-        <SelectRecordOption
-          label="Custom Row Range"
-          selected={recordType === "custom"}
-          onSelect={() => setRecordType("custom")}
-        />
-
-        {recordType === "custom" && (
-          <div
+      <div
+        style={{
+          padding: "18px 20px",
+          display: "flex",
+          flexDirection: "column",
+          gap: T.spacing[4],
+        }}
+      >
+        <div>
+          <label
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: T.spacing[3],
-              marginTop: T.spacing[1],
-              padding: T.spacing[3],
-              background: C.surface,
-              borderRadius: T.radius.md,
-              border: `1px solid ${C.borderLt}`,
+              display: "block",
+              color: C.text,
+              fontSize: T.font.size.bodySmall,
+              fontWeight: T.font.weight.semibold,
+              marginBottom: 6,
+              fontFamily: T.font.family,
             }}
           >
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  color: C.text,
-                  fontSize: T.font.size.bodySmall,
-                  fontWeight: T.font.weight.semibold,
-                  marginBottom: 6,
-                  fontFamily: T.font.family,
-                }}
-              >
-                Start Row
-              </label>
-              <TextField
-                value={startRow}
-                onChange={(e) => setStartRow(e.target.value)}
-                placeholder="1"
-                style={{ height: 36 }}
-              />
+            Campaign Name
+          </label>
+          <TextField
+            value={campaignName}
+            onChange={(e) => setCampaignName(e.target.value)}
+            placeholder="Enter campaign name"
+            style={{ height: 36 }}
+          />
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: T.spacing[3] }}>
+          <SelectRecordOption
+            label="All Records In View (4,500 Total)"
+            selected={recordType === "all"}
+            onSelect={() => setRecordType("all")}
+          />
+
+          <SelectRecordOption
+            label="Custom Row Range"
+            selected={recordType === "custom"}
+            onSelect={() => setRecordType("custom")}
+          />
+
+          {recordType === "custom" && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: T.spacing[3],
+                marginTop: T.spacing[1],
+                padding: T.spacing[3],
+                background: C.surface,
+                borderRadius: T.radius.md,
+                border: `1px solid ${C.borderLt}`,
+              }}
+            >
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    color: C.text,
+                    fontSize: T.font.size.bodySmall,
+                    fontWeight: T.font.weight.semibold,
+                    marginBottom: 6,
+                    fontFamily: T.font.family,
+                  }}
+                >
+                  Start Row
+                </label>
+                <TextField
+                  value={startRow}
+                  onChange={(e) => setStartRow(e.target.value)}
+                  placeholder="1"
+                  style={{ height: 36 }}
+                />
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    color: C.text,
+                    fontSize: T.font.size.bodySmall,
+                    fontWeight: T.font.weight.semibold,
+                    marginBottom: 6,
+                    fontFamily: T.font.family,
+                  }}
+                >
+                  End Row
+                </label>
+                <TextField
+                  value={endRow}
+                  onChange={(e) => setEndRow(e.target.value)}
+                  placeholder="100"
+                  style={{ height: 36 }}
+                />
+              </div>
             </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  color: C.text,
-                  fontSize: T.font.size.bodySmall,
-                  fontWeight: T.font.weight.semibold,
-                  marginBottom: 6,
-                  fontFamily: T.font.family,
-                }}
-              >
-                End Row
-              </label>
-              <TextField
-                value={endRow}
-                onChange={(e) => setEndRow(e.target.value)}
-                placeholder="100"
-                style={{ height: 36 }}
-              />
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <div
         style={{
@@ -203,7 +241,7 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
         <AppButton onClick={() => onClose?.()} compact>
           Cancel
         </AppButton>
-        <AppButton variant="primary" compact onClick={handleContinue}>
+        <AppButton disabled={!campaignName.trim()} variant="primary" compact onClick={handleContinue}>
           Continue
         </AppButton>
       </div>

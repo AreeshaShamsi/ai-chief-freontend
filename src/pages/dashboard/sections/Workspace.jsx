@@ -519,7 +519,6 @@ function createHeader(label, icon) {
 }
 
 function AddColumnHeader({ displayName, icon: Icon, context }) {
-  console.log("context", context);
   const handleSelectField = (typeLabel) => {
     if (context?.onOpenFieldConfig) {
       context.onOpenFieldConfig(typeLabel);
@@ -635,7 +634,6 @@ function WorkspaceToolbar({
     formData.append("tableId", activeViewId);
     formData.append("userId", localStorage.getItem("user_id"));
 
-    console.log(formData.get("workspaceId"), formData.get("tableId"), formData.get("userId"));
     const table = await appendTable(formData);
 
     onTableUpdated?.(table);
@@ -859,8 +857,7 @@ function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggl
     setIsEditing(true);
   };
   const handleSaveRename = async () => {
-    console.log("Renamed:", viewItem.id);
-    console.log("To:", editName);
+
     if (editName.trim()) {
       viewItem.name = editName.trim();
     } else {
@@ -1001,7 +998,6 @@ GridNameRowItem.propTypes = {
 };
 
 function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenImportModal, onActiveViewChange, onTableCreated, onTableDeleted }) {
-  console.log(viewsList);
   const fileInputRef = useRef(null);
   const [importType, setImportType] = useState(null);
 
@@ -1085,7 +1081,6 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
     setActiveViewId(viewId);
     onActiveViewChange?.(viewId);
   };
-  console.log(activeViewId);
 
   return (
     <aside
@@ -1207,6 +1202,7 @@ function WorkspaceGrid({
   renderDetailsModal,
   onExpandRow,
   hideAddColumn = false,
+  isEditable = true,
   context: outerContext,
   onDisplayedRowCountChange,
 }) {
@@ -1244,10 +1240,6 @@ function WorkspaceGrid({
     const selectedIds = selectedGridRows.map((r) => r.id).filter(Boolean);
     if (deleteRows && selectedIds.length > 0) {
       deleteRows(selectedIds);
-    } else if (deleteRow && selectedIds.length > 0) {
-      selectedIds.forEach((id) => {
-        deleteRow(id);
-      });
     }
     handleClearSelection();
     setIsBulkDeleteModalOpen(false);
@@ -1438,8 +1430,6 @@ function WorkspaceGrid({
     return rowDataProp;
   }, [refreshKey, rowDataProp]);
 
-  console.log(fields);
-  console.log(selectedRow);
   return (
     <div style={{ flex: "1 1 620px", minWidth: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <BulkActionToolbar
@@ -1469,6 +1459,7 @@ function WorkspaceGrid({
           quickFilterText={search}
           rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true, enableClickSelection: false }}
           suppressRowClickSelection={true}
+          isEditable={isEditable}
           selectionColumnDef={{ width: 44, headerClass: "ag-selection-header" }}
           context={context}
           onGridReady={handleGridReady}
@@ -1524,6 +1515,7 @@ WorkspaceGrid.propTypes = {
   renderDetailsModal: PropTypes.func,
   onExpandRow: PropTypes.func,
   hideAddColumn: PropTypes.bool,
+  isEditable: PropTypes.bool,
   context: PropTypes.object,
   onDisplayedRowCountChange: PropTypes.func,
 };
@@ -1600,6 +1592,7 @@ const dealRows = [
 
 const defaultWorkspaceConfigurations = {
   deals: {
+
     fields: initialDealFields,
     rows: dealRows,
     views: [
@@ -1891,6 +1884,8 @@ export function Workspace({
     workspaceData.tables?.find((table) => table.id === activeViewId) ??
     workspaceData.tables?.[0];
 
+  const isEditable = activeTable?.editable ?? true;
+  console.log(activeTable);
   const columns = activeTable?.fields ?? [];
   const rowData = activeTable?.rows ?? [];
 
@@ -1909,12 +1904,26 @@ export function Workspace({
     }
   }, [activeTabProp]);
 
-  const config = useMemo(() => {
-    return defaultWorkspaceConfigurations[effectiveWorkspaceId] || defaultWorkspaceConfigurations.deals;
-  }, [effectiveWorkspaceId]);
 
   console.log(effectiveWorkspaceId);
-  console.log(config);
+  const config = useMemo(() => {
+    const baseConfig =
+      defaultWorkspaceConfigurations[effectiveWorkspaceId] ??
+      defaultWorkspaceConfigurations.deals;
+
+    // If we're in the deals workspace and editing,
+    // override the UI flags.
+    if (effectiveWorkspaceId === "deals" && !isEditable) {
+      return {
+        ...baseConfig,
+        hideManageFields: true,
+        hideAddColumn: true,
+      };
+    }
+
+    return baseConfig;
+  }, [effectiveWorkspaceId, isEditable]);
+
   const effectiveRowsProp = rowData;
 
   const initialFields = useMemo(
@@ -1974,7 +1983,7 @@ export function Workspace({
         columnId,
         fields,
         table: activeTable,
-      }),
+      }) && isEditable,
     [activeTable, effectiveWorkspaceId, fields]
   );
 
@@ -2015,35 +2024,35 @@ export function Workspace({
       access: form.access,
     };
 
-    console.log(payload);
     await addUser(payload);
     setIsAddStaffModalOpen(false);
   }, [gridRowData, trackChange])
 
   const addRow = useCallback(async (newRow = {}) => {
     const nowFormatted = formatTimestamp();
-    const newRowId = `row-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-    const initializedRow = {
-      id: newRowId,
-      createdTime: nowFormatted,
-      created: nowFormatted,
-      createdAt: nowFormatted,
-      lastModifiedTime: nowFormatted,
-      lastModified: nowFormatted,
-      updatedAt: nowFormatted,
-      createdBy: "Ramesh Yadav",
-      lastModifiedBy: "Ramesh Yadav",
-      ...JSON.parse(JSON.stringify(newRow || {})),
-    };
 
-    setGridRowData((prev) => [...prev, initializedRow]);
-    trackChange("Add Row", newRowId, null, initializedRow);
+
+
 
     if (workspaceId == "staff") {
       setIsAddStaffModalOpen(true);
     } else {
       const user_id = localStorage.getItem("user_id");
-      await addRowValue(activeViewId, user_id);
+      const res = await addRowValue(activeViewId, user_id);
+      const initializedRow = {
+        id: res.data.id,
+        createdTime: nowFormatted,
+        created: nowFormatted,
+        createdAt: nowFormatted,
+        lastModifiedTime: nowFormatted,
+        lastModified: nowFormatted,
+        updatedAt: nowFormatted,
+        createdBy: user_id,
+        lastModifiedBy: user_id,
+        ...JSON.parse(JSON.stringify(newRow || {})),
+      };
+      setGridRowData((prev) => [...prev, initializedRow]);
+      trackChange("Add Row", res.data.id, null, initializedRow);
     }
   }, [activeViewId, trackChange, workspaceId]);
 
@@ -2064,13 +2073,8 @@ export function Workspace({
     const stringIds = new Set(rowIds.map((id) => String(id)));
     setGridRowData((prev) => prev.filter((r) => !stringIds.has(String(r.id))));
     trackChange("Delete Rows", Array.from(stringIds).join(","), null, null);
-    for (const id of stringIds) {
-      if (workspaceId == "staff") {
-        deleteUser(id).catch(console.error);
-      } else {
-        deleteRowValue(id).catch(console.error);
-      }
-    }
+    const payload = { "rowIds": rowIds };
+    await deleteRowsValue(payload);
   }, [trackChange, workspaceId]);
 
   const duplicateRow = useCallback(async (rowId) => {
@@ -2106,12 +2110,12 @@ export function Workspace({
       prev.map((r) =>
         String(r.id) === targetIdStr
           ? {
-              ...r,
-              ...updatedFields,
-              lastModifiedTime: nowFormatted,
-              lastModified: nowFormatted,
-              updatedAt: nowFormatted,
-            }
+            ...r,
+            ...updatedFields,
+            lastModifiedTime: nowFormatted,
+            lastModified: nowFormatted,
+            updatedAt: nowFormatted,
+          }
           : r
       )
     );
@@ -2203,6 +2207,7 @@ export function Workspace({
   // Cell Operations
   // ==========================
   const updateCell = useCallback(async (rowId, columnId, newValue) => {
+    console.log("Update Cell:", rowId, columnId, newValue);
     if (rowId === undefined || rowId === null || rowId === "") return;
     const targetIdStr = String(rowId);
     const nowFormatted = formatTimestamp();
@@ -2318,7 +2323,6 @@ export function Workspace({
       addRow();
     }
   }, [onAddRecord, onAddRow, addRow]);
-  console.log(config);
 
   // ==========================
   // Render
@@ -2402,6 +2406,7 @@ export function Workspace({
                 renderDetailsModal={renderDetailsModal}
                 onExpandRow={onExpandRow}
                 hideAddColumn={hideAddColumn || Boolean(config?.hideAddColumn)}
+                isEditable={isEditable}
                 context={context}
                 onDisplayedRowCountChange={setDisplayedRowCount}
               />

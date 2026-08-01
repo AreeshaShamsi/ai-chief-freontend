@@ -4,6 +4,7 @@ import { FiPlus } from "react-icons/fi";
 import { AppButton, C, T, Text } from "../../../components/utils";
 import Workspace from "./Workspace";
 import CreateCampaignSelectionModal from "../modals/CreateCampaignSelectionModal";
+import { createBulkCampaign } from "../../../api/campaign";
 
 export const contactColumns = [
   { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
@@ -86,10 +87,64 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
     console.log("Add record");
   }
 
+  const handleCampaignCreate = async (modal_data) => {
+    const fields = data.tables[0].fields;
+    const rows = data.tables[0].rows;
+
+    const fieldMap = Object.fromEntries(
+      fields.map((field) => [field.name, field.id])
+    );
+
+    const field_mapping = {
+      phone: fieldMap["Phone"],
+      prospect_name: fieldMap["Contact Name"],
+    };
+
+    const static_fields = {
+      company_name: localStorage.getItem("company_name"),
+    };
+
+    const company_id = localStorage.getItem("company_id");
+
+    const startRowId =
+      modal_data.recordType === "all"
+        ? rows[0].id
+        : rows[Number(modal_data.startRow) - 1].id;
+
+    const endRowId =
+      modal_data.recordType === "all"
+        ? rows[rows.length - 1].id
+        : rows[Number(modal_data.endRow) - 1].id;
+
+    const payload = {
+      company_id,
+      name: modal_data.campaignName,
+      table_id: data.tables[0].id,
+      start_row_id: startRowId,
+      end_row_id: endRowId,
+      script_type:
+        company_id === "0"
+          ? "real_estate_internal"
+          : "real_estate_cold_call",
+      campaign_type: "leads_uploaded",
+      field_mapping,
+      static_fields,
+    };
+
+    console.log(payload);
+
+    const response = await createBulkCampaign(payload);
+    setShowCreateModal(false)
+  };
+
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       {showCreateModal && (
-        <CreateCampaignSelectionModal onClose={() => setShowCreateModal(false)} />
+        <CreateCampaignSelectionModal
+          onClose={() => setShowCreateModal(false)}
+          onContinue={async (modal_data) => {
+            await handleCampaignCreate(modal_data);
+          }} />
       )}
       <PageSection>
         <header

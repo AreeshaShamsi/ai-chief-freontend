@@ -3,7 +3,8 @@ import { C, Avatar } from "../../../components/utils";
 
 const NAV = [{ id: "dashboard", e: "◼", l: "Dashboard" }, { id: "campaigns", e: "📢", l: "Campaigns" }, { id: "leads", e: "👥", l: "Leads" }, { id: "calls", e: "📞", l: "Call Log" }, { id: "kb", e: "📚", l: "Knowledge Base" }];
 function Sidebar({ tab, setTab }) {
-  const user_name = (localStorage.getItem("user_name") || "").trim().replace(/^./, c => c.toUpperCase());
+  const user_name = (localStorage.getItem("first_name") || "").trim().replace(/^./, c => c.toUpperCase());
+
   return (
     <div style={{ width: 210, background: C.sidebar, display: "flex", flexDirection: "column", flexShrink: 0, borderRight: "1px solid #1A2540" }}>
       <style>{`@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.35}}.pls{animation:pulse2 2s ease-in-out infinite;}`}</style>

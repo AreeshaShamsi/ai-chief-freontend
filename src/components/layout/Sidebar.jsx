@@ -23,6 +23,9 @@ const defaultUser = {
 };
 
 function Sidebar({ user = defaultUser }) {
+  const name = localStorage.getItem("first_name");
+  const initials = name.slice(0, 1);
+  const role = localStorage.getItem("role");
   const location = useLocation();
   const currentUser = { ...defaultUser, ...user };
 
@@ -50,17 +53,9 @@ function Sidebar({ user = defaultUser }) {
           </div>
         </div>
 
-        <div
-          className="mt-[18px] flex h-[30px] items-center gap-2 rounded-lg border border-[var(--success-600)] bg-[var(--sidebar-status-bg)] px-2.5 text-[12px] font-medium leading-5 text-[var(--success-500)]"
-        >
-          <span
-            className="h-1.5 w-1.5 rounded-full bg-[var(--success-500)]"
-            aria-hidden="true"
-          />
-          <span className="whitespace-nowrap">2 Active Campaigns</span>
-        </div>
 
-        <nav className="mt-3 flex flex-col gap-1" aria-label="Primary">
+
+        <nav className="mt-6 flex flex-col gap-1" aria-label="Primary">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -90,17 +85,17 @@ function Sidebar({ user = defaultUser }) {
           <div
             className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[var(--sidebar-purple)] text-[11px] font-bold leading-none text-white"
           >
-            {currentUser.initials}
+            {initials}
           </div>
 
           <div className="min-w-0">
             <div className="truncate text-[12px] font-semibold leading-4 text-white">
-              {currentUser.name}
+              {name}
             </div>
             <div
               className="truncate text-[10px] font-normal leading-3 text-[var(--sidebar-muted)]"
             >
-              {currentUser.role}
+              {role}
             </div>
           </div>
         </div>

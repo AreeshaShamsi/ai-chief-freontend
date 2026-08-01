@@ -133,13 +133,13 @@ function LeadFollowUpCard({
   leads,
   sectionTitle = "Hot leads act now",
   leadCount,
-  nextAction,
+  next_action,
   nextTime,
   name,
   initials,
-  timeAgo,
+  timestamp,
   tags,
-  message,
+  ai_summary,
 }) {
   if (Array.isArray(leads)) {
     return (
@@ -158,7 +158,7 @@ function LeadFollowUpCard({
           </span>
         </div>
 
-        <div className="flex flex-col gap-0">
+        <div className="flex flex-col h-[30px] gap-0 scrollbar overflow-y-scroll scrollbar-hide">
           {leads.map((lead, index) => (
             <LeadCard key={lead.id || lead.name || index} {...lead} />
           ))}
@@ -169,13 +169,13 @@ function LeadFollowUpCard({
 
   return (
     <LeadCard
-      nextAction={nextAction}
+      nextAction={next_action}
       nextTime={nextTime}
       name={name}
       initials={initials}
-      timeAgo={timeAgo}
+      timeAgo={timestamp}
       tags={tags}
-      message={message}
+      message={ai_summary}
     />
   );
 }

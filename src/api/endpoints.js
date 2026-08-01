@@ -41,6 +41,10 @@ export const ENDPOINTS = {
         UPDATE: (id) => `/faq/${id}`,
     },
 
+    CAMPAIGN: {
+        CREATE_BULK: `/campaign/bulk`,
+    },
+
 
 
 };

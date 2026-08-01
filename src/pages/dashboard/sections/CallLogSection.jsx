@@ -48,30 +48,7 @@ export function CallLogDetailPanel({
         {/* Left Column (35%): Heading & content stacked vertically with spacing only */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20, minWidth: 0 }}>
           {/* Call Outcome */}
-          <div>
-            <div
-              style={{
-                color: C.muted,
-                fontSize: T.font.size.xs,
-                fontWeight: T.font.weight.bold,
-                marginBottom: 6,
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-              }}
-            >
-              Call Outcome
-            </div>
-            <div
-              style={{
-                color: C.text,
-                fontSize: T.font.size.bodySmall,
-                fontWeight: T.font.weight.bold,
-                lineHeight: 1.5,
-              }}
-            >
-              {callOutcome}
-            </div>
-          </div>
+
 
           {/* Next Action */}
           <div>
@@ -203,7 +180,7 @@ export function CallLogDetailPanel({
                           lineHeight: 1.45,
                         }}
                       >
-                        {message.text}
+                        {message.message}
                       </div>
                     </div>
                   </div>
@@ -418,6 +395,7 @@ function CallLogSection({
   transcript,
   data,
 }) {
+  if (!data) return null;
   const [activeFilterTab, setActiveFilterTab] = useState("initial");
   const [selectedCallId, setSelectedCallId] = useState(fallbackCalls[0].id);
 
@@ -434,12 +412,17 @@ function CallLogSection({
   }
 
   const metrics = data?.metrics || {};
-  const calls = fallbackCalls;
-  const filteredCalls = calls.filter((c) => c.filterTab === activeFilterTab);
-  const selectedCall = calls.find((c) => c.id === selectedCallId) || filteredCalls[0] || calls[0];
+  const calls = data?.activity;
+  console.log(calls);
+  const filteredCalls = calls;
+  const selectedCall = calls.find((c) =>
+    c.calls?.some(
+      (call) => String(call.retry_id) === String(selectedCallId)
+    )
+  ) || filteredCalls[0] || calls[0];
 
   const statistics = [
-    { title: "Call Today", value: metrics.total_calls_today || 94, icon: LuPhone },
+    { title: "Calls", value: metrics.total_calls_today || 94, icon: LuPhone },
     { title: "Pick Up Rate", value: `${metrics.pickup_rate_percent || 74}%`, icon: LuPhone },
     {
       title: "Avg Duration",
@@ -452,11 +435,11 @@ function CallLogSection({
 
   const filterTabs = [
     { id: "initial", label: "Initial Call" },
-    { id: "discovery", label: "Discovery Call" },
-    { id: "followup", label: "Follow-Up" },
+    //{ id: "discovery", label: "Discovery Call" },
+    //{ id: "followup", label: "Follow-Up" },
   ];
 
-  const details = selectedCall?.details || {};
+  const details = selectedCall?.calls[0].output || {};
   const isNoAnswer = selectedCall?.status === "no answer";
 
   return (
@@ -528,10 +511,10 @@ function CallLogSection({
           >
             {(filteredCalls.length ? filteredCalls : calls).map((call) => (
               <CallCard
-                key={call.id}
+                key={call.calls[0].retry_id}
                 call={call}
-                isSelected={selectedCall?.id === call.id}
-                onSelect={() => setSelectedCallId(call.id)}
+                isSelected={selectedCall?.calls[0].retry_id === call.calls[0].retry_id}
+                onSelect={() => setSelectedCallId(call.calls[0].retry_id)}
               />
             ))}
           </div>
@@ -539,9 +522,9 @@ function CallLogSection({
           {/* Right Area: Single Outer Rounded Parent Container enclosing Left Panel & Transcript Panel */}
           <CallLogDetailPanel
             callOutcome={details.outcome}
-            nextAction={details.nextAction}
-            aiSummary={details.aiSummary}
-            transcript={details.transcript}
+            nextAction={{ title: details.next_action, date: details.follow_up_date || "" }}
+            aiSummary={details.ai_generated_call_summary}
+            transcript={details.messages}
             isNoAnswer={isNoAnswer}
           />
         </div>

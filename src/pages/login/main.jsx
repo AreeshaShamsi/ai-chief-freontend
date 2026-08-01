@@ -80,6 +80,8 @@ export function LoginPage() {
       localStorage.setItem("first_name", data.data.first_name);
       localStorage.setItem("user_name", data.data.user_name);
       localStorage.setItem("company_id", data.data.company_id);
+      localStorage.setItem("company_name", data.data.company_name);
+
       localStorage.setItem("user_id", data.data.id);
       localStorage.setItem("role", data.data.role);
       localStorage.setItem("access", data.data.access);

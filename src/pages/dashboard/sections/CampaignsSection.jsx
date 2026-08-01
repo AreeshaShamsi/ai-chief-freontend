@@ -14,7 +14,7 @@ function ActiveCallsPill({ count = 2 }) {
 
 function CampaignsSection({ data, onShowCreate }) {
   const campaigns = data?.campaigns || [];
-  const stats = data?.campaignStats || data?.campaigns || {};
+  const stats = data?.campaigns || {};
 
   const crmCampaigns = campaigns.filter(
     (c) => c.campaign_type === "crm_connected"

@@ -4,10 +4,20 @@ import { LuClock3, LuEye, LuPhone } from "react-icons/lu";
 import { AppCard, AppPill, C, T, Text } from "../utils";
 
 function CallCard({ call, isSelected, onSelect }) {
-  const isHot = call.score === "hot";
-  const isCold = call.score === "cold";
-  const isNoAnswer = call.status === "no answer";
-
+  console.log("call", call);
+  const isHot = call.calls?.[0]?.output?.lead_status === "hot";
+  const isCold = call.calls?.[0]?.output?.lead_status === "cold";
+  const isNoAnswer = call.calls?.[0]?.output?.lead_status === "no answer";
+  const getCallType = (callType) => {
+    switch (callType) {
+      case "real_estate_internal":
+        return "Internal Call";
+      case "real_estate_cold_call":
+        return "Cold Call";
+      default:
+        return "Unknown";
+    }
+  };
   return (
     <AppCard
       variant="compact"
@@ -44,7 +54,7 @@ function CallCard({ call, isSelected, onSelect }) {
             fontWeight: T.font.weight.semibold,
           }}
         >
-          {call.score}
+          {call.calls[0]?.output?.lead_status}
         </AppPill>
       </div>
 
@@ -57,20 +67,20 @@ function CallCard({ call, isSelected, onSelect }) {
       {/* Row 3: Call Type Chip */}
       <div>
         <AppPill size="xs" variant="primary" style={{ background: C.surface, color: C.text, border: `1px solid ${C.border}` }}>
-          {call.callType}
+          {getCallType(call.calls[0].call_type)}
         </AppPill>
       </div>
 
       {/* Row 4: Clock Icon + Date & Time */}
       <div style={{ fontSize: T.font.size.caption, color: C.muted, display: "flex", alignItems: "center", gap: 5 }}>
         <LuClock3 size={11} color={C.muted} />
-        <span>{call.time || "Today 10:15 AM"}</span>
+        <span>{call.calls[0].date_time_of_call || "Today 10:15 AM"}</span>
       </div>
 
       {/* Row 5: Large Duration + Small Label */}
       <div style={{ display: "flex", alignItems: "baseline", gap: 6, margin: "2px 0" }}>
         <span style={{ fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.extraBold, color: C.text }}>
-          {call.duration}
+          {call.calls[0]?.output?.call_duration} sec
         </span>
         <span style={{ fontSize: T.font.size.caption, color: C.muted, fontWeight: T.font.weight.medium }}>
           Duration
@@ -91,8 +101,7 @@ function CallCard({ call, isSelected, onSelect }) {
             fontWeight: T.font.weight.semibold,
           }}
         >
-          {call.status}
-        </AppPill>
+          {call.calls?.[0]?.output == null ? "No Answer" : "Completed"}        </AppPill>
         <div style={{ color: isSelected ? C.accent : C.muted }}>
           <LuEye size={14} />
         </div>

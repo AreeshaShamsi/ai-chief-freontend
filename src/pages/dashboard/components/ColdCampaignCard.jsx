@@ -21,26 +21,28 @@ function StatusPill({ status }) {
 }
 
 function ColdCampaignCard({ cp, stat = {} }) {
-  const called = stat.total_calls || cp.total_calls || 0;
-  const total = cp.total || stat.total || 0;
+  console.log(cp);
+  const called = cp.total_calls || cp.total_calls || 0;
+  const total = cp.total_leads_to_calls || 0;
   const pct = total > 0 ? Math.round((called / total) * 100) : 0;
-  const completed = cp.status === "completed";
+  const completed = called === total;
   const progress = completed ? 100 : pct;
   const remaining = Math.max(total - called, 0);
   const title = cp.name || cp.campaign_name;
   const subtitle = completed
     ? `Campaign finished${cp.completed_on ? ` on ${cp.completed_on}` : ""}  ${progress}% records processed`
-    : `${remaining} records remaining  Est completion in 45 mins`;
+    : `${remaining} records remaining `;
 
   const metrics = [
     { label: "Total", value: total, variant: "neutral" },
     { label: "Called", value: called, variant: "neutral" },
+    { label: "Hot", value: cp.hot || 0, variant: "hot" }
+    ,
     {
-      label: "Qualified",
-      value: stat.qualified || cp.qualified || 0,
-      variant: "qualified"
+      label: "Warm",
+      value: cp.warm || 0,
+      variant: "warm"
     },
-    { label: "Hot", value: stat.hot || cp.hot || 0, variant: "hot" }
   ];
 
   return (
@@ -81,7 +83,7 @@ function ColdCampaignCard({ cp, stat = {} }) {
           </div>
         </div>
 
-        <StatusPill status={cp.status} />
+        <StatusPill status={completed ? "completed" : "active"} />
       </div>
 
       <div

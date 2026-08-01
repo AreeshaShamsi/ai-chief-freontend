@@ -41,6 +41,7 @@ export default function AgGridTable({
   rowSelection,
   selectionColumnDef,
   suppressCellFocus,
+  isEditable,
   context,
   getRowId,
   noRowsOverlayComponent,
@@ -92,7 +93,7 @@ export default function AgGridTable({
       columnDefs={columnDefs}
       defaultColDef={defaultColDef}
       getRowId={effectiveGetRowId}
-      suppressClickEdit={workspaceId === "staff" || workspaceId === "mystaff"}
+      suppressClickEdit={(workspaceId === "staff" || workspaceId === "mystaff" || (!isEditable && workspaceId === "deals"))}
       suppressRowClickSelection={true}
       theme={agGridTheme}
       rowHeight={36}
