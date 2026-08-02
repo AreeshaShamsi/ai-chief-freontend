@@ -1152,15 +1152,21 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
         background: C.card,
         overflow: "hidden",
         transition: isResizing ? "none" : layoutTransition,
+        display: "flex",
+        flexDirection: "column",
       }}
+
     >
       <div
         aria-hidden={isHidden}
         style={{
           width: "100%",
+          height: "100%",
           boxSizing: "border-box",
           visibility: isHidden ? "hidden" : "visible",
           pointerEvents: isHidden ? "none" : "auto",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <div style={{ position: "relative" }}>
@@ -1211,7 +1217,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
         <div style={{ marginTop: 11 }}>
           <SearchBox value={viewSearch} onChange={setViewSearch} placeholder="Find A View" width="100%" />
         </div>
-        <div style={{ display: "grid", gap: 5, marginTop: 12 }}>
+        <div style={{ display: "grid", gap: 5, marginTop: 12, overflowY: "auto", flex: 1, minHeight: 0 }}>
           {filteredViews.map((viewItem) => (
             <GridNameRowItem
               key={viewItem.id}
