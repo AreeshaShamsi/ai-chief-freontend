@@ -5,7 +5,7 @@ import { Workspace } from "./Workspace";
 
 
 
-function SettingsField({ label, value, type = "text" }) {
+function SettingsField({ label, value, onChange, type = "text", readOnly = false, options = [] }) {
   return (
     <label style={{ display: "block" }}>
       <span
@@ -19,17 +19,45 @@ function SettingsField({ label, value, type = "text" }) {
       >
         {label}
       </span>
-      <TextField
-        type={type}
-        value={value}
-        readOnly
-        style={{
-          height: 38,
-          borderRadius: T.radius.sm,
-          background: C.surface,
-          fontSize: T.font.size.bodySmall,
-        }}
-      />
+      {type === "select" ? (
+        <select
+          value={value}
+          onChange={(e) => onChange && onChange(e.target.value)}
+          disabled={readOnly}
+          style={{
+            height: 38,
+            width: "100%",
+            borderRadius: T.radius.sm,
+            background: C.surface,
+            border: `1px solid ${C.border}`,
+            color: C.text,
+            fontSize: T.font.size.bodySmall,
+            padding: "0 12px",
+            outline: "none",
+            appearance: "none",
+          }}
+        >
+          <option value="" disabled>Select {label}</option>
+          {options.map((opt) => (
+            <option key={opt.value || opt} value={opt.value || opt}>
+              {opt.label || opt}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <TextField
+          type={type}
+          value={value}
+          onChange={(e) => onChange && onChange(e.target.value)}
+          readOnly={readOnly}
+          style={{
+            height: 38,
+            borderRadius: T.radius.sm,
+            background: C.surface,
+            fontSize: T.font.size.bodySmall,
+          }}
+        />
+      )}
     </label>
   );
 }
@@ -200,31 +228,63 @@ function SettingsSection({ data }) {
     ],
   };
 
+  const [firstName, setFirstName] = useState(profileData?.first_name || "");
+  const [lastName, setLastName] = useState(profileData?.last_name || "");
+  const [email, setEmail] = useState(profileData?.email || "");
+  const [phone, setPhone] = useState(profileData?.phone || "");
+  const [role, setRole] = useState(profileData?.role || "");
+
+  const [currentPassword, setCurrentPassword] = useState(profileData?.password || "");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const profileFields = [
-    { label: "First Name", value: profileData?.first_name || "", half: true },
-    { label: "Last Name", value: profileData?.last_name || "", half: true },
-    { label: "Email Address", value: profileData?.email || "" },
-    { label: "Phone Number", value: profileData?.phone || "" },
-    { label: "Role", value: profileData?.role || "" },
+    { label: "First Name", value: firstName, onChange: setFirstName, half: true },
+    { label: "Last Name", value: lastName, onChange: setLastName, half: true },
+    { label: "Email Address", value: email, onChange: setEmail },
+    { label: "Phone Number", value: phone, onChange: setPhone },
+    { label: "Role", value: role, onChange: setRole, type: "select", options: ["Admin", "User"] },
   ];
 
   const securityFields = [
     {
       label: "Current Password",
-      value: profileData?.password || "",
+      value: currentPassword,
+      onChange: setCurrentPassword,
       type: "password",
     },
     {
       label: "New Password",
-      value: "",
+      value: newPassword,
+      onChange: setNewPassword,
       type: "password",
     },
     {
       label: "Confirm New Password",
-      value: "",
+      value: confirmPassword,
+      onChange: setConfirmPassword,
       type: "password",
     },
   ];
+
+  const handleSaveProfile = () => {
+    localStorage.setItem("first_name", firstName);
+    localStorage.setItem("last_name", lastName);
+    localStorage.setItem("email", email);
+    localStorage.setItem("phone", phone);
+    localStorage.setItem("role", role);
+    alert("Profile changes saved successfully!");
+  };
+
+  const handleChangePassword = () => {
+    if (newPassword && newPassword !== confirmPassword) {
+      alert("New passwords do not match!");
+      return;
+    }
+    alert("Password updated successfully!");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
 
   return (
     <div
@@ -306,7 +366,13 @@ function SettingsSection({ data }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginTop: 18 }}>
               {profileFields.map((field) => (
                 <div key={field.label} style={{ gridColumn: field.half ? "auto" : "1 / -1" }}>
-                  <SettingsField label={field.label} value={field.value} />
+                  <SettingsField 
+                    label={field.label} 
+                    value={field.value} 
+                    onChange={field.onChange} 
+                    type={field.type} 
+                    options={field.options} 
+                  />
                 </div>
               ))}
             </div>
@@ -314,6 +380,7 @@ function SettingsSection({ data }) {
             <AppButton
               variant="primary"
               compact
+              onClick={handleSaveProfile}
               style={{
                 width: "100%",
                 height: 38,
@@ -321,10 +388,9 @@ function SettingsSection({ data }) {
                 borderRadius: T.radius.sm,
                 fontSize: T.font.size.bodySmall,
                 fontWeight: T.font.weight.semibold,
-                textTransform: "lowercase",
               }}
             >
-              save changes
+              Save Changes
             </AppButton>
           </AppCard>
 
@@ -359,23 +425,23 @@ function SettingsSection({ data }) {
 
             <div style={{ display: "grid", gap: 13, marginTop: 14 }}>
               {securityFields.map((field) => (
-                <SettingsField key={field.label} label={field.label} value={field.value} type={field.type} />
+                <SettingsField key={field.label} label={field.label} value={field.value} type={field.type} onChange={field.onChange} />
               ))}
             </div>
 
             <AppButton
               variant="primary"
               compact
+              onClick={handleChangePassword}
               style={{
                 height: 38,
                 marginTop: 16,
                 borderRadius: T.radius.sm,
                 fontSize: T.font.size.bodySmall,
                 fontWeight: T.font.weight.semibold,
-                textTransform: "lowercase",
               }}
             >
-              change password
+              Change Password
             </AppButton>
           </AppCard>
         </div>

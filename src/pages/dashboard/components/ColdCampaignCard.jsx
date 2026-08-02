@@ -1,5 +1,5 @@
-import React from "react";
-import { FiBarChart2 } from "react-icons/fi";
+import React, { useState } from "react";
+import { FiBarChart2, FiPause, FiPlay, FiSquare } from "react-icons/fi";
 import {
   AppCard,
   AppIconCircle,
@@ -11,17 +11,31 @@ import {
 } from "../../../components/utils";
 
 function StatusPill({ status }) {
-  const running = status === "active" || status === "running";
+  let label = "Completed";
+  let variant = "neutral";
+  
+  if (status === "active" || status === "running") {
+    label = "Running";
+    variant = "primary";
+  } else if (status === "paused") {
+    label = "Paused";
+    variant = "danger";
+  } else if (status === "stopped") {
+    label = "Stopped";
+    variant = "dark";
+  }
 
   return (
-    <AppPill variant={running ? "primary" : "neutral"} size="xs" dot>
-      {running ? "Running" : "Completed"}
+    <AppPill variant={variant} size="xs" dot>
+      {label}
     </AppPill>
   );
 }
 
 function ColdCampaignCard({ cp, stat = {} }) {
   console.log(cp);
+  const [status, setStatus] = useState(cp.status || "active");
+  
   const called = cp.total_calls || cp.total_calls || 0;
   const total = cp.total_leads_to_calls || 0;
   const pct = total > 0 ? Math.round((called / total) * 100) : 0;
@@ -32,6 +46,11 @@ function ColdCampaignCard({ cp, stat = {} }) {
   const subtitle = completed
     ? `Campaign finished${cp.completed_on ? ` on ${cp.completed_on}` : ""}  ${progress}% records processed`
     : `${remaining} records remaining `;
+
+  const currentStatus = completed ? "completed" : status;
+  const isRunning = currentStatus === "active" || currentStatus === "running";
+  const isPaused = currentStatus === "paused";
+  const isStopped = currentStatus === "stopped";
 
   const metrics = [
     { label: "Total", value: total, variant: "neutral" },
@@ -83,7 +102,37 @@ function ColdCampaignCard({ cp, stat = {} }) {
           </div>
         </div>
 
-        <StatusPill status={completed ? "completed" : "active"} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {!completed && !isStopped && (
+            <div style={{ display: "flex", gap: 6 }}>
+              {isRunning ? (
+                <button
+                  onClick={() => setStatus("paused")}
+                  title="Pause Campaign"
+                  style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, padding: 4, display: "flex", alignItems: "center" }}
+                >
+                  <FiPause size={14} />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setStatus("active")}
+                  title="Resume Campaign"
+                  style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, padding: 4, display: "flex", alignItems: "center" }}
+                >
+                  <FiPlay size={14} />
+                </button>
+              )}
+              <button
+                onClick={() => setStatus("stopped")}
+                title="Stop Campaign"
+                style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, padding: 4, display: "flex", alignItems: "center" }}
+              >
+                <FiSquare size={14} />
+              </button>
+            </div>
+          )}
+          <StatusPill status={currentStatus} />
+        </div>
       </div>
 
       <div

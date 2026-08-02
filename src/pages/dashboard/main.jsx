@@ -117,7 +117,16 @@ export default function DashboardMain() {
         const fetchData = async () => {
             try {
                 const company_id = localStorage.getItem("company_id");
-                setLoading(true);
+                
+                let needsLoading = false;
+                if ((tab === "dashboard" || tab === "campaigns") && !summaryData) needsLoading = true;
+                if (tab === "calls" && !activityData) needsLoading = true;
+                if (tab === "settings" && !userData) needsLoading = true;
+                if (tab === "contact" && !contactData) needsLoading = true;
+                if (tab === "kb" && !knowledgeBaseData) needsLoading = true;
+                if (tab === "deals" && !dealsData) needsLoading = true;
+
+                if (needsLoading) setLoading(true);
 
                 if (tab === "dashboard" || tab === "campaigns") {
                     if (!summaryData) {
@@ -166,7 +175,7 @@ export default function DashboardMain() {
         fetchData();
     }, [tab]);
 
-    const handleLead = () => { navigate("/deals"); };
+    const handleLead = () => { navigate("/contact"); };
     const handleLaunch = async () => { await fetchSummaryData(); };
 
     if (loading) return <Loader />;
@@ -175,7 +184,8 @@ export default function DashboardMain() {
             {showModal && <CreateCampaignModal onClose={() => setShowModal(false)} onLaunch={handleLaunch} />}
 
             <main style={{ width: "100%", minWidth: 0 }}>
-                {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => navigate("/campaigns")} />}
+                {tab === "dashboard" && <DashboardSection data={summaryData} onLeadClick={handleLead} openCampaign={() => navigate("/contact")} />}
+
                 {tab === "campaigns" && <CampaignsSection data={summaryData} onShowCreate={() => setShowModal(true)} />}
                 {tab === "deals" && <LeadsSection data={dealsData} />}
                 {tab === "calls" && <CallLogSection data={activityData} />}
@@ -183,6 +193,7 @@ export default function DashboardMain() {
                 {tab === "contact" && <ContactSection data={contactData} />}
                 {tab === "integration" && <IntegrationSection />}
                 {tab === "settings" && <SettingsSection data={userData} />}
+                {tab === "tasks" && <TasksSection />}
             </main>
         </div>
     );

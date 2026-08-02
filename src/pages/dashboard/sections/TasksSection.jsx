@@ -152,7 +152,7 @@ function StatusBadge({ status }) {
         border: `1px solid ${tone.border}`,
         fontSize: T.font.size.caption,
         fontWeight: T.font.weight.semibold,
-        textTransform: "lowercase",
+        textTransform: "capitalize",
       }}
     >
       {status}
@@ -202,7 +202,7 @@ function CategoryBadge({ category }) {
         border: `1px solid ${tone.border}`,
         fontSize: T.font.size.caption,
         fontWeight: T.font.weight.medium,
-        textTransform: "lowercase",
+        textTransform: "capitalize",
       }}
     >
       {category}
@@ -288,7 +288,7 @@ function KanbanTaskCard({ task, onEdit }) {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 10 }}>
-        <div style={{ color: C.text, fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.bold, textTransform: "lowercase" }}>
+        <div style={{ color: C.text, fontSize: T.font.size.bodySmall, fontWeight: T.font.weight.bold }}>
           {task.title}
         </div>
         <CategoryBadge category={task.category} />
@@ -297,8 +297,8 @@ function KanbanTaskCard({ task, onEdit }) {
       <div style={{ marginTop: 9, color: C.muted, fontSize: T.font.size.caption, lineHeight: 1.45 }}>
         {task.description}
       </div>
-      <div style={{ marginTop: 12, color: C.text, fontSize: T.font.size.caption, fontWeight: T.font.weight.medium, textTransform: "lowercase" }}>
-        assigned to - {task.assignedTo}
+      <div style={{ marginTop: 12, color: C.text, fontSize: T.font.size.caption, fontWeight: T.font.weight.medium }}>
+        Assigned to - {task.assignedTo}
       </div>
     </AppCard>
   );

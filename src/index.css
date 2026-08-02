@@ -35,14 +35,33 @@ a:hover {
 
 body {
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   background: #F7F8FC;
+  text-wrap: pretty;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/* Baseline data & numbers */
+.tabular-nums,
+[data-tabular-nums="true"],
+.ag-cell-value,
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 button {
@@ -54,7 +73,7 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 150ms ease-out, background-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out;
 }
 
 button:hover {
@@ -63,7 +82,8 @@ button:hover {
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid #6366F1;
+  outline-offset: 2px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -190,4 +210,28 @@ button:focus-visible {
     opacity: 1;
     transform: scaleY(1);
   }
+}
+
+/* Ag-Grid Row Number Checkbox Interaction */
+.row-number-checkbox-cell .ag-selection-checkbox {
+  display: none !important;
+}
+.ag-row-selected .row-number-checkbox-cell .ag-selection-checkbox,
+.ag-row-hover .row-number-checkbox-cell .ag-selection-checkbox,
+.row-number-checkbox-cell:hover .ag-selection-checkbox {
+  display: flex !important;
+}
+
+.ag-row-selected .row-number-checkbox-cell .ag-cell-value,
+.ag-row-hover .row-number-checkbox-cell .ag-cell-value,
+.row-number-checkbox-cell:hover .ag-cell-value {
+  display: none !important;
+}
+
+/* Ensure the header checkbox stays visible */
+.ag-header-cell.row-number-checkbox-cell .ag-selection-checkbox {
+  display: flex !important;
+}
+.ag-header-cell.row-number-checkbox-cell .ag-cell-value {
+  display: none !important;
 }

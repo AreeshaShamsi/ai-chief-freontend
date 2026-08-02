@@ -24,6 +24,7 @@ import {
   T,
   Text,
   TextField,
+  EmptyState,
 } from "../../../components/utils";
 import AddColumnModal from "../modals/AddColumnModal";
 import ManageFieldsModal from "../modals/ManageFieldsModal";
@@ -35,6 +36,8 @@ import ImportModal from "../modals/ImportModal";
 import ColumnActionsModal from "../modals/ColumnActionsModal";
 import GridNameActionsModal from "../modals/GridNameActionsModal";
 import FieldConfigurationModal from "../modals/FieldConfigurationModal";
+import NextActionModal from "../modals/NextActionModal";
+import AiCallSummaryModal from "../modals/AiCallSummaryModal";
 import FaqObjectionsSection from "./FaqObjectionsSection";
 import { LuChevronDown, LuBookOpen, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertical } from "react-icons/lu";
 import { FaStar } from "react-icons/fa";
@@ -153,7 +156,7 @@ const columnWidths = {
   lastModifiedBy: 160,
 };
 
-function WorkspaceCell({ value, colDef }) {
+function WorkspaceCell({ value, colDef, context, data }) {
   if (colDef?.field === "username") {
     return <Text variant="body">{value || "—"}</Text>;
   }
@@ -180,11 +183,42 @@ function WorkspaceCell({ value, colDef }) {
     );
   }
 
+  const fieldKey = (colDef?.field || "").toLowerCase().replace(/[_\s-]/g, "");
+  const headerKey = (colDef?.headerName || "").toLowerCase().replace(/[_\s-]/g, "");
+  const isNextAction = fieldKey === "nextaction" || headerKey === "nextaction" || fieldKey.includes("nextaction") || headerKey.includes("nextaction");
+
+  if (isNextAction) {
+    return (
+      <span
+        title="Double-click to view complete text"
+        onDoubleClick={(e) => {
+          if (context?.onOpenNextAction) {
+            e.stopPropagation();
+            context.onOpenNextAction(value, data, colDef);
+          }
+        }}
+        style={{
+          cursor: "pointer",
+          display: "inline-block",
+          width: "100%",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <Text variant="body">{value || "—"}</Text>
+      </span>
+    );
+  }
+
   return <Text variant="body">{value || "—"}</Text>;
 }
 
 WorkspaceCell.propTypes = {
   value: PropTypes.node,
+  colDef: PropTypes.object,
+  context: PropTypes.object,
+  data: PropTypes.object,
 };
 
 function PrimaryNameCell(params) {
@@ -936,7 +970,7 @@ function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggl
             }}
           />
         ) : (
-          <Text variant="label" color={isActive ? C.accent : C.text} style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <Text variant="label" color={isActive ? C.accent : C.text} style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {viewItem.name}
           </Text>
         )}
@@ -967,6 +1001,7 @@ function GridNameRowItem({ viewItem, isActive, isFavorite, onSelectView, onToggl
             justifyContent: "center",
             color: isActive ? C.accent : C.muted,
             borderRadius: T.radius.sm,
+            flexShrink: 0,
           }}
         >
           <LuEllipsisVertical size={14} />
@@ -1000,6 +1035,28 @@ GridNameRowItem.propTypes = {
 function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenImportModal, onActiveViewChange, onTableCreated, onTableDeleted }) {
   const fileInputRef = useRef(null);
   const [importType, setImportType] = useState(null);
+
+  const [panelWidth, setPanelWidth] = useState(viewsPanelWidth);
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleMouseMove = (e) => {
+      if (sidebarRef.current) {
+        const left = sidebarRef.current.getBoundingClientRect().left;
+        const newWidth = Math.max(150, Math.min(600, e.clientX - left));
+        setPanelWidth(newWidth);
+      }
+    };
+    const handleMouseUp = () => setIsResizing(false);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizing]);
 
   const normalizedViews = useMemo(() => {
     return viewsList.map((view, idx) => {
@@ -1084,21 +1141,24 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
 
   return (
     <aside
+      ref={sidebarRef}
       aria-label="Grid views list"
       style={{
-        width: isHidden ? 0 : viewsPanelWidth,
+        position: "relative",
+        width: isHidden ? 0 : panelWidth,
         borderRight: isHidden ? "none" : `1px solid ${C.border}`,
         padding: isHidden ? 0 : viewsPanelPadding,
         boxSizing: "border-box",
         background: C.card,
         overflow: "hidden",
-        transition: layoutTransition,
+        transition: isResizing ? "none" : layoutTransition,
       }}
     >
       <div
         aria-hidden={isHidden}
         style={{
-          width: viewsPanelWidth - viewsPanelPadding * 2,
+          width: "100%",
+          boxSizing: "border-box",
           visibility: isHidden ? "hidden" : "visible",
           pointerEvents: isHidden ? "none" : "auto",
         }}
@@ -1173,6 +1233,24 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
           onChange={handleFileChange}
         />
       </div>
+      {!isHidden && (
+        <div
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsResizing(true);
+          }}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: 4,
+            height: "100%",
+            cursor: "col-resize",
+            zIndex: 10,
+            background: isResizing ? C.accent : "transparent",
+          }}
+        />
+      )}
     </aside>
   );
 }
@@ -1205,12 +1283,90 @@ function WorkspaceGrid({
   isEditable = true,
   context: outerContext,
   onDisplayedRowCountChange,
+  onSelectionChanged,
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedGridRows, setSelectedGridRows] = useState([]);
   const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+  const [nextActionModal, setNextActionModal] = useState({
+    isOpen: false,
+    text: "",
+    dealName: "",
+  });
+  const [aiCallSummaryModal, setAiCallSummaryModal] = useState({
+    isOpen: false,
+    dealName: "",
+    summary: "",
+    transcript: [],
+    callHistory: [],
+  });
   const gridApiRef = useRef(null);
+
+  const handleOpenNextAction = useCallback((value, row) => {
+    const textVal = value !== null && value !== undefined ? String(value) : "";
+    const rowData = row || {};
+    const dealTitle = rowData.name || rowData.dealName || rowData.leadName || rowData.contactName || rowData.title || rowData.clientName || "";
+    setNextActionModal({
+      isOpen: true,
+      text: textVal,
+      dealName: dealTitle,
+    });
+  }, []);
+
+  const handleCloseNextAction = useCallback(() => {
+    setNextActionModal((prev) => ({ ...prev, isOpen: false }));
+  }, []);
+
+  const handleCloseAiCallSummary = useCallback(() => {
+    setAiCallSummaryModal((prev) => ({ ...prev, isOpen: false }));
+  }, []);
+
+  const handleCellDoubleClicked = useCallback((event) => {
+    if (!event || !event.colDef) return;
+    const fieldKey = (event.colDef.field || "").toLowerCase().replace(/[_\s-]/g, "");
+    const headerKey = (event.colDef.headerName || "").toLowerCase().replace(/[_\s-]/g, "");
+    const isNextAction = fieldKey === "nextaction" || headerKey === "nextaction" || fieldKey.includes("nextaction") || headerKey.includes("nextaction");
+    const isAiCallSummary =
+      fieldKey === "aicallsummary" ||
+      headerKey === "aicallsummary" ||
+      fieldKey.includes("aicallsummary") ||
+      headerKey.includes("aigeneratedcallsummary") ||
+      fieldKey.includes("aigeneratedcallsummary");
+
+    if (isNextAction) {
+      const textVal = event.value !== null && event.value !== undefined ? String(event.value) : "";
+      const rowData = event.data || {};
+      const dealTitle = rowData.name || rowData.dealName || rowData.leadName || rowData.contactName || rowData.title || rowData.clientName || "";
+
+      setNextActionModal({
+        isOpen: true,
+        text: textVal,
+        dealName: dealTitle,
+      });
+
+      if (event.api && event.api.stopEditing) {
+        event.api.stopEditing(true);
+      }
+    } else if (isAiCallSummary) {
+      const rowData = event.data || {};
+      const dealTitle = rowData.name || rowData.dealName || rowData.leadName || rowData.contactName || rowData.title || rowData.clientName || "";
+      const summaryData = rowData.aiCallSummaryData || {};
+      const summaryText = summaryData.summary || (event.value !== null && event.value !== undefined ? String(event.value) : "");
+
+      setAiCallSummaryModal({
+        isOpen: true,
+        dealName: dealTitle,
+        summary: summaryText,
+        transcript: summaryData.transcript || [],
+        callHistory: summaryData.callHistory || [],
+      });
+
+      if (event.api && event.api.stopEditing) {
+        event.api.stopEditing(true);
+      }
+    }
+  }, []);
 
   const handleGridReady = useCallback(
     (params) => {
@@ -1222,10 +1378,14 @@ function WorkspaceGrid({
   const handleSelectionChanged = useCallback(
     (event) => {
       if (event?.api) {
-        setSelectedGridRows(event.api.getSelectedRows());
+        const selected = event.api.getSelectedRows();
+        setSelectedGridRows(selected);
+        if (onSelectionChanged) {
+          onSelectionChanged(selected);
+        }
       }
     },
-    []
+    [onSelectionChanged]
   );
 
   const handleClearSelection = useCallback(() => {
@@ -1244,6 +1404,17 @@ function WorkspaceGrid({
     handleClearSelection();
     setIsBulkDeleteModalOpen(false);
   }, [selectedGridRows, deleteRows, deleteRow, handleClearSelection]);
+
+  const handleStopBulkCalls = useCallback(() => {
+    if (!selectedGridRows || selectedGridRows.length === 0) return;
+    const selectedIds = selectedGridRows.map((r) => r.id).filter(Boolean);
+    if (updateCell && selectedIds.length > 0) {
+      selectedIds.forEach((id) => {
+        updateCell(id, "callStopped", true);
+      });
+    }
+    handleClearSelection();
+  }, [selectedGridRows, updateCell, handleClearSelection]);
 
   const primaryNameKey = useMemo(() => {
     const found = fields.find((f) => f.id.toLowerCase().includes("name"))?.id;
@@ -1421,8 +1592,9 @@ function WorkspaceGrid({
       selectedRowId: selectedRow?.id || null,
       openDetails,
       onExpandRow: openDetails,
+      onOpenNextAction: handleOpenNextAction,
     }),
-    [outerContext, selectedRow, openDetails]
+    [outerContext, selectedRow, openDetails, handleOpenNextAction]
   );
 
   const rowData = useMemo(() => {
@@ -1436,6 +1608,8 @@ function WorkspaceGrid({
         selectedCount={selectedGridRows.length}
         onDelete={() => setIsBulkDeleteModalOpen(true)}
         onClearSelection={handleClearSelection}
+        showStopCalls={workspaceId === "deals" || workspaceId === "leads" || workspaceId === "contacts"}
+        onStopCalls={handleStopBulkCalls}
       />
 
       {isBulkDeleteModalOpen && (
@@ -1450,7 +1624,7 @@ function WorkspaceGrid({
         />
       )}
 
-      <div style={{ height: 318, minWidth: 0, flex: "0 0 auto" }}>
+      <div style={{ flex: "1 1 0%", minHeight: 400, minWidth: 0 }}>
         <AgGridTable
           workspaceId={workspaceId}
           rowData={rowData}
@@ -1465,8 +1639,12 @@ function WorkspaceGrid({
           onGridReady={handleGridReady}
           onSelectionChanged={handleSelectionChanged}
           onCellValueChanged={handleCellValueChanged}
+          onCellDoubleClicked={handleCellDoubleClicked}
           onModelUpdated={handleModelUpdated}
           suppressCellFocus={false}
+          noRowsOverlayComponent={() => (
+            <EmptyState title="No records found" description="There are currently no items to display in this workspace." />
+          )}
         />
       </div>
 
@@ -1501,6 +1679,22 @@ function WorkspaceGrid({
           />
         )
       ) : null}
+
+      <NextActionModal
+        isOpen={nextActionModal.isOpen}
+        text={nextActionModal.text}
+        dealName={nextActionModal.dealName}
+        onClose={handleCloseNextAction}
+      />
+
+      <AiCallSummaryModal
+        isOpen={aiCallSummaryModal.isOpen}
+        dealName={aiCallSummaryModal.dealName}
+        summary={aiCallSummaryModal.summary}
+        transcript={aiCallSummaryModal.transcript}
+        callHistory={aiCallSummaryModal.callHistory}
+        onClose={handleCloseAiCallSummary}
+      />
     </div>
   );
 }
@@ -1870,6 +2064,7 @@ export function Workspace({
   onTableCreated,
   onTableDeleted,
   onTableUpdated,
+  onSelectionChanged,
 }) {
   if (!workspaceData) return null;
   const [internalTab, setInternalTab] = useState(activeTabProp || workspaceId || "deals");
@@ -2380,7 +2575,7 @@ export function Workspace({
           </div>
         ) : (
           <>
-            <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", minHeight: 318 }}>
+            <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", flex: "1 1 0%", minHeight: 400 }}>
               <WorkspaceViewsPanel
                 isHidden={isViewsPanelHidden || Boolean(config?.hideViewsPanel)}
                 viewsList={viewsList}
@@ -2409,6 +2604,7 @@ export function Workspace({
                 isEditable={isEditable}
                 context={context}
                 onDisplayedRowCountChange={setDisplayedRowCount}
+                onSelectionChanged={onSelectionChanged}
               />
             </div>
             <AppCardFooter recordsCountText={recordsCountText} onAddRecord={handleAddRecordClick} />

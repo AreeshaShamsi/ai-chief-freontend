@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useMemo } from "react";
 import PropTypes from "prop-types";
 import { AgGridReact } from "ag-grid-react";
 import { themeQuartz } from "ag-grid-community";
@@ -24,10 +24,37 @@ const agGridTheme = themeQuartz.withParams({
   wrapperBorderRadius: 0,
 });
 
-function DefaultNoRowsOverlay() {
+import { FiInbox } from "react-icons/fi";
+
+function DefaultNoRowsOverlay(params) {
+  const message = params.message || "No records found";
+  const subMessage = params.subMessage || "Get started by creating your first entry.";
+  const ctaText = params.ctaText;
+  
+  const handleCtaClick = () => {
+    if (params.onCtaClick) {
+      params.onCtaClick();
+    }
+  };
+
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-      <Text variant="subtitle">No rows to show</Text>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: "32px", color: C.muted }}>
+      <div style={{ background: C.surface, padding: "16px", borderRadius: "50%", marginBottom: "16px" }}>
+        <FiInbox size={32} color={C.accent} />
+      </div>
+      <Text variant="h6" style={{ color: C.text, marginBottom: "4px", fontWeight: T.font.weight.semibold }}>{message}</Text>
+      <Text variant="bodySmall" style={{ textAlign: "center", marginBottom: ctaText ? "16px" : 0 }}>{subMessage}</Text>
+      {ctaText && (
+        <button 
+          onClick={handleCtaClick}
+          style={{ 
+            background: C.accent, color: "#fff", border: "none", padding: "8px 16px", 
+            borderRadius: T.border.radius, cursor: "pointer", fontWeight: T.font.weight.medium, fontSize: T.font.size.bodySmall 
+          }}
+        >
+          {ctaText}
+        </button>
+      )}
     </div>
   );
 }
@@ -84,7 +111,17 @@ export default function AgGridTable({
   const isStaff = context?.workspaceId === "staff" || context?.workspaceId === "mystaff";
   const effectiveAutoSizeStrategy = rest.autoSizeStrategy || (isStaff ? { type: "fitGridWidth" } : undefined);
   const effectiveRowSelection = rowSelection || { mode: "multiRow", checkboxes: true, headerCheckbox: true, selectAll: "all", enableClickSelection: false };
-  const effectiveSelectionColumnDef = selectionColumnDef || { width: 44, headerClass: "ag-selection-header" };
+  const effectiveSelectionColumnDef = {
+    headerName: "#",
+    valueGetter: "node.rowIndex + 1",
+    width: 50,
+    minWidth: 50,
+    maxWidth: 50,
+    pinned: "left",
+    cellClass: "row-number-checkbox-cell",
+    headerClass: "ag-center-header",
+    ...(selectionColumnDef || {}),
+  };
   const effectiveNoRowsOverlayComponent = noRowsOverlayComponent || DefaultNoRowsOverlay;
 
   return (
@@ -96,8 +133,8 @@ export default function AgGridTable({
       suppressClickEdit={(workspaceId === "staff" || workspaceId === "mystaff" || (!isEditable && workspaceId === "deals"))}
       suppressRowClickSelection={true}
       theme={agGridTheme}
-      rowHeight={36}
-      headerHeight={34}
+      rowHeight={40}
+      headerHeight={38}
       quickFilterText={quickFilterText}
       rowSelection={effectiveRowSelection}
       selectionColumnDef={effectiveSelectionColumnDef}

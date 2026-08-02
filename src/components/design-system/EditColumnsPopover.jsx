@@ -105,7 +105,6 @@ function EditColumnsPopover({
                 color: C.text,
                 fontSize: T.font.size.bodySmall,
                 fontWeight: T.font.weight.medium,
-                textTransform: "lowercase",
               }}
             >
               {column.label}

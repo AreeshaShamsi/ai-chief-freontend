@@ -9,8 +9,10 @@ function Sidebar({ tab, setTab }) {
     <div style={{ width: 210, background: C.sidebar, display: "flex", flexDirection: "column", flexShrink: 0, borderRight: "1px solid #1A2540" }}>
       <style>{`@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.35}}.pls{animation:pulse2 2s ease-in-out infinite;}`}</style>
       <div style={{ padding: "20px 18px", borderBottom: "1px solid #1A2540", display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>📞</div>
-        <div><div style={{ color: "#F8FAFC", fontWeight: 700, fontSize: 14, letterSpacing: "-.3px" }}>VoiceIQ</div><div style={{ color: "#475569", fontSize: 10, marginTop: 1 }}>MVP · Real Estate</div></div>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 2 }}>
+          <img src="/ai-removebg-preview.png" alt="AI Chief" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+        </div>
+        <div><div style={{ color: "#F8FAFC", fontWeight: 700, fontSize: 14, letterSpacing: "-.3px" }}>AI Chief</div><div style={{ color: "#475569", fontSize: 10, marginTop: 1 }}>MVP · Real Estate</div></div>
       </div>
 
       <nav style={{ flex: 1, padding: "6px 0" }}>

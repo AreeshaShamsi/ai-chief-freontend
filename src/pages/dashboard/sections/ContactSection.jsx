@@ -54,7 +54,7 @@ function PageSection({ children, style }) {
     <section
       style={{
         width: "100%",
-        maxWidth: T.layout.pageMaxWidth,
+        maxWidth: "100%",
         margin: "0 auto",
         ...style,
       }}
@@ -70,10 +70,12 @@ PageSection.propTypes = {
 };
 
 function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCampaign }) {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+
   if (!data) {
     return null;
   }
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleCreateClick = () => {
     if (onCreateCampaign) {
@@ -106,15 +108,18 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
 
     const company_id = localStorage.getItem("company_id");
 
-    const startRowId =
-      modal_data.recordType === "all"
-        ? rows[0].id
-        : rows[Number(modal_data.startRow) - 1].id;
+    let startRowId = rows[0].id;
+    let endRowId = rows[rows.length - 1].id;
+    let selected_row_ids = [];
 
-    const endRowId =
-      modal_data.recordType === "all"
-        ? rows[rows.length - 1].id
-        : rows[Number(modal_data.endRow) - 1].id;
+    if (modal_data.recordType === "custom") {
+      startRowId = rows[Number(modal_data.startRow) - 1].id;
+      endRowId = rows[Number(modal_data.endRow) - 1].id;
+    } else if (modal_data.recordType === "selected") {
+      selected_row_ids = selectedRows.map((r) => r.id);
+      startRowId = null;
+      endRowId = null;
+    }
 
     const payload = {
       company_id,
@@ -122,10 +127,8 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
       table_id: data.tables[0].id,
       start_row_id: startRowId,
       end_row_id: endRowId,
-      script_type:
-        company_id === "0"
-          ? "real_estate_internal"
-          : "real_estate_cold_call",
+      selected_row_ids,
+      script_type: modal_data.callType || (company_id === "0" ? "real_estate_internal" : "real_estate_cold_call"),
       campaign_type: "leads_uploaded",
       field_mapping,
       static_fields,
@@ -141,6 +144,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       {showCreateModal && (
         <CreateCampaignSelectionModal
+          selectedCount={selectedRows.length}
           onClose={() => setShowCreateModal(false)}
           onContinue={async (modal_data) => {
             await handleCampaignCreate(modal_data);
@@ -193,7 +197,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
 
           activeTab={activeTab}
           onTabChange={onTabChange}
-
+          onSelectionChanged={setSelectedRows}
         />
       </PageSection>
     </div>

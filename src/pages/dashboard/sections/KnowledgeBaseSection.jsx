@@ -58,7 +58,7 @@ function PageSection({ children, style }) {
     <section
       style={{
         width: "100%",
-        maxWidth: T.layout.pageMaxWidth,
+        maxWidth: "100%",
         margin: "0 auto",
         ...style,
       }}

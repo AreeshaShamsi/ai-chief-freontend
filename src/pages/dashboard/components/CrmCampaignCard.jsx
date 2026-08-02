@@ -1,12 +1,23 @@
-import React from "react";
-import { FiFileText } from "react-icons/fi";
+import React, { useState } from "react";
+import { FiFileText, FiPause, FiPlay, FiSquare } from "react-icons/fi";
 import { scriptLabel } from "../utils";
 import { AppCard, AppPill, C, MetricCard, T } from "../../../components/utils";
 
-function StatusPill() {
+function StatusPill({ status }) {
+  let label = "Live";
+  let variant = "success";
+
+  if (status === "paused") {
+    label = "Paused";
+    variant = "danger";
+  } else if (status === "stopped") {
+    label = "Stopped";
+    variant = "dark";
+  }
+
   return (
-    <AppPill variant="success" size="xs" dot>
-      Live
+    <AppPill variant={variant} size="xs" dot>
+      {label}
     </AppPill>
   );
 }
@@ -43,6 +54,11 @@ function ScriptInfoStrip({ children }) {
 }
 
 function CrmCampaignCard({ cp, stat = {} }) {
+  const [status, setStatus] = useState("active");
+  const isRunning = status === "active";
+  const isPaused = status === "paused";
+  const isStopped = status === "stopped";
+
   const scriptName =
     scriptLabel[cp.script_type] ||
     (cp.script_type === "real_estate_enquiry"
@@ -108,7 +124,37 @@ function CrmCampaignCard({ cp, stat = {} }) {
           </div>
         </div>
 
-        <StatusPill />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {!isStopped && (
+            <div style={{ display: "flex", gap: 6 }}>
+              {isRunning ? (
+                <button
+                  onClick={() => setStatus("paused")}
+                  title="Pause Campaign"
+                  style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, padding: 4, display: "flex", alignItems: "center" }}
+                >
+                  <FiPause size={14} />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setStatus("active")}
+                  title="Resume Campaign"
+                  style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, padding: 4, display: "flex", alignItems: "center" }}
+                >
+                  <FiPlay size={14} />
+                </button>
+              )}
+              <button
+                onClick={() => setStatus("stopped")}
+                title="Stop Campaign"
+                style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, padding: 4, display: "flex", alignItems: "center" }}
+              >
+                <FiSquare size={14} />
+              </button>
+            </div>
+          )}
+          <StatusPill status={status} />
+        </div>
       </div>
 
       <ScriptInfoStrip>

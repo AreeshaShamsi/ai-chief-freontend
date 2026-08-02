@@ -1,114 +1,58 @@
-import React from "react";
+import { useState } from "react";
 import { FiLink, FiMoreVertical, FiSearch, FiSettings, FiXCircle } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
-import { FaWhatsapp } from "react-icons/fa";
-import {
-  SiGooglemaps,
-  SiMeta,
-} from "react-icons/si";
 import { AppCard, C, T } from "../../../components/utils";
 import acres99Logo from "../../../assets/logos/99acres.webp";
-import adobeLogo from "../../../assets/logos/adobe.webp";
 import facebookLogo from "../../../assets/logos/facebook.avif";
 import googleAdsLogo from "../../../assets/logos/google-ads.png";
-import googleCalendarLogo from "../../../assets/logos/google-calender.png";
-import slackLogo from "../../../assets/logos/slack.jpg";
-import stripeLogo from "../../../assets/logos/stripe.jpg";
+import housingLogo from "/Housing.com_Logo.png";
+import magicbricksLogo from "/MagicBricks.png";
+import Acres99ConnectorModal from "../modals/Acres99ConnectorModal";
+import HousingConnectorModal from "../modals/HousingConnectorModal";
+import MagicBricksConnectorModal from "../modals/MagicBricksConnectorModal";
 
 const integrations = [
   {
-    title: "Google",
-    text: "Connect your Google account to access features such as Drive, Sheets, Gmail, Analytics, and AdWords.",
-    action: "Connect",
-    icon: FcGoogle,
-    iconColor: null,
-    iconBg: "transparent",
-    iconSize: 20,
-  },
-  {
-    title: "Google Calendar",
-    text: "Google Calendar setup has moved! Connect it from My Profile or Calendar Settings > Connections to start syncing your events.",
-    action: "Manage",
-    logoSrc: googleCalendarLogo,
-    iconBg: "transparent",
-    logoWidth: 22,
-  },
-  {
-    title: "Facebook",
+    title: "Meta Ads",
     text: "Auto-sync ad leads, manage DMs, and handle reviews and comments across all your Facebook Pages and Instagram.",
-    action: "Disconnect",
+    action: "Manage",
     logoSrc: facebookLogo,
     iconBg: "transparent",
     logoWidth: 22,
   },
   {
-    title: "99acres",
-    text: "Auto-sync ad leads, manage DMs, and handle reviews and comments across all your Facebook Pages and Instagram.",
-    action: "Disconnect",
-    logoSrc: acres99Logo,
-    iconBg: "transparent",
-    logoWidth: 28,
-    logoHeight: 20,
-  },
-  {
-    title: "Whatsapp",
-    text: "Integrate WhatsApp to connect with over 2 billion customers on their favorite messaging app, and accelerate your business growth.",
-    action: "Connect",
-    icon: FaWhatsapp,
-    iconColor: "#16A34A",
-    iconBg: "transparent",
-    iconSize: 20,
-  },
-  {
-    title: "Slack",
-    text: "Integrate WhatsApp to connect with over 2 billion customers on their favorite messaging app, and accelerate your business growth.",
-    action: "Connect",
-    logoSrc: slackLogo,
-    iconBg: "transparent",
-    logoWidth: 22,
-  },
-  {
-    title: "Google maps",
-    text: "Integrate WhatsApp to connect with over 2 billion customers on their favorite messaging app, and accelerate your business growth.",
-    action: "Connect",
-    icon: SiGooglemaps,
-    iconColor: "#34A853",
-    iconBg: "transparent",
-    iconSize: 20,
-  },
-  {
-    title: "Adobe",
-    text: "Integrate WhatsApp to connect with over 2 billion customers on their favorite messaging app, and accelerate your business growth.",
-    action: "Connect",
-    logoSrc: adobeLogo,
-    iconBg: "transparent",
-    logoWidth: 22,
-  },
-  {
-    title: "Payments and Checkout",
-    text: "Integrate WhatsApp to connect with over 2 billion customers on their favorite messaging app, and accelerate your business growth.",
-    action: "Connect",
-    logoSrc: stripeLogo,
-    iconBg: "transparent",
-    logoWidth: 24,
-    logoHeight: 18,
-  },
-  {
-    title: "Google ads",
-    text: "Google Calendar setup has moved! Connect it from My Profile or Calendar Settings > Connections to start syncing your events.",
+    title: "Google Ads",
+    text: "Connect your Google Ads account to track campaigns, sync leads automatically, and measure ROI directly from your CRM.",
     action: "Manage",
     logoSrc: googleAdsLogo,
     iconBg: "transparent",
     logoWidth: 22,
   },
   {
-    title: "meta",
-    text: "Google Calendar setup has moved! Connect it from My Profile or Calendar Settings > Connections to start syncing your events.",
-    action: "Manage",
-    icon: SiMeta,
-    iconColor: "#2563EB",
+    title: "99acres",
+    text: "Sync property inquiries and leads directly from 99acres into your CRM for faster follow-ups and management.",
+    action: "Connect",
+    logoSrc: acres99Logo,
     iconBg: "transparent",
-    iconSize: 21,
+    logoWidth: 28,
+    logoHeight: 20,
+  },
+  {
+    title: "Housing.com",
+    text: "Automatically fetch leads and inquiries from your Housing.com listings directly into your sales pipeline.",
+    action: "Connect",
+    logoSrc: housingLogo,
+    iconBg: "transparent",
+    logoWidth: 90,
+    logoHeight: 22,
+  },
+  {
+    title: "MagicBricks",
+    text: "Centralize your property leads by integrating MagicBricks inquiries directly into your real estate CRM.",
+    action: "Connect",
+    logoSrc: magicbricksLogo,
+    iconBg: "transparent",
+    logoWidth: 90,
+    logoHeight: 22,
   },
 ];
 
@@ -133,13 +77,14 @@ const actionStyles = {
   },
 };
 
-function IntegrationActionButton({ action }) {
+function IntegrationActionButton({ action, onClick }) {
   const tone = actionStyles[action] || actionStyles.Connect;
   const Icon = tone.icon;
 
   return (
     <button
       type="button"
+      onClick={onClick}
       style={{
         width: "100%",
         height: 34,
@@ -163,7 +108,7 @@ function IntegrationActionButton({ action }) {
   );
 }
 
-function IntegrationCard({ integration }) {
+function IntegrationCard({ integration, onConnect }) {
   const BrandIcon = integration.icon;
 
   return (
@@ -256,12 +201,20 @@ function IntegrationCard({ integration }) {
         {integration.text}
       </p>
 
-      <IntegrationActionButton action={integration.action} />
+      <IntegrationActionButton
+        action={integration.action}
+        onClick={onConnect}
+      />
+
     </AppCard>
   );
 }
 
 function IntegrationSection() {
+  const [show99acres,     setShow99acres]     = useState(false);
+  const [showHousing,     setShowHousing]     = useState(false);
+  const [showMagicBricks, setShowMagicBricks] = useState(false);
+
   return (
     <div
       style={{
@@ -333,11 +286,25 @@ function IntegrationSection() {
         }}
       >
         {integrations.map((integration) => (
-          <IntegrationCard key={integration.title} integration={integration} />
+          <IntegrationCard
+            key={integration.title}
+            integration={integration}
+            onConnect={
+              integration.title === "99acres"     ? () => setShow99acres(true)
+            : integration.title === "Housing.com" ? () => setShowHousing(true)
+            : integration.title === "MagicBricks" ? () => setShowMagicBricks(true)
+            : undefined
+            }
+          />
         ))}
       </div>
+
+      {show99acres     && <Acres99ConnectorModal     onClose={() => setShow99acres(false)}     />}
+      {showHousing     && <HousingConnectorModal     onClose={() => setShowHousing(false)}     />}
+      {showMagicBricks && <MagicBricksConnectorModal onClose={() => setShowMagicBricks(false)} />}
     </div>
   );
 }
 
 export default IntegrationSection;
+

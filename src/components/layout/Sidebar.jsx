@@ -7,13 +7,13 @@ import { RiDashboardLine } from "react-icons/ri";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: RiDashboardLine },
-  { label: "Campaigns", path: "/campaigns", icon: HiOutlineSpeakerphone },
   { label: "Deals", path: "/deals", icon: FiUsers },
+  { label: "Contact", path: "/contact", icon: FiUser },
   { label: "Call Log", path: "/call-log", icon: FiPhoneCall },
+  { label: "Campaigns", path: "/campaigns", icon: HiOutlineSpeakerphone },
   { label: "Knowledge Base", path: "/knowledge-base", icon: HiOutlineBookOpen },
-  { label: "contact", path: "/contact", icon: FiUser },
-  { label: "integration", path: "/integration", icon: LuWorkflow },
-  { label: "settings", path: "/settings", icon: FiSettings },
+  { label: "Integration", path: "/integration", icon: LuWorkflow },
+  { label: "Settings", path: "/settings", icon: FiSettings },
 ];
 
 const defaultUser = {
@@ -23,37 +23,36 @@ const defaultUser = {
 };
 
 function Sidebar({ user = defaultUser }) {
-  const name = localStorage.getItem("first_name");
-  const initials = name.slice(0, 1);
-  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("first_name") || "Himanshu";
+  const initials = (name && name.length > 0 ? name.slice(0, 1) : "H").toUpperCase();
+  const role = localStorage.getItem("role") || "Workspace Admin";
   const location = useLocation();
-  const currentUser = { ...defaultUser, ...user };
 
   return (
     <aside
-      className="sticky top-0 flex h-screen w-[280px] shrink-0 flex-col justify-between overflow-hidden border-l border-r border-l-[var(--sidebar-border-blue)] border-r-[var(--sidebar-border-dark)] bg-[var(--sidebar-background)] px-3 py-4 font-[Inter,system-ui,sans-serif]"
+      className="sticky top-0 flex h-dvh w-[280px] shrink-0 flex-col justify-between overflow-hidden border-l border-r border-l-[var(--sidebar-border-blue)] border-r-[var(--sidebar-border-dark)] bg-[var(--sidebar-background)] px-3 py-4 font-[Inter,system-ui,sans-serif]"
     >
       <div>
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--sidebar-logo-purple)] text-white"
-          >
-            <FiPhone size={17} />
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white overflow-hidden p-0.5">
+            <img 
+              src="/ai-removebg-preview.png" 
+              alt="AI Chief" 
+              className="w-full h-full object-contain"
+            />
           </div>
 
           <div className="min-w-0">
             <div className="truncate text-[16px] font-semibold leading-5 text-white">
-              VoiceIQ
+              AI Chief
             </div>
             <div
-              className="truncate text-[11px] font-normal leading-4 text-[var(--sidebar-muted)]"
+              className="truncate text-[12px] font-normal leading-4 text-[var(--sidebar-muted)]"
             >
               Real Estate
             </div>
           </div>
         </div>
-
-
 
         <nav className="mt-6 flex flex-col gap-1" aria-label="Primary">
           {navItems.map((item) => {
@@ -62,15 +61,16 @@ function Sidebar({ user = defaultUser }) {
 
             return (
               <NavLink
-                className="flex h-[34px] w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[12px] font-medium leading-5 transition-colors hover:bg-[#111827]"
+                className="flex h-[38px] w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[13px] font-medium leading-5 transition-colors hover:bg-[#111827]"
                 key={item.path}
                 to={item.path}
+                aria-current={isActive ? "page" : undefined}
                 style={{
                   backgroundColor: isActive ? "var(--sidebar-purple)" : "transparent",
                   color: isActive ? "#FFFFFF" : "var(--sidebar-muted)",
                 }}
               >
-                <Icon size={14} className="shrink-0" aria-hidden="true" />
+                <Icon size={15} className="shrink-0" aria-hidden="true" />
                 <span className="whitespace-nowrap">{item.label}</span>
               </NavLink>
             );
@@ -83,17 +83,17 @@ function Sidebar({ user = defaultUser }) {
       >
         <div className="flex items-center gap-2.5">
           <div
-            className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[var(--sidebar-purple)] text-[11px] font-bold leading-none text-white"
+            className="flex size-[36px] shrink-0 items-center justify-center rounded-full bg-[var(--sidebar-purple)] text-[12px] font-bold leading-none text-white"
           >
             {initials}
           </div>
 
           <div className="min-w-0">
-            <div className="truncate text-[12px] font-semibold leading-4 text-white">
+            <div className="truncate text-[13px] font-semibold leading-4 text-white">
               {name}
             </div>
             <div
-              className="truncate text-[10px] font-normal leading-3 text-[var(--sidebar-muted)]"
+              className="truncate text-[12px] font-normal leading-3 text-[var(--sidebar-muted)]"
             >
               {role}
             </div>

@@ -7,7 +7,7 @@ function AppLayout() {
       className="text-left"
       style={{
         width: "100vw",
-        height: "100vh",
+        height: "100dvh",
         display: "flex",
         overflow: "hidden",
         background: "#F7F8FC",
@@ -18,7 +18,7 @@ function AppLayout() {
         style={{
           flex: 1,
           minWidth: 0,
-          height: "100vh",
+          height: "100dvh",
           overflowY: "auto",
           overflowX: "hidden",
           background: "#F7F8FC",

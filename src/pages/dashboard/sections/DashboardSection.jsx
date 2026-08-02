@@ -6,6 +6,7 @@ import {
   FiPhoneCall,
   FiX,
   FiZap,
+  FiPlus,
 } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import { LeadFollowUpCard } from "../../../components/cards";
@@ -18,6 +19,8 @@ import {
   MetricCard as AppMetricCard,
   ProgressBar,
   T,
+  EmptyState,
+  Skeleton,
 } from "../../../components/utils";
 
 
@@ -69,12 +72,12 @@ const sectionCardStyle = {
 
 const dashboardSectionStyle = {
   width: "100%",
-  height: T.layout.dashboardSectionHeight,
-  minHeight: T.layout.dashboardSectionHeight,
-  maxHeight: T.layout.dashboardSectionHeight,
+  minHeight: 0,
   minWidth: 0,
   boxSizing: "border-box",
   overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
   borderRadius: T.radius.section,
   padding: T.spacing.card,
   background: C.sectionBg,
@@ -94,25 +97,27 @@ const dashboardSectionHeaderStyle = {
 
 function ActiveCallsPill() {
   return (
-    <AppPill variant="neutral" dot dotColor={C.green} style={{ height: 24 }}>
+    <AppPill variant="neutral" dot dotColor={C.green} style={{ height: 24 }} aria-label="3 calls active now" role="status">
       3 calls active now
     </AppPill>
   );
 }
 
-function MetricBadge({ children, tone = "green" }) {
+function MetricBadge({ children, tone = "green", "aria-label": ariaLabel }) {
   const isGreen = tone === "green";
 
   return (
     <AppPill
       variant={isGreen ? "neutral" : "danger"}
+      aria-label={ariaLabel}
+      role="status"
       style={{
-        height: 18,
+        height: 20,
         padding: "0 8px",
         border: "none",
         background: isGreen ? C.greenBg : C.hotSoft,
         color: isGreen ? C.greenText : C.hot,
-        fontSize: 8,
+        fontSize: T.font.size.tiny,
         fontWeight: 800,
       }}
     >
@@ -151,7 +156,7 @@ function DashboardMetricCard({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: progress ? 14 : 12,
+              fontSize: progress ? T.font.size.cardTitle : T.font.size.bodySmall,
               fontWeight: progress ? 700 : 600,
               color: labelColor,
               lineHeight: 1.2,
@@ -160,7 +165,7 @@ function DashboardMetricCard({
             {label}
           </div>
           {subtitle ? (
-            <div style={{ marginTop: 4, fontSize: 9, color: subtitleColor, lineHeight: 1.25 }}>
+            <div style={{ marginTop: 4, fontSize: T.font.size.caption, color: subtitleColor, lineHeight: 1.25 }}>
               {subtitle}
             </div>
           ) : null}
@@ -178,41 +183,55 @@ function DashboardMetricCard({
           style={{ width: "100%", marginTop: 24 }}
         />
       ) : (
-        <div style={{ marginTop: 24, fontSize: 28, fontWeight: 800, lineHeight: 1, color: labelColor }}>
+        <div
+          className="tabular-nums"
+          style={{
+            marginTop: 24,
+            fontSize: T.font.size.dashboardValue,
+            fontWeight: 800,
+            lineHeight: 1,
+            color: labelColor,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
           {valueNode || value}
         </div>
       )}
 
       {badge ? (
         <div style={{ position: "absolute", right: 14, bottom: 14 }}>
-          <MetricBadge tone={badgeTone}>{badge}</MetricBadge>
+          <MetricBadge tone={badgeTone} aria-label={`${badge} ${label}`}>
+            {badge}
+          </MetricBadge>
         </div>
       ) : null}
     </AppCard>
   );
 }
 
-function CampaignCard({ campaign }) {
+function CampaignCard({ campaign, onClick }) {
   const isLive = campaign.status !== "completed";
 
   return (
     <div
+      onClick={onClick}
       style={{
         marginTop: 12,
         borderRadius: 16,
         background: C.card,
         padding: 16,
+        cursor: onClick ? "pointer" : "default",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.2 }}>
+        <div style={{ fontSize: T.font.size.cardTitle, fontWeight: 700, color: C.text, lineHeight: 1.2 }}>
           {campaign.campaign_name}
         </div>
         <AppPill
           variant={isLive ? "success" : "dark"}
           size="xs"
           dot
-          style={{ textTransform: "lowercase", fontWeight: 600 }}
+          style={{ textTransform: "capitalize", fontWeight: 600 }}
         >
           {campaign.status}
         </AppPill>
@@ -236,8 +255,8 @@ function CampaignCard({ campaign }) {
           variant="hot"
           height={96}
           style={{ border: "none", borderRadius: 12, padding: 14 }}
-          labelStyle={{ color: C.hot, fontSize: 10, fontWeight: 500, lineHeight: 1 }}
-          valueStyle={{ color: C.hot, marginTop: 24, fontSize: 25, fontWeight: 700, lineHeight: 1 }}
+          labelStyle={{ color: C.hot, fontSize: T.font.size.caption, fontWeight: 500, lineHeight: 1 }}
+          valueStyle={{ color: C.hot, marginTop: 24, fontSize: T.font.size.metric, fontWeight: 700, lineHeight: 1 }}
         />
         <AppMetricCard
           label="Warm"
@@ -245,8 +264,8 @@ function CampaignCard({ campaign }) {
           variant="warm"
           height={96}
           style={{ border: "none", borderRadius: 12, padding: 14 }}
-          labelStyle={{ color: C.accent, fontSize: 10, fontWeight: 500, lineHeight: 1 }}
-          valueStyle={{ color: C.accent, marginTop: 24, fontSize: 25, fontWeight: 700, lineHeight: 1 }}
+          labelStyle={{ color: C.accent, fontSize: T.font.size.caption, fontWeight: 500, lineHeight: 1 }}
+          valueStyle={{ color: C.accent, marginTop: 24, fontSize: T.font.size.metric, fontWeight: 700, lineHeight: 1 }}
         />
       </div>
     </div>
@@ -266,7 +285,7 @@ function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }
           <AppIconCircle size={30} color={C.accent}>
             <FiBarChart2 size={14} />
           </AppIconCircle>
-          <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.text, lineHeight: 1.1 }}>
+          <h2 style={{ margin: 0, fontSize: T.font.size.cardTitle, fontWeight: 700, color: C.text, lineHeight: 1.1 }}>
             Active campaigns
           </h2>
         </div>
@@ -281,7 +300,7 @@ function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }
             background: C.card,
             color: C.text,
             padding: "0 11px",
-            fontSize: 9,
+            fontSize: T.font.size.caption,
             fontWeight: 500,
             flexShrink: 0,
           }}
@@ -290,9 +309,15 @@ function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }
         </AppButton>
       </div>
 
-      {campaignItems.map((campaign) => (
-        <CampaignCard key={campaign.campaign_id} campaign={campaign} />
-      ))}
+      {campaignItems.length === 0 ? (
+        <EmptyState title="No active campaigns" description="Create your first campaign to get started." />
+      ) : (
+        <div style={{ flex: "1 1 0%", minHeight: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none" }}>
+          {campaignItems.map((campaign) => (
+            <CampaignCard key={campaign.campaign_id} campaign={campaign} onClick={() => onViewAll?.()} />
+          ))}
+        </div>
+      )}
     </AppCard>
   );
 }
@@ -321,8 +346,8 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
       icon: <span style={{ fontSize: 14, fontWeight: 800 }}>₹</span>,
       valueNode: (
         <>
-          <span style={{ fontSize: 24, fontWeight: 800 }}>₹7</span>
-          <span style={{ fontSize: 10, fontWeight: 700 }}>/min</span>
+          <span style={{ fontSize: T.font.size.dashboardValue, fontWeight: 800 }}>₹7</span>
+          <span style={{ fontSize: T.font.size.caption, fontWeight: 700 }}>/min</span>
         </>
       ),
     },
@@ -407,7 +432,7 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
             <h1
               style={{
                 margin: 0,
-                fontSize: 18,
+                fontSize: T.font.size.pageTitle,
                 lineHeight: 1.15,
                 fontWeight: 700,
                 color: C.text,
@@ -415,11 +440,29 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
             >
               Good morning, {first_name}
             </h1>
-            <div style={{ marginTop: 4, fontSize: 9, fontWeight: 500, color: C.muted }}>
+            <div style={{ marginTop: 4, fontSize: T.font.size.caption, fontWeight: 500, color: C.muted }}>
               {data.date}&nbsp;&nbsp; {data.active_campaigns} campaigns active
             </div>
           </div>
-
+          
+          <div style={{ display: "flex", gap: 10 }}>
+            <AppButton
+              variant="outline"
+              compact
+              onClick={() => onLeadClick?.()}
+              style={{ borderRadius: T.radius.md, height: 36 }}
+            >
+              <FiPlus size={14} /> Add Lead
+            </AppButton>
+            <AppButton
+              variant="primary"
+              compact
+              onClick={() => openCampaign?.()}
+              style={{ borderRadius: T.radius.md, height: 36 }}
+            >
+              <FiPlus size={14} /> New Campaign
+            </AppButton>
+          </div>
         </header>
 
         <section
@@ -475,6 +518,7 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
             gap: 16,
             alignItems: "stretch",
             minWidth: 0,
+            height: 450,
           }}
         >
           <AppCard
@@ -491,28 +535,52 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
                 <AppIconCircle size={28} color={C.accentStrong}>
                   <FiZap size={14} />
                 </AppIconCircle>
-                <h2 style={{ margin: 0, fontSize: 14, fontWeight: 850, color: C.text }}>
+                <h2 style={{ margin: 0, fontSize: T.font.size.cardTitle, fontWeight: 850, color: C.text }}>
                   Hot leads act now
                 </h2>
               </div>
-              <AppPill style={{ color: C.accentStrong, fontSize: 10, fontWeight: 800, height: 24 }}>
-                {data.hot_leads.length} leads
-              </AppPill>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <AppPill style={{ color: C.accentStrong, fontSize: T.font.size.caption, fontWeight: 800, height: 24 }}>
+                  {data.hot_leads.length} leads
+                </AppPill>
+                <AppButton
+                  type="button"
+                  onClick={() => onLeadClick?.()}
+                  compact
+                  pill
+                  style={{
+                    height: 26,
+                    border: `1px solid ${C.borderMuted}`,
+                    background: C.card,
+                    color: C.text,
+                    padding: "0 11px",
+                    fontSize: T.font.size.caption,
+                    fontWeight: 500,
+                    flexShrink: 0,
+                  }}
+                >
+                  view all
+                </AppButton>
+              </div>
             </div>
 
             <div style={{
-              display: "flex", flexDirection: "column", gap: 0, maxHeight: "350px", overflowY: "auto",
+              display: "flex", flexDirection: "column", gap: 0, flex: "1 1 0%", minHeight: 0, overflowY: "auto",
               overflowX: "hidden", padding: "8px 0", scrollbarWidth: "none",
             }}>
-              {data.hot_leads.map((lead) => (
-                <div
-                  key={lead.name}
-                  onClick={() => onLeadClick?.(lead)}
-                  style={{ cursor: onLeadClick ? "pointer" : "default", width: "100%", height: "auto" }}
-                >
-                  <LeadFollowUpCard {...lead} compact />
-                </div>
-              ))}
+              {data.hot_leads.length === 0 ? (
+                <EmptyState title="No hot leads right now" description="Check back later or try reaching out to more contacts." />
+              ) : (
+                data.hot_leads.map((lead) => (
+                  <div
+                    key={lead.name}
+                    onClick={() => onLeadClick?.(lead)}
+                    style={{ cursor: onLeadClick ? "pointer" : "default", width: "100%", height: "auto" }}
+                  >
+                    <LeadFollowUpCard {...lead} compact />
+                  </div>
+                ))
+              )}
             </div>
           </AppCard>
 

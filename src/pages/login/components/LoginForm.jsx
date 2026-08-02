@@ -51,6 +51,7 @@ export function LoginForm({
   onPasswordChange,
   onTogglePassword,
   onSubmit,
+  onBypass,
   onClearError,
 }) {
   return (
@@ -124,10 +125,43 @@ export function LoginForm({
         />
       </div>
 
-      <div style={{ marginTop: T.spacing[6] - 2 }}>
+      <div style={{ marginTop: T.spacing[6] - 2, display: "flex", flexDirection: "column", gap: 10 }}>
         <PrimaryButton loading={loading} onClick={onSubmit}>
           Sign in
         </PrimaryButton>
+
+        <button
+          type="button"
+          onClick={onBypass}
+          style={{
+            width: "100%",
+            height: 40,
+            borderRadius: T.radius.sm + 1,
+            background: "rgba(99, 102, 241, 0.15)",
+            border: `1px solid rgba(129, 140, 248, 0.35)`,
+            color: "#C7D2FE",
+            fontSize: T.font.size.sm,
+            fontWeight: T.font.weight.semibold,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            transition: "all 150ms ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(99, 102, 241, 0.28)";
+            e.currentTarget.style.borderColor = "rgba(165, 180, 252, 0.6)";
+            e.currentTarget.style.color = "#FFFFFF";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(99, 102, 241, 0.15)";
+            e.currentTarget.style.borderColor = "rgba(129, 140, 248, 0.35)";
+            e.currentTarget.style.color = "#C7D2FE";
+          }}
+        >
+          <span>⚡ Bypass Login (Instant Access)</span>
+        </button>
       </div>
     </div>
   );
@@ -143,6 +177,7 @@ LoginForm.propTypes = {
   onPasswordChange: PropTypes.func.isRequired,
   onTogglePassword: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onBypass: PropTypes.func,
   onClearError: PropTypes.func,
 };
 

@@ -46,10 +46,10 @@ ModalHeader.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-function SelectRecordOption({ label, selected, onSelect }) {
+function SelectRecordOption({ label, selected, onSelect, disabled }) {
   return (
     <div
-      onClick={onSelect}
+      onClick={disabled ? undefined : onSelect}
       style={{
         display: "flex",
         alignItems: "center",
@@ -58,7 +58,8 @@ function SelectRecordOption({ label, selected, onSelect }) {
         borderRadius: T.radius.md,
         border: selected ? `1.5px solid ${C.accent}` : `1px solid ${C.border}`,
         background: selected ? C.accentLt : C.surface,
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.5 : 1,
         transition: "all 180ms ease",
         boxSizing: "border-box",
       }}
@@ -106,13 +107,15 @@ SelectRecordOption.propTypes = {
   label: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
   onSelect: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
 };
 
-export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
+export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedCount = 0 }) {
   const [recordType, setRecordType] = useState("all");
   const [startRow, setStartRow] = useState("1");
   const [endRow, setEndRow] = useState("100");
   const [campaignName, setCampaignName] = useState("");
+  const [callType, setCallType] = useState("real_estate_cold_call");
 
   const handleContinue = () => {
     if (onContinue) {
@@ -121,6 +124,7 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
         recordType,
         startRow,
         endRow,
+        callType,
       });
     }
     onClose?.();
@@ -163,6 +167,13 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
             label="All Records In View (4,500 Total)"
             selected={recordType === "all"}
             onSelect={() => setRecordType("all")}
+          />
+
+          <SelectRecordOption
+            label={`Selected Rows (${selectedCount} Total)`}
+            selected={recordType === "selected"}
+            onSelect={() => setRecordType("selected")}
+            disabled={selectedCount === 0}
           />
 
           <SelectRecordOption
@@ -228,6 +239,42 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
             </div>
           )}
         </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              color: C.text,
+              fontSize: T.font.size.bodySmall,
+              fontWeight: T.font.weight.semibold,
+              marginBottom: 6,
+              fontFamily: T.font.family,
+            }}
+          >
+            Call Type
+          </label>
+          <select
+            value={callType}
+            onChange={(e) => setCallType(e.target.value)}
+            style={{
+              width: "100%",
+              height: 36,
+              padding: "0 12px",
+              border: `1px solid ${C.border}`,
+              borderRadius: T.radius.sm,
+              background: C.surface,
+              color: C.text,
+              fontSize: T.font.size.bodySmall,
+              fontFamily: T.font.family,
+              outline: "none",
+              boxSizing: "border-box",
+              cursor: "pointer",
+            }}
+          >
+            <option value="real_estate_cold_call">Cold Call</option>
+            <option value="requirement_gathering">Requirement Gathering</option>
+          </select>
+        </div>
       </div>
       <div
         style={{
@@ -252,4 +299,5 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue }) {
 CreateCampaignSelectionModal.propTypes = {
   onClose: PropTypes.func,
   onContinue: PropTypes.func,
+  selectedCount: PropTypes.number,
 };

@@ -4,24 +4,25 @@ import { C, T, Text } from "../../../components/utils";
 
 const logoGradient = `linear-gradient(135deg, ${C.accent} 0%, ${C.accentStrong} 100%)`;
 
-export function LogoSection({ title = "VoiceIQ", subtitle = "AI Calling Platform - Real Estate" }) {
+export function LogoSection({ title = "AI Chief", subtitle = "AI Calling Platform - Real Estate" }) {
   return (
     <div style={{ textAlign: "center", marginBottom: T.spacing[6] + T.spacing[2] }}>
       <div
         style={{
           width: 52,
           height: 52,
+          background: "#fff",
           borderRadius: T.radius.xl,
-          background: logoGradient,
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          color: C.card,
           marginBottom: T.spacing[4] - 2,
-          boxShadow: `0 8px 24px rgba(99, 102, 241, 0.4)`,
+          overflow: "hidden",
+          padding: 4,
+          boxShadow: `0 8px 24px rgba(255, 255, 255, 0.1)`,
         }}
       >
-        <FiPhoneCall size={24} />
+        <img src="/ai-removebg-preview.png" alt="AI Chief Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
       </div>
 
       <Text

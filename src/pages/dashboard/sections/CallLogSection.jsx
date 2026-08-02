@@ -150,7 +150,10 @@ export function CallLogDetailPanel({
           <div style={{ flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column", gap: 14, paddingRight: 4 }}>
             {transcript?.length ? (
               transcript.map((message, index) => {
-                const isAI = message.sender === "AI Agent";
+                const sUpper = (message.sender || "").toUpperCase();
+                const isAI = sUpper.includes("AI") || sUpper === "ASSISTANT" || sUpper === "BOT";
+                const displayTag = isAI ? "AI" : "USER";
+                
                 return (
                   <div key={`${message.sender}-${index}`} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                     <AppIconCircle
@@ -163,7 +166,7 @@ export function CallLogDetailPanel({
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                         <span style={{ color: C.text, fontSize: T.font.size.xs, fontWeight: T.font.weight.bold }}>
-                          {message.sender}
+                          {displayTag}
                         </span>
                         <span style={{ color: C.muted, fontSize: T.font.size.caption }}>
                           {message.time}
@@ -268,7 +271,7 @@ const completedCallDetails = {
     {
       sender: "AI Agent",
       time: "10:15 AM",
-      text: "Hi Arjun, this is Alex from VoiceIQ. I noticed you recently downloaded our guide on AI-driven sales. Did you find it helpful?",
+      text: "Hi Arjun, this is Alex from AI Chief. I noticed you recently downloaded our guide on AI-driven sales. Did you find it helpful?",
     },
     {
       sender: "Customer",
@@ -373,7 +376,7 @@ function PageSection({ children, style }) {
     <section
       style={{
         width: "100%",
-        maxWidth: T.layout.pageMaxWidth,
+        maxWidth: "100%",
         margin: "0 auto",
         ...style,
       }}

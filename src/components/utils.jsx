@@ -321,8 +321,8 @@ const AppButton = React.forwardRef(function AppButton({
         color: primary ? C.card : C.muted,
         border: `1px solid ${primary ? C.accent : C.border}`,
         borderRadius: pill ? T.radius.pill : 7,
-        padding: compact ? "5px 12px" : "8px 18px",
-        fontSize: compact ? 11 : 13,
+        padding: compact ? "6px 14px" : "8px 18px",
+        fontSize: compact ? T.font.size.bodySmall : T.font.size.body || 14,
         fontWeight: T.font.weight.semibold,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
@@ -379,19 +379,23 @@ function AppPill({
   dotColor,
   size = "sm",
   style,
+  "aria-label": ariaLabel,
+  role,
 }) {
   const tone = pillVariants[variant] || pillVariants.neutral;
   const compact = size === "xs";
   return (
     <span
+      aria-label={ariaLabel}
+      role={role}
       style={{
-        height: compact ? 21 : 25,
-        padding: compact ? "0 9px" : "0 10px",
+        height: compact ? 24 : 28,
+        padding: compact ? "0 10px" : "0 12px",
         borderRadius: T.radius.pill,
         background: tone.background,
         color: tone.color,
         border: tone.border,
-          fontSize: compact ? T.font.size.caption : T.font.size.caption,
+          fontSize: T.font.size.caption,
         fontWeight: T.font.weight.bold,
         display: "inline-flex",
         alignItems: "center",
@@ -424,6 +428,8 @@ function AppIconCircle({
   background = C.card,
   variant,
   style,
+  "aria-label": ariaLabel,
+  role,
 }) {
   const variants = {
     neutral: { background: C.card, color: C.muted },
@@ -435,6 +441,8 @@ function AppIconCircle({
 
   return (
     <span
+      aria-label={ariaLabel}
+      role={role}
       style={{
         width: size,
         height: size,
@@ -509,21 +517,23 @@ function MetricCard({
     >
       <div
         style={{
-          fontSize: T.font.size.xs,
+          fontSize: T.font.size.caption,
           color: tone.label,
-          lineHeight: "11px",
+          lineHeight: "14px",
           ...labelStyle,
         }}
       >
         {label}
       </div>
       <div
+        className="tabular-nums"
         style={{
           fontSize: T.font.size.metric,
           fontWeight: T.font.weight.bold,
           color: tone.value,
-          lineHeight: "26px",
+          lineHeight: "30px",
           marginTop: 4,
+          fontVariantNumeric: "tabular-nums",
           ...valueStyle,
         }}
       >
@@ -641,12 +651,13 @@ const textVariants = {
     color: C.text,
     fontSize: T.font.size.pageTitle,
     fontWeight: T.font.weight.bold,
-    lineHeight: 1.15,
+    lineHeight: 1.2,
   },
   subtitle: {
     color: C.muted,
     fontSize: T.font.size.bodySmall,
     fontWeight: T.font.weight.medium,
+    lineHeight: 1.4,
   },
   sectionTitle: {
     color: C.text,
@@ -657,7 +668,7 @@ const textVariants = {
     color: C.text,
     fontSize: T.font.size.bodySmall,
     fontWeight: T.font.weight.medium,
-    lineHeight: 1.4,
+    lineHeight: 1.45,
   },
   label: {
     color: C.text,
@@ -674,6 +685,12 @@ const textVariants = {
     fontSize: T.font.size.bodySmall,
     fontWeight: T.font.weight.semibold,
     lineHeight: 1,
+  },
+  cardTitle: {
+    color: C.text,
+    fontSize: T.font.size.cardTitle,
+    fontWeight: T.font.weight.semibold,
+    lineHeight: 1.3,
   },
   iconGlyph: {
     color: C.muted,
@@ -945,6 +962,53 @@ function RenameModal({
   );
 }
 
+function Skeleton({ width = "100%", height = 20, borderRadius = T.radius.sm, style }) {
+  return (
+    <div
+      className="animate-pulse"
+      style={{
+        width,
+        height,
+        borderRadius,
+        backgroundColor: C.borderLt,
+        ...style,
+      }}
+    />
+  );
+}
+
+function EmptyState({ icon: Icon, title, description, action }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "48px 24px",
+        textAlign: "center",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      {Icon && (
+        <AppIconCircle size={56} variant="neutral" style={{ marginBottom: 16 }}>
+          <Icon size={24} color={C.muted} />
+        </AppIconCircle>
+      )}
+      <Text variant="cardTitle" style={{ marginBottom: 4 }}>
+        {title}
+      </Text>
+      {description && (
+        <Text variant="body" style={{ color: C.muted, maxWidth: 300, marginBottom: 24 }}>
+          {description}
+        </Text>
+      )}
+      {action}
+    </div>
+  );
+}
+
 export {
   Avatar,
   Waveform,
@@ -968,4 +1032,6 @@ export {
   Text,
   Alert,
   AppStepper,
+  Skeleton,
+  EmptyState,
 };
