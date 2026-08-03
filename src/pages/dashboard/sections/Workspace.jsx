@@ -279,6 +279,55 @@ UserBadgeCell.propTypes = {
   value: PropTypes.node,
 };
 
+// ── Call Count Badge Cell ─────────────────────────────────────────────────────
+function CallCountBadgeCell({ value }) {
+  if (value === undefined || value === null || value === 0 || value === "") {
+    return <span style={{ color: C.muted, fontSize: T.font.size.caption }}>—</span>;
+  }
+  const count = Number(value);
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        background: C.accentLt,
+        color: C.accent,
+        border: `1px solid ${C.accentTrack || C.accent + "33"}`,
+        borderRadius: 99,
+        padding: "2px 10px",
+        fontSize: T.font.size.caption,
+        fontWeight: T.font.weight.bold,
+        whiteSpace: "nowrap",
+      }}
+    >
+      🔁 {count} call{count !== 1 ? "s" : ""}
+    </span>
+  );
+}
+
+CallCountBadgeCell.propTypes = { value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]) };
+
+// ── Last Called Cell ──────────────────────────────────────────────────────────
+function LastCalledCell({ value }) {
+  if (!value || value === "—") {
+    return <span style={{ color: C.muted, fontSize: T.font.size.caption }}>—</span>;
+  }
+  return (
+    <span
+      style={{
+        color: C.muted,
+        fontSize: T.font.size.bodySmall,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {value}
+    </span>
+  );
+}
+
+LastCalledCell.propTypes = { value: PropTypes.string };
+
 function SearchBox({ value, onChange, placeholder, width = 190 }) {
   return (
     <div style={{ position: "relative", width, minWidth: 140 }}>
@@ -1306,6 +1355,7 @@ function WorkspaceGrid({
     summary: "",
     transcript: [],
     callHistory: [],
+    callCount: 0,
   });
   const gridApiRef = useRef(null);
 
@@ -1366,6 +1416,7 @@ function WorkspaceGrid({
         summary: summaryText,
         transcript: summaryData.transcript || [],
         callHistory: summaryData.callHistory || [],
+        callCount: typeof rowData.callCount === "number" ? rowData.callCount : (summaryData.callHistory || []).length,
       });
 
       if (event.api && event.api.stopEditing) {
@@ -1445,7 +1496,11 @@ function WorkspaceGrid({
             ? { cellRenderer: PrimaryNameCell }
             : field.id === "createdBy" || field.id === "lastModifiedBy"
               ? { cellRenderer: UserBadgeCell }
-              : {}),
+              : field.id === "callCount"
+                ? { cellRenderer: CallCountBadgeCell }
+                : field.id === "lastCalled"
+                  ? { cellRenderer: LastCalledCell }
+                  : {}),
         };
       }),
       ...(hideAddColumn || isStaff
@@ -1484,6 +1539,8 @@ function WorkspaceGrid({
           "lastmodified",
           "lastmodifiedtime",
           "updatedat",
+          "callcount",
+          "lastcalled",
         ];
         if (readOnlyFields.includes(field)) return false;
         return true;
@@ -1699,6 +1756,7 @@ function WorkspaceGrid({
         summary={aiCallSummaryModal.summary}
         transcript={aiCallSummaryModal.transcript}
         callHistory={aiCallSummaryModal.callHistory}
+        callCount={aiCallSummaryModal.callCount}
         onClose={handleCloseAiCallSummary}
       />
     </div>

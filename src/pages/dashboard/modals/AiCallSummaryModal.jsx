@@ -529,11 +529,14 @@ export default function AiCallSummaryModal({
   summary,
   transcript,
   callHistory,
+  callCount,
   onClose,
 }) {
   const [activeTab, setActiveTab] = useState("summary");
 
   if (!isOpen) return null;
+
+  const totalCalls = callCount ?? callHistory?.length ?? 0;
 
   return (
     <Modal width={720} onClose={onClose}>
@@ -558,12 +561,30 @@ export default function AiCallSummaryModal({
               <FiFileText size={16} />
             </AppIconCircle>
             <div>
-              <Text
-                variant="sectionTitle"
-                style={{ margin: 0, fontWeight: T.font.weight.bold }}
-              >
-                AI Generated Call Summary
-              </Text>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Text
+                  variant="sectionTitle"
+                  style={{ margin: 0, fontWeight: T.font.weight.bold }}
+                >
+                  AI Generated Call Summary
+                </Text>
+                {totalCalls > 0 && (
+                  <span
+                    style={{
+                      background: C.accentLt,
+                      color: C.accent,
+                      border: `1px solid ${C.accent}33`,
+                      borderRadius: 99,
+                      padding: "2px 10px",
+                      fontSize: T.font.size.caption,
+                      fontWeight: T.font.weight.bold,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    🔁 {totalCalls} call{totalCalls !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
               {dealName && (
                 <Text
                   variant="caption"
@@ -651,6 +672,7 @@ AiCallSummaryModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   dealName: PropTypes.string,
   summary: PropTypes.string,
+  callCount: PropTypes.number,
   transcript: PropTypes.arrayOf(
     PropTypes.shape({
       sender: PropTypes.string,
