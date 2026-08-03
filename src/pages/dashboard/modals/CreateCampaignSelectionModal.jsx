@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { FiX } from "react-icons/fi";
 import {
@@ -10,6 +10,7 @@ import {
   TextField,
   Text,
 } from "../../../components/utils";
+import { getSummary } from "../../../api/dashboard";
 
 function ModalHeader({ title, onClose }) {
   return (
@@ -111,15 +112,38 @@ SelectRecordOption.propTypes = {
 };
 
 export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedCount = 0 }) {
+  const [actionType, setActionType] = useState("new");
   const [recordType, setRecordType] = useState("all");
   const [startRow, setStartRow] = useState("1");
   const [endRow, setEndRow] = useState("100");
   const [campaignName, setCampaignName] = useState("");
   const [callType, setCallType] = useState("real_estate_cold_call");
+  const [existingCampaigns, setExistingCampaigns] = useState([]);
+  const [loadingCampaigns, setLoadingCampaigns] = useState(false);
+
+  useEffect(() => {
+    async function loadCampaigns() {
+      const company_id = localStorage.getItem("company_id");
+      if (!company_id) return;
+      try {
+        setLoadingCampaigns(true);
+        const data = await getSummary(company_id);
+        if (data?.campaigns) {
+          setExistingCampaigns(data.campaigns);
+        }
+      } catch (err) {
+        console.error("Failed to load campaigns", err);
+      } finally {
+        setLoadingCampaigns(false);
+      }
+    }
+    loadCampaigns();
+  }, []);
 
   const handleContinue = () => {
     if (onContinue) {
       onContinue({
+        actionType,
         campaignName: campaignName.trim(),
         recordType,
         startRow,
@@ -141,6 +165,31 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
           gap: T.spacing[4],
         }}
       >
+        <div style={{ display: "flex", gap: 12, marginBottom: 8 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: T.font.size.bodySmall, color: C.text, fontFamily: T.font.family }}>
+            <input
+              type="radio"
+              name="actionType"
+              value="new"
+              checked={actionType === "new"}
+              onChange={() => setActionType("new")}
+              style={{ accentColor: C.accent }}
+            />
+            Create a new campaign
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: T.font.size.bodySmall, color: C.text, fontFamily: T.font.family }}>
+            <input
+              type="radio"
+              name="actionType"
+              value="existing"
+              checked={actionType === "existing"}
+              onChange={() => setActionType("existing")}
+              style={{ accentColor: C.accent }}
+            />
+            Add to existing campaign
+          </label>
+        </div>
+
         <div>
           <label
             style={{
@@ -152,14 +201,46 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
               fontFamily: T.font.family,
             }}
           >
-            Campaign Name
+            {actionType === "new" ? "Campaign Name" : "Select Existing Campaign"}
           </label>
-          <TextField
-            value={campaignName}
-            onChange={(e) => setCampaignName(e.target.value)}
-            placeholder="Enter campaign name"
-            style={{ height: 36 }}
-          />
+          {actionType === "new" ? (
+            <TextField
+              value={campaignName}
+              onChange={(e) => setCampaignName(e.target.value)}
+              placeholder="Enter campaign name"
+              style={{ height: 36 }}
+            />
+          ) : (
+            <select
+              value={campaignName}
+              onChange={(e) => setCampaignName(e.target.value)}
+              style={{
+                width: "100%",
+                height: 36,
+                padding: "0 12px",
+                border: `1px solid ${C.border}`,
+                borderRadius: T.radius.sm,
+                background: C.surface,
+                color: C.text,
+                fontSize: T.font.size.bodySmall,
+                fontFamily: T.font.family,
+                outline: "none",
+                boxSizing: "border-box",
+                cursor: "pointer",
+              }}
+            >
+              <option value="">Select a campaign...</option>
+              {loadingCampaigns ? (
+                <option value="" disabled>Loading campaigns...</option>
+              ) : (
+                existingCampaigns.map((camp) => (
+                  <option key={camp.id} value={camp.name}>
+                    {camp.name}
+                  </option>
+                ))
+              )}
+            </select>
+          )}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: T.spacing[3] }}>
