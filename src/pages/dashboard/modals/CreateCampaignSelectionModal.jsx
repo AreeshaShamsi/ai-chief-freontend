@@ -118,6 +118,7 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
   const [endRow, setEndRow] = useState("100");
   const [campaignName, setCampaignName] = useState("");
   const [callType, setCallType] = useState("real_estate_cold_call");
+  const [scheduledTime, setScheduledTime] = useState("");
   const [existingCampaigns, setExistingCampaigns] = useState([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
 
@@ -149,6 +150,7 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
         startRow,
         endRow,
         callType,
+        scheduledTime,
       });
     }
     onClose?.();
@@ -355,6 +357,39 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
             <option value="real_estate_cold_call">Cold Call</option>
             <option value="requirement_gathering">Requirement Gathering</option>
           </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              color: C.text,
+              fontSize: T.font.size.bodySmall,
+              fontWeight: T.font.weight.semibold,
+              marginBottom: 6,
+              fontFamily: T.font.family,
+            }}
+          >
+            Schedule Start Time (Optional)
+          </label>
+          <input
+            type="datetime-local"
+            value={scheduledTime}
+            onChange={(e) => setScheduledTime(e.target.value)}
+            style={{
+              width: "100%",
+              height: 36,
+              padding: "0 12px",
+              border: `1px solid ${C.border}`,
+              borderRadius: T.radius.sm,
+              background: C.surface,
+              color: C.text,
+              fontSize: T.font.size.bodySmall,
+              fontFamily: T.font.family,
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
         </div>
       </div>
       <div

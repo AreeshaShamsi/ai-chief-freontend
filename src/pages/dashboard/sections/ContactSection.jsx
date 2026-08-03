@@ -132,6 +132,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
       campaign_type: "leads_uploaded",
       field_mapping,
       static_fields,
+      scheduled_time: modal_data.scheduledTime || null,
     };
 
     console.log(payload);
