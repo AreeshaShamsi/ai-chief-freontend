@@ -145,6 +145,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
       {showCreateModal && (
         <CreateCampaignSelectionModal
           selectedCount={selectedRows.length}
+          totalRecords={data.tables[0].rows.length}
           onClose={() => setShowCreateModal(false)}
           onContinue={async (modal_data) => {
             await handleCampaignCreate(modal_data);

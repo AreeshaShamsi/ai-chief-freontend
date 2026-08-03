@@ -111,7 +111,7 @@ SelectRecordOption.propTypes = {
   disabled: PropTypes.bool,
 };
 
-export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedCount = 0 }) {
+export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedCount = 0, totalRecords = 0 }) {
   const [actionType, setActionType] = useState("new");
   const [recordType, setRecordType] = useState("all");
   const [startRow, setStartRow] = useState("1");
@@ -245,7 +245,7 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
 
         <div style={{ display: "flex", flexDirection: "column", gap: T.spacing[3] }}>
           <SelectRecordOption
-            label="All Records In View (4,500 Total)"
+            label={`All Records In View (${totalRecords.toLocaleString()} Total)`}
             selected={recordType === "all"}
             onSelect={() => setRecordType("all")}
           />
