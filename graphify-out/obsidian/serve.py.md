@@ -1,0 +1,86 @@
+---
+source_file: "temp-graphify/graphify/serve.py"
+type: "code"
+community: "serve.py"
+location: "L1"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/servepy
+---
+
+# serve.py
+
+## Connections
+- [[NOTE no decorators here — the handlers below are plain coroutines,]] - `rationale_for` [EXTRACTED]
+- [[_ApiKeyMiddleware]] - `contains` [EXTRACTED]
+- [[_GraphContextCache]] - `contains` [EXTRACTED]
+- [[_MCPASGIApp]] - `contains` [EXTRACTED]
+- [[_QueryScores]] - `contains` [EXTRACTED]
+- [[_bfs()]] - `contains` [EXTRACTED]
+- [[_build_http_app()]] - `contains` [EXTRACTED]
+- [[_build_server()]] - `contains` [EXTRACTED]
+- [[_communities_from_graph()]] - `contains` [EXTRACTED]
+- [[_community_header()]] - `contains` [EXTRACTED]
+- [[_complete_induced_edges()]] - `contains` [EXTRACTED]
+- [[_compute_idf()]] - `contains` [EXTRACTED]
+- [[_cut_lines_to_budget()]] - `contains` [EXTRACTED]
+- [[_detect_default_branch()]] - `imports` [EXTRACTED]
+- [[_dfs()]] - `contains` [EXTRACTED]
+- [[_filter_blank_stdin()]] - `contains` [EXTRACTED]
+- [[_filter_graph_by_context()]] - `contains` [EXTRACTED]
+- [[_find_node()]] - `contains` [EXTRACTED]
+- [[_find_node_tiers()]] - `contains` [EXTRACTED]
+- [[_get_trigram_index()]] - `contains` [EXTRACTED]
+- [[_gh()]] - `imports` [EXTRACTED]
+- [[_has_chinese()]] - `contains` [EXTRACTED]
+- [[_infer_context_filters()]] - `contains` [EXTRACTED]
+- [[_is_searchable()]] - `contains` [EXTRACTED]
+- [[_load_graph()]] - `contains` [EXTRACTED]
+- [[_main()]] - `contains` [EXTRACTED]
+- [[_max_server_contexts()]] - `contains` [EXTRACTED]
+- [[_node_search_text()]] - `contains` [EXTRACTED]
+- [[_normalize_context_filters()]] - `contains` [EXTRACTED]
+- [[_parse_ci()]] - `imports` [EXTRACTED]
+- [[_pick_scored_endpoint()]] - `contains` [EXTRACTED]
+- [[_pick_seeds()]] - `contains` [EXTRACTED]
+- [[_query_graph_text()]] - `contains` [EXTRACTED]
+- [[_query_terms()]] - `contains` [EXTRACTED]
+- [[_resolve_context_filters()]] - `contains` [EXTRACTED]
+- [[_score_nodes()]] - `contains` [EXTRACTED]
+- [[_score_query()]] - `contains` [EXTRACTED]
+- [[_search_tokens()]] - `contains` [EXTRACTED]
+- [[_segment_chinese()]] - `contains` [EXTRACTED]
+- [[_strip_diacritics()_1]] - `contains` [EXTRACTED]
+- [[_subgraph_to_text()]] - `contains` [EXTRACTED]
+- [[_trigram_candidates()]] - `contains` [EXTRACTED]
+- [[_trigrams()]] - `contains` [EXTRACTED]
+- [[bench_query_scoring.py]] - `imports_from` [EXTRACTED]
+- [[benchmark.py]] - `imports_from` [EXTRACTED]
+- [[check_graph_file_size_cap()]] - `imports` [EXTRACTED]
+- [[compute_pr_impact()]] - `imports` [EXTRACTED]
+- [[default_graph_json()]] - `imports` [EXTRACTED]
+- [[edge_data()]] - `imports` [EXTRACTED]
+- [[edge_datas()]] - `imports` [EXTRACTED]
+- [[fetch_pr_files()]] - `imports` [EXTRACTED]
+- [[fetch_prs()]] - `imports` [EXTRACTED]
+- [[fetch_worktrees()]] - `imports` [EXTRACTED]
+- [[find_node_ambiguity()]] - `contains` [EXTRACTED]
+- [[format_prs_text()]] - `imports` [EXTRACTED]
+- [[god_nodes()]] - `imports` [EXTRACTED]
+- [[graph_has_legacy_ids()]] - `imports` [EXTRACTED]
+- [[graphifybuild.py]] - `imports_from` [EXTRACTED]
+- [[load_learning_overlay()]] - `imports` [EXTRACTED]
+- [[paths.py]] - `imports_from` [EXTRACTED]
+- [[querylog.py]] - `imports_from` [EXTRACTED]
+- [[sanitize_label()]] - `imports` [EXTRACTED]
+- [[security.py]] - `imports_from` [EXTRACTED]
+- [[serve()]] - `contains` [EXTRACTED]
+- [[serve_http()]] - `contains` [EXTRACTED]
+- [[suggest_questions()]] - `imports` [EXTRACTED]
+- [[surprising_connections()]] - `imports` [EXTRACTED]
+- [[test_query_induced_edges.py]] - `imports_from` [EXTRACTED]
+- [[test_serve.py]] - `imports_from` [EXTRACTED]
+- [[test_serve_http.py]] - `imports_from` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/servepy

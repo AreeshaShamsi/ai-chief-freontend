@@ -1,0 +1,88 @@
+---
+source_file: "temp-graphify/tests/test_export.py"
+type: "code"
+community: "test_export.py"
+location: "L1"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/test_exportpy
+---
+
+# test_export.py
+
+## Connections
+- [[_case_collision_graph()]] - `contains` [EXTRACTED]
+- [[_four_node_two_community_graph()]] - `contains` [EXTRACTED]
+- [[_mkG()]] - `contains` [EXTRACTED]
+- [[_obsidian_safe_stem()]] - `imports` [EXTRACTED]
+- [[_punct_graph()]] - `contains` [EXTRACTED]
+- [[_two_node_graph()]] - `contains` [EXTRACTED]
+- [[_vis_nodes_from_html()]] - `contains` [EXTRACTED]
+- [[backup_if_protected()]] - `imports` [EXTRACTED]
+- [[build_from_json()]] - `imports` [EXTRACTED]
+- [[cluster()]] - `imports` [EXTRACTED]
+- [[existing_graph_node_count()]] - `imports` [EXTRACTED]
+- [[export.py]] - `imports_from` [EXTRACTED]
+- [[graphifybuild.py]] - `imports_from` [EXTRACTED]
+- [[graphifycluster.py]] - `imports_from` [EXTRACTED]
+- [[make_graph()_2]] - `contains` [EXTRACTED]
+- [[test_backup_curated_labels()]] - `contains` [EXTRACTED]
+- [[test_backup_default_labels_only()]] - `contains` [EXTRACTED]
+- [[test_backup_env_disable()]] - `contains` [EXTRACTED]
+- [[test_backup_no_graph_json()]] - `contains` [EXTRACTED]
+- [[test_backup_no_markers()]] - `contains` [EXTRACTED]
+- [[test_backup_same_day_changed_content()]] - `contains` [EXTRACTED]
+- [[test_backup_same_day_no_accumulation()]] - `contains` [EXTRACTED]
+- [[test_backup_semantic_marker()]] - `contains` [EXTRACTED]
+- [[test_existing_graph_node_count()]] - `contains` [EXTRACTED]
+- [[test_obsidian_canvas_filenames_agree()]] - `contains` [EXTRACTED]
+- [[test_obsidian_safe_stem_all_dots_label_falls_back_to_unnamed()]] - `contains` [EXTRACTED]
+- [[test_to_canvas_case_only_distinct_labels_get_distinct_files()]] - `contains` [EXTRACTED]
+- [[test_to_canvas_file_paths_relative_to_vault()]] - `contains` [EXTRACTED]
+- [[test_to_canvas_never_emits_punctuation_only_filenames()]] - `contains` [EXTRACTED]
+- [[test_to_canvas_no_communities_still_populates()]] - `contains` [EXTRACTED]
+- [[test_to_canvas_node_grid_matches_box_columns()]] - `contains` [EXTRACTED]
+- [[test_to_cypher_contains_merge_statements()]] - `contains` [EXTRACTED]
+- [[test_to_cypher_creates_file()]] - `contains` [EXTRACTED]
+- [[test_to_graphml_creates_file()]] - `contains` [EXTRACTED]
+- [[test_to_graphml_has_community_attribute()]] - `contains` [EXTRACTED]
+- [[test_to_graphml_preserves_native_scalar_types()]] - `contains` [EXTRACTED]
+- [[test_to_graphml_tolerates_dict_and_list_attribute_values()]] - `contains` [EXTRACTED]
+- [[test_to_graphml_tolerates_none_attribute_values()]] - `contains` [EXTRACTED]
+- [[test_to_graphml_valid_xml()]] - `contains` [EXTRACTED]
+- [[test_to_html_annotated_node_gets_learning_status_and_ring()]] - `contains` [EXTRACTED]
+- [[test_to_html_contains_legend_with_labels()]] - `contains` [EXTRACTED]
+- [[test_to_html_contains_nodes_and_edges()]] - `contains` [EXTRACTED]
+- [[test_to_html_contains_search()]] - `contains` [EXTRACTED]
+- [[test_to_html_contains_visjs()]] - `contains` [EXTRACTED]
+- [[test_to_html_contested_stale_node_gets_dashed_desaturated_ring()]] - `contains` [EXTRACTED]
+- [[test_to_html_creates_file()]] - `contains` [EXTRACTED]
+- [[test_to_html_handles_null_source_file_and_label()]] - `contains` [EXTRACTED]
+- [[test_to_html_member_counts_accepted()]] - `contains` [EXTRACTED]
+- [[test_to_html_neighbor_links_have_no_inline_onclick_xss()]] - `contains` [EXTRACTED]
+- [[test_to_html_pins_visjs_version_with_sri()]] - `contains` [EXTRACTED]
+- [[test_to_html_unannotated_identical_to_pre_feature()]] - `contains` [EXTRACTED]
+- [[test_to_json_creates_file()]] - `contains` [EXTRACTED]
+- [[test_to_json_fails_safe_on_corrupt_existing()]] - `contains` [EXTRACTED]
+- [[test_to_json_nodes_have_community()]] - `contains` [EXTRACTED]
+- [[test_to_json_proceeds_on_empty_existing()]] - `contains` [EXTRACTED]
+- [[test_to_json_refuses_shrink()]] - `contains` [EXTRACTED]
+- [[test_to_json_valid_json()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_case_only_distinct_labels_dont_overwrite()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_community_notes_case_collision()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_empty_dir_writes_full_vault()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_generated_suffix_doesnt_overwrite_literal()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_leading_dot_labels_are_not_hidden_filenames()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_never_emits_punctuation_only_filenames()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_preserves_existing_user_notes_and_obsidian_config()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_removed_node_returning_is_writable_again()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_rerun_prunes_removed_nodes()]] - `contains` [EXTRACTED]
+- [[test_to_obsidian_rerun_updates_own_notes_but_not_user_files()]] - `contains` [EXTRACTED]
+- [[to_canvas()]] - `imports` [EXTRACTED]
+- [[to_cypher()]] - `imports` [EXTRACTED]
+- [[to_graphml()]] - `imports` [EXTRACTED]
+- [[to_json()]] - `imports` [EXTRACTED]
+- [[to_obsidian()]] - `imports` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/test_exportpy

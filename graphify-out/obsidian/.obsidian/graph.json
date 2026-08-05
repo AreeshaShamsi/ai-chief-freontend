@@ -1,0 +1,4211 @@
+{
+  "colorGroups": [
+    {
+      "query": "tag:#community/test_detect.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/_read_text",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_extract.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/graphify/__main__.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/extract.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_languages.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/_make_id",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_js_import_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/detect.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_install.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_chunking.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/extract_js",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/classify_file",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_analyze.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_build.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_reflect.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/generate",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_llm_backends.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_dotnet.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_serve.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/_score_nodes",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/C",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/reflect.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/main",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/to_wiki",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_cache.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_codebuddy.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_export.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/extract_python",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/llm.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/extract",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/_edge_labels",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/extract_bash",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_watch.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_ruby_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/components/utils.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/build_from_json",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_pascal.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/_call_claude_cli",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/Workspace.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/build",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_image_vision.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/cache.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/_rebuild_code",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/_labels",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_install_references.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/dashboard/main.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/dispatch_command",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/gen.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_multigraph_diagnostics.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_hooks.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_cli_export.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_csharp_member_calls.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_devin.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/extract_files_direct",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/validate_extraction",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/graphify/build.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/to_json",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/claude_install",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/to_obsidian",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_labeling.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_security.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_indirect_dispatch.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/make_id",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_benchmark.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_skillgen.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/extract_objc",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/devDependencies",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/save_semantic_cache",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_mcp_ingest.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/ingest_scip_json",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/Graph",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/_load_graphifyignore",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/paths.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/file_hash",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/deduplicate_entities",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_file_slice.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_transcribe.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/graphify/__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_serve_http.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_dedup.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_scip_ingest.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/raw/analyze.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/Path",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/_relations",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/Path",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/Response",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/_parse_llm_json",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/remixed-a8e3cfa2_(3).tsx",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_querylog.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/BaseTransport",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/HttpClient",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/CreateCampaignModal.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/remixed-a8e3cfa2_(2).tsx",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/save_query_result",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/prs.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_manifest_ingest.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_explain_cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_minhash.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/hooks.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_query_induced_edges.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/StaffMemberForm.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/CallLogSection.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/install",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_prs.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/run_language_resolvers",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/render",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/exceptions.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/security.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_file_label_disambiguation.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/write_callflow_html",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_install_roundtrip.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_path_cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_office_limits.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_agents_platform.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_hook_guard.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_read_hook.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/_make_symbol_doc",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/render_all",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/Cookies",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/sample.swift",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/serve.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/scip_ingest.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/_find_node",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/introspect_cargo",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_vue_extraction.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/client.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/TasksSection.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_affected_cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/google_workspace.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/_fixture",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_incremental.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/generate_section_flowchart",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/dedup.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/CsharpNameResolver",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/extract_markdown",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/resolve_bash_source_edges",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/load_platforms",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/multigraph_compat.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_stat_index_portability.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_semantic_cleanup.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_search_hook.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/_key",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/extract_powershell",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/_check_shrink",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/skipif",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_extract_cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/_corpus",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_python_decorators.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/extract_dm",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/Counter",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/extract_json",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/extract_terraform",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/ingest.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_evidence_binding.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/_load_custom_providers",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/build_label_index",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_jsconfig_baseurl.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/_extract_sql_or_skip",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/manifest.json",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_settings_merge.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/pick_text",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/convert_office_file",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/extract_cpp",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/_get_extractor",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/extract_rust",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/sanitize_semantic_fragment",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_symbol_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_cpp_objc_cross_file_calls.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_extract_code_only_cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_go_builtin_call_targets.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_install_upgrade.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/parametrize",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/affected_nodes",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/callflow_html.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_cluster.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_cross_extension_reexport_self_cycle.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_multilang.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/_claude_artifacts",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_watch_manifest_location.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/sample.kt",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/_stale_graph_sources",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/backup_if_protected",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/fetch_worktrees",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/symbol_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/_run_extract",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_semantic_cache_out_root.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_ts_decorators.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/utils.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/sample.php",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/Window",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/ToolkitViewModel",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/typescript_advanced.ts",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/label_communities_by_hub",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/extract_powershell_manifest",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/_hooks_dir",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/_query_terms",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_semantic_similarity.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/Demo.ViewModels",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/string",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/DataProcessor",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/_semantic_id_remap",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/clear_cache",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/collect_files",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/_make_scip_node_id",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_indirect_call_nested_closure_shadow.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_java_member_calls.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_uninstall_scope.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/api.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/processor.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/Request",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/AccountService",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/validator.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/load_graph",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/extract_astro",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/resolve_python_import_guided_calls",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/TDataProcessor",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_file_node_id_spec.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_java_type_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_merge_chunks_validation.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/storage.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/sample.sv",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/safe_fetch",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/TestDart",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_extract_cache_location.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/_make_corpus",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_node_id_canonical.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_swift_cross_file_calls.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_ts_namespace.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/Geometry",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/sample.razor",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/geometry",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/DataProcessor",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/sample.go",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/Animal",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/Window",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/make_pr",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/sample.dmf",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/ScopedCallsUnit",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_csharp_partial_classes.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_extraction_spec_ids.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_src_layout_import_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_ts_inheritance.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/default_graph_json",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/_queue_pending",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/TestSubprocessEncoding",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_indirect_dispatch_getattr.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_install_strings.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_scala_self_type.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_ts_generators.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_typescript_module_extensions.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/parser.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/TextStylesGrid.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/ManageFieldsModal.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/dashboard/utils.jsx",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_corrupt_graph_json.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_merge_graphs_cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/_norm",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/compute_pr_impact",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/validate_graph_path",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/barrel_reexport.ts",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/TMainForm",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_warm_cache_from_another_root_does_not_leak_that_root",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_cjs_module_extension.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_indirect_dispatch_assign_return.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_kotlin_object_literal.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_pascal_call_scoping.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_wheel_packaging.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/compilerOptions",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/design-tokens/index.js",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/_communities_from_graph",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/ExtendedService",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_file_path_allowlist_accepts_windows_backslash_path",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_phantom_cross_package_call.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_php_type_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/monolith_roundtrip",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/render_always_on",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/sample.csproj",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/verilog.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/_replace_or_append_section",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/TBaseGadget",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/Config",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/sample_calls.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_cross_language_call_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_gemini_hook.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_god_nodes_cli.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_import_self_loops.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_swift_computed_properties.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/saxpy",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/semantic_cleanup.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/first_present",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/_is_variant_pair",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/load_validated_semantic_fragment",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/iter_raw_calls",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/gen_demo_path.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/sample.zig",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/sample.rb",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_antigravity_install.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_case_sensitive_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_falkordb_integration.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_phantom_external_import.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/schema_singleton",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_swift_builtin_noise.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_swift_import_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_ts_receiver_member_calls.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/DigestAuth",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/build_community_labels",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/_path_match",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/sanitize_label",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/Foo",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/sample_php_listen.php",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_crossfile_identical_labels_stay_distinct_for_guarded_types",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/_edges_with_relation",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_python_import_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/sample.c",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/normalize_sections",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/humanize_label",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/dynamic_import.ts",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/Widget",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/sample.sh",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/TSampleForm",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/sample_php_container.php",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/SampleSpec",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_builtin_global_type_refs.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_cli_broken_pipe.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/_write_graph",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/_seed_semantic_doc_graph",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/SamplePackage",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/pascal_resolution.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/_write_build_config",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/_sandbox_home",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/TOtherGadget",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/MyApp.Accounts.User",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/sample.luau",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/RateLimiter",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/ColorResolver",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/UserControl",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_js_exported_scalar_bindings.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/shapes",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/_detached_launch",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/_max_server_contexts",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/_MCPASGIApp",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/cjs_require.js",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/a/Logger.cpp",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/b/Logger.cpp",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/Server",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/Widget",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/App",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/sample.ts",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/Transformer",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/sample.slnx",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_extract_timing_flag_emits_stage_timings",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/_call_pairs",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/build_from_json",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/App.csproj",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/Dup",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/Dup",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/crate_a/src/lib.rs",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/AccountTrigger",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/sample.dmi",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/Foo",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/Foo",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_non_dict_input_returns_empty",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\env.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0002_add_preview_columns.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0003_make_siege_date_nullable.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0004_add_post_priority_config.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0005_add_description_to_post_priority_config.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0006_power_level_and_drop_sort_value.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0007_fix_group_number_max.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0008_add_matched_condition_id_to_position.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0009_add_discord_id_to_member.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0010_add_last_seen_changelog_at_to_member.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\alembic\\\\versions\\\\0011_add_post_suggest_preview.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\attack_day.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\auth.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\autofill.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\board.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\buildings.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\changelog.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\comparison.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\discord_sync.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\health.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\images.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\lifecycle.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\members.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\notifications.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\post_priority_config.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\post_suggestions.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\posts.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\reference.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\siege_members.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\sieges.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\validation.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\version.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\config.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\db\\\\base.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\db\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\db\\\\seeds.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\db\\\\session.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\dependencies\\\\auth.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\dependencies\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\main.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\middleware.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\building_group.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\building.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\building_type_config.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\enums.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\member_post_preference.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\member.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\notification_batch.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\notification_batch_result.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\position.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\post_active_condition.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\post_condition.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\post_priority_config.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\post.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\siege_member.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\models\\\\siege.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\rate_limit.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\attack_day.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\autofill.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\board.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\building.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\changelog.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\common.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\comparison.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\member.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\post_condition.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\post.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\post_suggestions.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\siege_member.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\siege.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\validation.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\schemas\\\\version.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\attack_day.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\autofill.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\board.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\bot_client.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\building_capacity.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\buildings.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\comparison.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\discord_sync.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\image_gen.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\lifecycle.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\members.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\notification_message.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\post_suggestions.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\posts.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\reference.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\siege_members.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\sieges.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\services\\\\validation.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\telemetry.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\scripts\\\\seed_demo.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\scripts\\\\seed.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\conftest.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_attack_day.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_auth.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_auth_rate_limit.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_autofill.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_board.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_bot_client.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_buildings.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_changelog.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_comparison.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_config_endpoint.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_config.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_cors.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_discord_sync.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_enums.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_health.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_image_gen.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_lifecycle_integration.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_lifecycle.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_member_changelog_column.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_members.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_notification_message.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_notifications.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_post_suggestions_integration.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_post_suggestions.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_posts.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_reference.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_schema.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_seed_canonical.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_seed_demo.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_sieges.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_telemetry.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_validation.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\tests\\\\test_version.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\app\\\\config.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\app\\\\discord_client.py",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\app\\\\http_api.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\app\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\app\\\\telemetry.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\tests\\\\conftest.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\tests\\\\__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\tests\\\\test_discord_client.py",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\tests\\\\test_get_guild_member.py",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\tests\\\\test_http_api.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\bot\\\\tests\\\\test_telemetry.py",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\e2e\\\\board.spec.ts",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\e2e\\\\siege-lifecycle.spec.ts",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\e2e\\\\smoke.spec.ts",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\eslint.config.js",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\playwright.config.ts",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\postcss.config.js",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\api\\\\board.ts",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\api\\\\changelog.ts",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\api\\\\client.ts",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\api\\\\config.ts",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\api\\\\members.ts",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\api\\\\notifications.ts",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\App.tsx",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\main.tsx",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\src\\\\vite-env.d.ts",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\tailwind.config.ts",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\vite.config.ts",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\frontend\\\\vitest.config.ts",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/.get",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/no_tokenizer",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_pass2_winner_union_does_not_pull_in_uncompared_same_label_nodes",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_dedup_does_not_merge_crossfile_document_headings",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_dedup_still_merges_crossfile_true_duplicates",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_cross_chunk_id_collision_emits_warning",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_dedup_summary_prints_fuzzy_count_when_no_exact_merges",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_cross_file_id_collision_does_not_mix_attributes",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_dedup_survivor_does_not_inherit_false_origin_ast",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_dedup_fills_explicit_none_attribute",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_crossfile_one_char_typo_concepts_still_merge",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_negation_does_not_disable_directory_pruning",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_extract_tsx_finds_helpers_and_component",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_barrel_reexport_emits_imports_from",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_barrel_local_exports_still_extracted",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_extract_js_member_require_emits_property_symbol",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_go_method_declaration_emits_refs_only_when_name_present",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_rust_no_cross_crate_spurious_edges",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_sql_cross_file_fk_resolves_and_never_leaks_scan_path",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_symbol_trailing_hash_no_display_name_has_non_empty_label",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_relationship_target_unknown_emits_stub_node",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_non_string_relative_path_falls_back_to_default",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_non_string_language_falls_back",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_documents_field_non_list_returns_empty",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_occurrence_negative_line_falls_back_to_zero",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_unique_cross_document_symbol_still_resolves",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_relationship_truthy_string_flag_is_ignored",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_relationship_int_flag_is_ignored",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_relationship_boolean_true_routes_correctly",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_multiple_symbols_in_one_document",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_multiple_documents",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_documents_empty_list",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_edge_source_location_from_first_occurrence",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_single_symbol_no_relationships",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_duplicate_symbols_in_same_file_are_deduplicated",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_document_item_not_a_dict_is_skipped",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_symbol_without_symbol_id_is_skipped",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_document_without_symbols_key",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_symbol_without_kind_defaults_to_unknown",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_document_relative_path_overrides_source_file_param",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_symbol_with_short_range_uses_first_element_as_line",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_symbol_with_documentation_becomes_description",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_symbol_with_empty_documentation_skips_description",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_ingest_edge_with_zero_sourceline_has_empty_location",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/AI_Chief/.obsidian/app.json",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/.eslintrc.cjs",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/.obsidian/app.json",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/graphifyy",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/RecordDetailsModal",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/RowDetailsModal",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/exporters/__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/plain.h",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/sample.dmm",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/distance",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/.buildRequest",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/.get",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/.post",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/ButtonOKClick",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/TButton",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/x",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/y",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/z",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/.log",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/.run",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/sample.psd1",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/.fetch",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/.run",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/.buildRequest",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/.get",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/.post",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/Int",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/.log",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/.run",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/tests/__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/tools/__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/vite.config.js",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/main",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    }
+  ]
+}

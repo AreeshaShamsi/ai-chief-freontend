@@ -70,8 +70,10 @@ PageSection.propTypes = {
 };
 
 function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCampaign }) {
+  const [localData, setLocalData] = useState(data);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [activeTableId, setActiveTableId] = useState(localData?.tables?.[0]?.id);
 
   if (!data) {
     return null;
@@ -85,13 +87,31 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
     }
   };
 
+  const handleTableCreated = (table) => {
+    setLocalData((prev) => ({
+      ...prev,
+      tables: [...prev.tables, table],
+    }));
+  };
+
+  const handleTableDeleted = (tableId) => {
+    setLocalData((prev) => ({
+      ...prev,
+      tables: prev.tables.filter((t) => t.id !== tableId),
+    }));
+    if (activeTableId === tableId) {
+      setActiveTableId(localData.tables[0].id);
+    }
+  };
+
   const addRecord = () => {
     console.log("Add record");
   }
 
   const handleCampaignCreate = async (modal_data) => {
-    const fields = data.tables[0].fields;
-    const rows = data.tables[0].rows;
+    const activeTable = localData.tables.find(t => t.id === activeTableId) || localData.tables[0];
+    const fields = activeTable.fields;
+    const rows = activeTable.rows;
 
     const fieldMap = Object.fromEntries(
       fields.map((field) => [field.name, field.id])
@@ -113,8 +133,8 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
     let selected_row_ids = [];
 
     if (modal_data.recordType === "custom") {
-      startRowId = rows[Number(modal_data.startRow) - 1].id;
-      endRowId = rows[Number(modal_data.endRow) - 1].id;
+      startRowId = rows[Number(modal_data.startRow) - 1]?.id || startRowId;
+      endRowId = rows[Number(modal_data.endRow) - 1]?.id || endRowId;
     } else if (modal_data.recordType === "selected") {
       selected_row_ids = selectedRows.map((r) => r.id);
       startRowId = null;
@@ -124,7 +144,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
     const payload = {
       company_id,
       name: modal_data.campaignName,
-      table_id: data.tables[0].id,
+      table_id: activeTable.id,
       start_row_id: startRowId,
       end_row_id: endRowId,
       selected_row_ids,
@@ -143,15 +163,18 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
 
   return (
     <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
-      {showCreateModal && (
-        <CreateCampaignSelectionModal
-          selectedCount={selectedRows.length}
-          totalRecords={data.tables[0].rows.length}
+      {showCreateModal && (() => {
+        const activeTable = localData.tables.find(t => t.id === activeTableId) || localData.tables[0];
+        return (
+          <CreateCampaignSelectionModal
+            selectedCount={selectedRows.length}
+            totalRecords={activeTable.rows.length}
           onClose={() => setShowCreateModal(false)}
           onContinue={async (modal_data) => {
             await handleCampaignCreate(modal_data);
           }} />
-      )}
+        );
+      })()}
       <PageSection>
         <header
           style={{
@@ -192,14 +215,15 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
         </header>
         <Workspace
           workspaceId="contacts"
-          workspaceData={data}
-          columns={data.tables[0].fields}
-          rowData={data.tables[0].rows}
-
-
+          workspaceData={localData}
           activeTab={activeTab}
           onTabChange={onTabChange}
           onSelectionChanged={setSelectedRows}
+          onActiveViewChange={(newViewId) => {
+            setActiveTableId(newViewId);
+          }}
+          onTableCreated={handleTableCreated}
+          onTableDeleted={handleTableDeleted}
         />
       </PageSection>
     </div>

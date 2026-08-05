@@ -1,0 +1,17 @@
+---
+source_file: "temp-graphify/worked/rsl-siege-manager/manifest.json"
+type: "code"
+community: "I:\\\\games\\\\raid\\\\siege-web\\\\.worktrees\\\\experiment-graphify-dry-run-doc\\\\backend\\\\app\\\\api\\\\version.py"
+location: "L159"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/Igamesraidsiege-webworktreesexperiment-graphify-dry-run-docbackendappapiversionpy
+---
+
+# mtime
+
+## Connections
+- [[Igamesraidsiege-web.worktreesexperiment-graphify-dry-run-docbackendappapiversion.py]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/Igamesraidsiege-webworktreesexperiment-graphify-dry-run-docbackendappapiversionpy

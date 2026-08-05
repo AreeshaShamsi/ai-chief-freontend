@@ -1,0 +1,21 @@
+---
+source_file: "temp-graphify/tests/test_serve.py"
+type: "code"
+community: "test_serve.py"
+location: "L175"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/test_servepy
+---
+
+# test_score_nodes_coverage_full_coverage_query_is_unchanged()
+
+## Connections
+- [[Coverage scaling must not touch full-coverage queries (coverage == 1). A…]] - `rationale_for` [EXTRACTED]
+- [[_compute_idf()]] - `calls` [EXTRACTED]
+- [[_make_graph()_4]] - `calls` [EXTRACTED]
+- [[_score_nodes()]] - `calls` [EXTRACTED]
+- [[test_serve.py]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/test_servepy
