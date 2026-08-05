@@ -1154,6 +1154,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
         transition: isResizing ? "none" : layoutTransition,
         display: "flex",
         flexDirection: "column",
+        minHeight: 0,
       }}
 
     >
@@ -1167,6 +1168,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
           pointerEvents: isHidden ? "none" : "auto",
           display: "flex",
           flexDirection: "column",
+          minHeight: 0,
         }}
       >
         <div style={{ position: "relative" }}>
