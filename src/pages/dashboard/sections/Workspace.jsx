@@ -301,6 +301,8 @@ function SearchBox({ value, onChange, placeholder, width = 190 }) {
         style={{
           height: 30,
           paddingLeft: 30,
+        }}
+      />
     </div>
   );
 }
@@ -2567,7 +2569,7 @@ export function Workspace({
 
   return (
     <>
-      <AppCard variant="compact" style={{ ...cardFrameStyle, padding: 0, marginTop: T.spacing[4], overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <AppCard variant="compact" style={{ ...cardFrameStyle, padding: 0, marginTop: T.spacing[4], overflow: "hidden", display: "flex", flexDirection: "column", height: "calc(100dvh - 180px)" }}>
         <div style={{ padding: T.spacing[4], borderBottom: `1px solid ${C.border}` }}>
           <WorkspaceToolbar
             workspaceId={effectiveWorkspaceId}
@@ -2596,7 +2598,7 @@ export function Workspace({
           </div>
         ) : (
           <>
-            <div style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", flex: "1 1 0%", minHeight: 400 }}>
+            <div style={{ display: "flex", alignItems: "stretch", flexWrap: "nowrap", flex: "1 1 0%", minHeight: 0 }}>
               <WorkspaceViewsPanel
                 isHidden={isViewsPanelHidden || Boolean(config?.hideViewsPanel)}
                 viewsList={viewsList}

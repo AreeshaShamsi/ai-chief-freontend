@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FiCalendar, FiClock, FiX } from "react-icons/fi";
-import { AppButton, C, ModalOverlay, T, Text, TextField } from "../../../components/utils";
+import { AppButton, C, T, Text, TextField } from "../../../components/utils";
 
 export default function ScheduleMeetingModal({ onClose, contactName }) {
   const [date, setDate] = useState("");
@@ -13,9 +13,23 @@ export default function ScheduleMeetingModal({ onClose, contactName }) {
   };
 
   return (
-    <ModalOverlay onClose={onClose}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      onMouseDown={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        background: "rgba(15, 23, 42, 0.58)",
+      }}
+    >
       <div
-        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
         style={{
           width: 400,
           background: C.card,
@@ -104,6 +118,6 @@ export default function ScheduleMeetingModal({ onClose, contactName }) {
           </AppButton>
         </footer>
       </div>
-    </ModalOverlay>
+    </div>
   );
 }
