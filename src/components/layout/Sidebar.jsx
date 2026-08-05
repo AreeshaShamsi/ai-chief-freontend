@@ -43,11 +43,11 @@ function Sidebar({ user = defaultUser }) {
           </div>
 
           <div className="min-w-0">
-            <div className="truncate text-[16px] font-semibold leading-5 text-white">
+            <div className="truncate text-[18px] font-semibold leading-6 text-white">
               AI Chief
             </div>
             <div
-              className="truncate text-[12px] font-normal leading-4 text-[var(--sidebar-muted)]"
+              className="truncate text-[13px] font-normal leading-4 text-[var(--sidebar-muted)]"
             >
               Real Estate
             </div>
@@ -61,7 +61,7 @@ function Sidebar({ user = defaultUser }) {
 
             return (
               <NavLink
-                className="flex h-[38px] w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[13px] font-medium leading-5 transition-colors hover:bg-[#111827]"
+                className="flex h-[46px] w-full items-center gap-3 rounded-lg px-3 text-left text-[15px] font-medium leading-6 transition-colors hover:bg-[#111827]"
                 key={item.path}
                 to={item.path}
                 aria-current={isActive ? "page" : undefined}
@@ -70,7 +70,7 @@ function Sidebar({ user = defaultUser }) {
                   color: isActive ? "#FFFFFF" : "var(--sidebar-muted)",
                 }}
               >
-                <Icon size={15} className="shrink-0" aria-hidden="true" />
+                <Icon size={20} className="shrink-0" aria-hidden="true" />
                 <span className="whitespace-nowrap">{item.label}</span>
               </NavLink>
             );
@@ -81,19 +81,19 @@ function Sidebar({ user = defaultUser }) {
       <div
         className="border-t border-t-[var(--sidebar-border-dark)] pt-3"
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <div
-            className="flex size-[36px] shrink-0 items-center justify-center rounded-full bg-[var(--sidebar-purple)] text-[12px] font-bold leading-none text-white"
+            className="flex size-[40px] shrink-0 items-center justify-center rounded-full bg-[var(--sidebar-purple)] text-[14px] font-bold leading-none text-white"
           >
             {initials}
           </div>
 
           <div className="min-w-0">
-            <div className="truncate text-[13px] font-semibold leading-4 text-white">
+            <div className="truncate text-[16px] font-semibold leading-6 text-white">
               {name}
             </div>
             <div
-              className="truncate text-[12px] font-normal leading-3 text-[var(--sidebar-muted)]"
+              className="truncate text-[14px] font-normal leading-5 text-[var(--sidebar-muted)]"
             >
               {role}
             </div>

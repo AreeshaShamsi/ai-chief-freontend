@@ -10,6 +10,8 @@ export default function BulkActionToolbar({
   onClearSelection,
   showStopCalls,
   onStopCalls,
+  showScheduleMeeting,
+  onScheduleMeeting,
 }) {
   const [showStopConfirm, setShowStopConfirm] = useState(false);
 
@@ -76,6 +78,24 @@ export default function BulkActionToolbar({
             </AppButton>
           )}
 
+          {showScheduleMeeting && selectedCount === 1 && (
+            <AppButton
+              compact
+              onClick={onScheduleMeeting}
+              aria-label="Schedule Meeting with selected"
+              style={{
+                background: C.accent,
+                color: "#ffffff",
+                border: "none",
+                gap: 6,
+              }}
+            >
+              <Text variant="label" color="#ffffff">
+                Schedule Meeting
+              </Text>
+            </AppButton>
+          )}
+
           <AppButton
             compact
             onClick={onDelete}
@@ -133,4 +153,6 @@ BulkActionToolbar.propTypes = {
   onClearSelection: PropTypes.func.isRequired,
   showStopCalls: PropTypes.bool,
   onStopCalls: PropTypes.func,
+  showScheduleMeeting: PropTypes.bool,
+  onScheduleMeeting: PropTypes.func,
 };

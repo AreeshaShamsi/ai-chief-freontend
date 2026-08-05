@@ -43,6 +43,7 @@ import { LuChevronDown, LuBookOpen, LuArrowUpAZ, LuArrowDownZA, LuEllipsisVertic
 import { FaStar } from "react-icons/fa";
 import { updateCellValue, addColumnValue, addRowValue, deleteRowValue, deleteRowsValue, duplicateRowValue, updateColumnValue, createBlankTable, importTable, renameTable, deleteTable, duplicateTable, deleteColumnValue, duplicateColumnValue, addUser, deleteUser, updateUser, appendTable } from "../../../api/workspace";
 import AddStaffMemberModal from "../modals/AddStaffMemberModal";
+import ScheduleMeetingModal from "../modals/ScheduleMeetingModal";
 import BulkActionToolbar from "../components/BulkActionToolbar";
 import { canModifyColumn } from "../utils/columnPermissions";
 
@@ -300,9 +301,6 @@ function SearchBox({ value, onChange, placeholder, width = 190 }) {
         style={{
           height: 30,
           paddingLeft: 30,
-          background: C.card,
-        }}
-      />
     </div>
   );
 }
@@ -1300,6 +1298,7 @@ function WorkspaceGrid({
     text: "",
     dealName: "",
   });
+  const [isScheduleMeetingModalOpen, setIsScheduleMeetingModalOpen] = useState(false);
   const [aiCallSummaryModal, setAiCallSummaryModal] = useState({
     isOpen: false,
     dealName: "",
@@ -1616,6 +1615,8 @@ function WorkspaceGrid({
         onClearSelection={handleClearSelection}
         showStopCalls={workspaceId === "deals" || workspaceId === "leads" || workspaceId === "contacts"}
         onStopCalls={handleStopBulkCalls}
+        showScheduleMeeting={workspaceId === "contacts"}
+        onScheduleMeeting={() => setIsScheduleMeetingModalOpen(true)}
       />
 
       {isBulkDeleteModalOpen && (
@@ -1701,6 +1702,13 @@ function WorkspaceGrid({
         callHistory={aiCallSummaryModal.callHistory}
         onClose={handleCloseAiCallSummary}
       />
+
+      {isScheduleMeetingModalOpen && (
+        <ScheduleMeetingModal
+          contactName={selectedGridRows[0]?.name || selectedGridRows[0]?.contactName || selectedGridRows[0]?.leadName || selectedGridRows[0]?.title || "Contact"}
+          onClose={() => setIsScheduleMeetingModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

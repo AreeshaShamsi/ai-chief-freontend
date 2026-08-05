@@ -325,4 +325,3 @@ function IntegrationSection() {
 }
 
 export default IntegrationSection;
-

@@ -78,8 +78,8 @@ function LeadCard({
 }) {
   return (
     <article className="mt-[10px] w-full overflow-hidden rounded-[18px] border border-[#BBD2FF] bg-white text-left font-[Inter,system-ui,sans-serif] shadow-none">
-      <div className="flex h-[34px] items-center justify-between bg-[#A9B5FF] px-[14px] text-[#4338CA]">
-        <p className="m-0 min-w-0 truncate text-[11px] font-medium leading-none">
+      <div className="flex min-h-[38px] items-center justify-between bg-[#A9B5FF] px-[14px] py-1 text-[#4338CA]">
+        <p className="m-0 min-w-0 text-sm font-medium leading-tight">
           Next: {nextAction} &mdash; {nextTime}
         </p>
         <span className="ml-2 shrink-0 text-[#6366F1]">
@@ -90,15 +90,15 @@ function LeadCard({
       <div className="flex flex-col gap-[13px] px-[18px] pb-[18px] pt-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center">
-            <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[#4867FF] text-[10px] font-bold leading-none text-white">
+            <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full bg-[#4867FF] text-xs font-bold leading-none text-white">
               {initials}
             </div>
-            <h3 className="m-0 ml-[14px] truncate text-[15px] font-bold leading-5 text-[#0F172A]">
+            <h3 className="m-0 ml-[14px] truncate text-base font-bold leading-5 text-[#0F172A]">
               {name}
             </h3>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1 text-[10px] font-medium leading-none text-[#94A3B8]">
+          <div className="flex shrink-0 items-center gap-1 text-xs font-medium leading-none text-[#94A3B8]">
             <ClockIcon />
             <span>{timeAgo}</span>
           </div>
@@ -107,7 +107,7 @@ function LeadCard({
         <div className="flex flex-wrap gap-[7px]">
           {tags.map((tag, index) => (
             <span
-              className="inline-flex h-[25px] items-center gap-1 rounded-[7px] border border-[#AFC2FF] bg-[#EEF2FF] px-2.5 text-[9px] font-medium leading-none text-[#4F46E5]"
+              className="inline-flex min-h-[28px] items-center gap-1.5 rounded-[7px] border border-[#AFC2FF] bg-[#EEF2FF] px-3 py-1 text-xs font-medium leading-none text-[#4F46E5]"
               key={tag}
             >
               {index === 0 ? <BuildingIcon /> : null}
@@ -120,7 +120,7 @@ function LeadCard({
           <span className="mt-0.5 shrink-0">
             <NoteArrowIcon />
           </span>
-          <p className="m-0 max-w-full text-[10px] font-medium leading-[1.45] text-[#334155]">
+          <p className="m-0 max-w-full text-[13px] font-medium leading-relaxed text-[#334155]">
             {message}
           </p>
         </div>
@@ -144,21 +144,21 @@ function LeadFollowUpCard({
   if (Array.isArray(leads)) {
     return (
       <section className="w-full rounded-[18px] bg-[#F3F4F6] p-[14px] text-left font-[Inter,system-ui,sans-serif] shadow-none">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-full bg-white text-[#EF4444]">
+            <span className="flex h-[32px] w-[32px] shrink-0 items-center justify-center rounded-full bg-white text-[#EF4444]">
               <FlameIcon />
             </span>
-            <h2 className="m-0 truncate text-xs font-bold leading-4 text-[#0F172A]">
+            <h2 className="m-0 truncate text-sm font-bold leading-5 text-[#0F172A]">
               {sectionTitle}
             </h2>
           </div>
-          <span className="inline-flex h-[23px] shrink-0 items-center rounded-full border border-[#E5E7EB] bg-white px-[9px] text-[9px] font-semibold leading-none text-[#0F172A]">
+          <span className="inline-flex h-[26px] shrink-0 items-center rounded-full border border-[#E5E7EB] bg-white px-3 text-xs font-semibold leading-none text-[#0F172A]">
             {leadCount ?? leads.length} leads
           </span>
         </div>
 
-        <div className="flex flex-col h-[30px] gap-0 scrollbar overflow-y-scroll scrollbar-hide">
+        <div className="flex flex-col gap-3 scrollbar overflow-y-auto scrollbar-hide">
           {leads.map((lead, index) => (
             <LeadCard key={lead.id || lead.name || index} {...lead} />
           ))}

@@ -69,11 +69,55 @@ PageSection.propTypes = {
   style: PropTypes.object,
 };
 
+const generateAllContactsTable = (tables) => {
+  if (!tables) return null;
+  const allContactsRows = [];
+  tables.forEach((table) => {
+    if (table.id === "all-contacts") return;
+    const phoneFieldId = table.fields.find(f => f.type === "Phone Number" || f.name.toLowerCase().includes("phone"))?.id;
+    const emailFieldId = table.fields.find(f => f.type === "Email" || f.name.toLowerCase().includes("email"))?.id;
+    const nameFieldId = table.fields.find(f => f.name.toLowerCase().includes("name") && !f.name.toLowerCase().includes("business"))?.id;
+    const businessFieldId = table.fields.find(f => f.name.toLowerCase().includes("business"))?.id;
+    const tagsFieldId = table.fields.find(f => f.type === "Multiple Select" || f.name.toLowerCase().includes("tag"))?.id;
+    
+    table.rows.forEach(row => {
+      allContactsRows.push({
+        id: `${table.id}-${row.id}`,
+        contactName: nameFieldId && row[nameFieldId] ? row[nameFieldId] : row.contactName || "—",
+        phone: phoneFieldId && row[phoneFieldId] ? row[phoneFieldId] : row.phone || "—",
+        email: emailFieldId && row[emailFieldId] ? row[emailFieldId] : row.email || "—",
+        businessName: businessFieldId && row[businessFieldId] ? row[businessFieldId] : row.businessName || "—",
+        created: row.created || "—",
+        lastActivity: row.lastActivity || "—",
+        tags: tagsFieldId && row[tagsFieldId] ? row[tagsFieldId] : row.tags || [],
+        sourceTable: table.name,
+      });
+    });
+  });
+
+  return {
+    id: "all-contacts",
+    name: "All Contacts",
+    fields: [
+      ...contactColumns,
+      { id: "sourceTable", name: "Source List", type: "Single Line Text", value: "Source List" }
+    ],
+    rows: allContactsRows
+  };
+};
+
 function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCampaign }) {
-  const [localData, setLocalData] = useState(data);
+  const [localData, setLocalData] = useState(() => {
+    if (!data || !data.tables) return data;
+    const allContacts = generateAllContactsTable(data.tables);
+    return {
+      ...data,
+      tables: allContacts ? [allContacts, ...data.tables.filter(t => t.id !== "all-contacts")] : data.tables
+    };
+  });
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [activeTableId, setActiveTableId] = useState(localData?.tables?.[0]?.id);
+  const [activeTableId, setActiveTableId] = useState(localData?.tables?.[0]?.id || "all-contacts");
 
   if (!data) {
     return null;
@@ -88,19 +132,28 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
   };
 
   const handleTableCreated = (table) => {
-    setLocalData((prev) => ({
-      ...prev,
-      tables: [...prev.tables, table],
-    }));
+    setLocalData((prev) => {
+      const newTables = [...prev.tables.filter(t => t.id !== "all-contacts"), table];
+      const allContacts = generateAllContactsTable(newTables);
+      return {
+        ...prev,
+        tables: [allContacts, ...newTables],
+      };
+    });
   };
 
   const handleTableDeleted = (tableId) => {
-    setLocalData((prev) => ({
-      ...prev,
-      tables: prev.tables.filter((t) => t.id !== tableId),
-    }));
+    if (tableId === "all-contacts") return;
+    setLocalData((prev) => {
+      const newTables = prev.tables.filter((t) => t.id !== tableId && t.id !== "all-contacts");
+      const allContacts = generateAllContactsTable(newTables);
+      return {
+        ...prev,
+        tables: [allContacts, ...newTables],
+      };
+    });
     if (activeTableId === tableId) {
-      setActiveTableId(localData.tables[0].id);
+      setActiveTableId("all-contacts");
     }
   };
 
