@@ -166,14 +166,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
     const fields = activeTable.fields;
     const rows = activeTable.rows;
 
-    const fieldMap = Object.fromEntries(
-      fields.map((field) => [field.name, field.id])
-    );
-
-    const field_mapping = {
-      phone: fieldMap["Phone"],
-      prospect_name: fieldMap["Contact Name"],
-    };
+    const field_mapping = modal_data.fieldMapping || {};
 
     const static_fields = {
       company_name: localStorage.getItem("company_name"),
@@ -222,10 +215,12 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
           <CreateCampaignSelectionModal
             selectedRows={selectedRows}
             totalRecords={activeTable.rows.length}
+            tableFields={activeTable.fields}
             onClose={() => setShowCreateModal(false)}
             onContinue={async (modal_data) => {
               await handleCampaignCreate(modal_data);
-            }} />
+            }}
+          />
         );
       })()}
       <PageSection style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>

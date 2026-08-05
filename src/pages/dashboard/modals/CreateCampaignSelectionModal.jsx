@@ -10,6 +10,7 @@ import {
   TextField,
   Text,
 } from "../../../components/utils";
+import { FiTrash2 } from "react-icons/fi";
 import { getSummary } from "../../../api/dashboard";
 
 function ModalHeader({ title, onClose }) {
@@ -111,7 +112,7 @@ SelectRecordOption.propTypes = {
   disabled: PropTypes.bool,
 };
 
-export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedRows, totalRecords = 0 }) {
+export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedRows = [], totalRecords = 0, tableFields = [] }) {
   const [actionType, setActionType] = useState("new");
   const [recordType, setRecordType] = useState("all");
   const [startRow, setStartRow] = useState("1");
@@ -124,6 +125,13 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
 
   const [callType, setCallType] = useState(company_id === "0" ? "real_estate_internal" : "real_estate_cold_call");
   const selectedCount = selectedRows.length || 0;
+
+  // Field mapping and Context state
+  const defaultPhoneField = tableFields.find(f => f.name.toLowerCase().includes("phone") || f.type === "Phone Number")?.id || "";
+  const defaultNameField = tableFields.find(f => f.name.toLowerCase().includes("name") && !f.name.toLowerCase().includes("business"))?.id || "";
+  
+  const [mappedPhone, setMappedPhone] = useState(defaultPhoneField);
+  const [mappedProspectName, setMappedProspectName] = useState(defaultNameField);
 
   useEffect(() => {
     async function loadCampaigns() {
@@ -145,6 +153,11 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
   }, []);
 
   const handleContinue = () => {
+    const fieldMapping = { 
+      phone: mappedPhone,
+      prospect_name: mappedProspectName,
+    };
+
     if (onContinue) {
       onContinue({
         actionType,
@@ -154,6 +167,7 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
         endRow,
         callType,
         scheduledTime,
+        fieldMapping,
       });
     }
     onClose?.();
@@ -168,6 +182,8 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
           display: "flex",
           flexDirection: "column",
           gap: T.spacing[4],
+          maxHeight: "70vh",
+          overflowY: "auto",
         }}
       >
         <div style={{ display: "flex", gap: 12, marginBottom: 8 }}>
@@ -239,8 +255,8 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
                 <option value="" disabled>Loading campaigns...</option>
               ) : (
                 existingCampaigns.map((camp) => (
-                  <option key={camp.id} value={camp.name}>
-                    {camp.name}
+                  <option key={camp.campaign_id || camp.id} value={camp.campaign_name || camp.name || camp.title}>
+                    {camp.campaign_name || camp.name || camp.title}
                   </option>
                 ))
               )}
@@ -404,6 +420,83 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
             }}
           />
         </div>
+
+        {/* Variable Mapping Section */}
+        <div
+          style={{
+            background: C.surface,
+            padding: T.spacing[3],
+            borderRadius: T.radius.md,
+            border: `1px solid ${C.borderLt}`,
+          }}
+        >
+          <Text
+            as="div"
+            style={{
+              color: C.text,
+              fontSize: T.font.size.bodySmall,
+              fontWeight: T.font.weight.bold,
+              marginBottom: 12,
+            }}
+          >
+            Variable Mapping
+          </Text>
+          
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+            <div>
+              <label style={{ display: "block", fontSize: 12, color: C.text, marginBottom: 4, fontWeight: T.font.weight.semibold }}>
+                Phone (Required)
+              </label>
+              <select
+                value={mappedPhone}
+                onChange={(e) => setMappedPhone(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: 32,
+                  padding: "0 8px",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: T.radius.sm,
+                  background: C.surface,
+                  color: C.text,
+                  fontSize: 12,
+                  outline: "none",
+                }}
+              >
+                <option value="">Select Column...</option>
+                {tableFields.map(f => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label style={{ display: "block", fontSize: 12, color: C.text, marginBottom: 4, fontWeight: T.font.weight.semibold }}>
+                Prospect Name (Required)
+              </label>
+              <select
+                value={mappedProspectName}
+                onChange={(e) => setMappedProspectName(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: 32,
+                  padding: "0 8px",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: T.radius.sm,
+                  background: C.surface,
+                  color: C.text,
+                  fontSize: 12,
+                  outline: "none",
+                }}
+              >
+                <option value="">Select Column...</option>
+                {tableFields.map(f => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+        </div>
       </div>
       <div
         style={{
@@ -417,7 +510,7 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
         <AppButton onClick={() => onClose?.()} compact>
           Cancel
         </AppButton>
-        <AppButton disabled={!campaignName.trim()} variant="primary" compact onClick={handleContinue}>
+        <AppButton disabled={!campaignName.trim() || !mappedPhone || !mappedProspectName} variant="primary" compact onClick={handleContinue}>
           Continue
         </AppButton>
       </div>
@@ -429,4 +522,5 @@ CreateCampaignSelectionModal.propTypes = {
   onClose: PropTypes.func,
   onContinue: PropTypes.func,
   selectedCount: PropTypes.number,
+  tableFields: PropTypes.array,
 };
