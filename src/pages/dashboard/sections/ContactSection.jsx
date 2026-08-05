@@ -147,7 +147,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
       table_id: activeTable.id,
       start_row_id: startRowId,
       end_row_id: endRowId,
-      selected_row_ids,
+      row_ids: selected_row_ids,
       script_type: modal_data.callType || (company_id === "0" ? "real_estate_internal" : "real_estate_cold_call"),
       campaign_type: "leads_uploaded",
       field_mapping,
@@ -167,12 +167,12 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
         const activeTable = localData.tables.find(t => t.id === activeTableId) || localData.tables[0];
         return (
           <CreateCampaignSelectionModal
-            selectedCount={selectedRows.length}
+            selectedRows={selectedRows}
             totalRecords={activeTable.rows.length}
-          onClose={() => setShowCreateModal(false)}
-          onContinue={async (modal_data) => {
-            await handleCampaignCreate(modal_data);
-          }} />
+            onClose={() => setShowCreateModal(false)}
+            onContinue={async (modal_data) => {
+              await handleCampaignCreate(modal_data);
+            }} />
         );
       })()}
       <PageSection>

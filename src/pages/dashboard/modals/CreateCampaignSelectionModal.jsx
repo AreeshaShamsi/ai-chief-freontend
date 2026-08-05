@@ -111,16 +111,19 @@ SelectRecordOption.propTypes = {
   disabled: PropTypes.bool,
 };
 
-export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedCount = 0, totalRecords = 0 }) {
+export default function CreateCampaignSelectionModal({ onClose, onContinue, selectedRows, totalRecords = 0 }) {
   const [actionType, setActionType] = useState("new");
   const [recordType, setRecordType] = useState("all");
   const [startRow, setStartRow] = useState("1");
   const [endRow, setEndRow] = useState("100");
   const [campaignName, setCampaignName] = useState("");
-  const [callType, setCallType] = useState("real_estate_cold_call");
   const [scheduledTime, setScheduledTime] = useState("");
   const [existingCampaigns, setExistingCampaigns] = useState([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
+  const company_id = localStorage.getItem("company_id");
+
+  const [callType, setCallType] = useState(company_id === "0" ? "real_estate_internal" : "real_estate_cold_call");
+  const selectedCount = selectedRows.length || 0;
 
   useEffect(() => {
     async function loadCampaigns() {
@@ -353,9 +356,19 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
               boxSizing: "border-box",
               cursor: "pointer",
             }}
-          >
-            <option value="real_estate_cold_call">Cold Call</option>
-            <option value="requirement_gathering">Requirement Gathering</option>
+          > {company_id === "0" ? (
+            <>
+              <option value="real_estate_internal_cold_call">Cold Call</option>
+
+              <option value="real_estate_internal_cold_call_detailed">Detailed Cold Call</option>
+            </>
+          ) : (
+            <>
+              <option value="real_estate_cold_call">Cold Call</option>
+              <option value="real_estate_requirement">Requirement Gathering</option>
+            </>
+
+          )}
           </select>
         </div>
 

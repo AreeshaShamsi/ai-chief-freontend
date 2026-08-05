@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+.firebase
+.firebase/*
+
 .env
 .env.development
 .env.production

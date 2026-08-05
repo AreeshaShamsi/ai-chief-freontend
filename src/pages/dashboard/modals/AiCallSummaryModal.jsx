@@ -298,6 +298,7 @@ const CALL_OUTCOME_COLORS = {
 function HistoryCallCard({ call, index }) {
   const scoreColors = CALL_OUTCOME_COLORS[call.score] || CALL_OUTCOME_COLORS.cold;
 
+  console.log(call);
   return (
     <div
       style={{
@@ -332,7 +333,7 @@ function HistoryCallCard({ call, index }) {
           >
             Call #{index + 1}
           </span>
-          {call.date && (
+          {call.date_time_of_call && (
             <span
               style={{
                 color: C.muted,
@@ -343,7 +344,10 @@ function HistoryCallCard({ call, index }) {
               }}
             >
               <FiClock size={11} />
-              {call.date}
+              {new Date(call.date_time_of_call).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
             </span>
           )}
         </div>
@@ -360,7 +364,7 @@ function HistoryCallCard({ call, index }) {
               textTransform: "capitalize",
             }}
           >
-            {call.score}
+            {call.lead_status}
           </span>
         )}
       </div>
@@ -393,7 +397,7 @@ function HistoryCallCard({ call, index }) {
       )}
 
       {/* Row 3: AI Summary */}
-      {call.aiSummary && (
+      {call.ai_generated_call_summary && (
         <div>
           <span
             style={{
@@ -414,13 +418,13 @@ function HistoryCallCard({ call, index }) {
               lineHeight: 1.5,
             }}
           >
-            {call.aiSummary}
+            {call.ai_generated_call_summary}
           </p>
         </div>
       )}
 
       {/* Row 4: Next Action */}
-      {call.nextAction && (
+      {call.next_action && (
         <div>
           <span
             style={{
@@ -441,7 +445,7 @@ function HistoryCallCard({ call, index }) {
               lineHeight: 1.5,
             }}
           >
-            {call.nextAction}
+            {call.next_action}
           </p>
         </div>
       )}
@@ -461,6 +465,7 @@ HistoryCallCard.propTypes = {
 };
 
 function CallHistoryTab({ callHistory, dealName }) {
+  console.log(callHistory);
   if (!callHistory || callHistory.length === 0) {
     return (
       <div
@@ -532,7 +537,7 @@ export default function AiCallSummaryModal({
   onClose,
 }) {
   const [activeTab, setActiveTab] = useState("summary");
-
+  console.log("callHistory", callHistory);
   if (!isOpen) return null;
 
   return (

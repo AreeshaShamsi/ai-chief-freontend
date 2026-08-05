@@ -13,8 +13,8 @@ import {
 function StatusPill({ status }) {
   let label = "Completed";
   let variant = "neutral";
-  
-  if (status === "active" || status === "running") {
+
+  if (status === "active" || status === "running" || status === "pending") {
     label = "Running";
     variant = "primary";
   } else if (status === "paused") {
@@ -35,7 +35,7 @@ function StatusPill({ status }) {
 function ColdCampaignCard({ cp, stat = {} }) {
   console.log(cp);
   const [status, setStatus] = useState(cp.status || "active");
-  
+
   const called = cp.total_calls || cp.total_calls || 0;
   const total = cp.total_leads_to_calls || 0;
   const pct = total > 0 ? Math.round((called / total) * 100) : 0;

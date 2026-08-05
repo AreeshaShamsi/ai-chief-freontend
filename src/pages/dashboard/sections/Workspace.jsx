@@ -1358,14 +1358,14 @@ function WorkspaceGrid({
       const rowData = event.data || {};
       const dealTitle = rowData.name || rowData.dealName || rowData.leadName || rowData.contactName || rowData.title || rowData.clientName || "";
       const summaryData = rowData.aiCallSummaryData || {};
-      const summaryText = summaryData.summary || (event.value !== null && event.value !== undefined ? String(event.value) : "");
+      const summaryText = (event.value !== null && event.value !== undefined ? String(event.value) : "");
 
       setAiCallSummaryModal({
         isOpen: true,
         dealName: dealTitle,
         summary: summaryText,
-        transcript: summaryData.transcript || [],
-        callHistory: summaryData.callHistory || [],
+        transcript: rowData.messages || [],
+        callHistory: rowData.call_logs || [],
       });
 
       if (event.api && event.api.stopEditing) {
