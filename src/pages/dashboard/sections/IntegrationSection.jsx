@@ -9,6 +9,9 @@ import magicbricksLogo from "/MagicBricks.png";
 import Acres99ConnectorModal from "../modals/Acres99ConnectorModal";
 import HousingConnectorModal from "../modals/HousingConnectorModal";
 import MagicBricksConnectorModal from "../modals/MagicBricksConnectorModal";
+import GoogleCalendarConnectorModal from "../modals/GoogleCalendarConnectorModal";
+import GoogleAdsConnectorModal from "../modals/GoogleAdsConnectorModal";
+import googleCalLogo from "../../../assets/logos/google-calender.png";
 
 const integrations = [
   {
@@ -22,10 +25,19 @@ const integrations = [
   {
     title: "Google Ads",
     text: "Connect your Google Ads account to track campaigns, sync leads automatically, and measure ROI directly from your CRM.",
-    action: "Manage",
+    action: "Connect",
     logoSrc: googleAdsLogo,
     iconBg: "transparent",
     logoWidth: 22,
+  },
+  {
+    title: "Google Calendar",
+    text: "Connect your Google Calendar to seamlessly schedule meetings, sync availability, and manage appointments with leads directly from your CRM.",
+    action: "Connect",
+    logoSrc: googleCalLogo,
+    iconBg: "transparent",
+    logoWidth: 26,
+    logoHeight: 26,
   },
   {
     title: "99acres",
@@ -214,6 +226,8 @@ function IntegrationSection() {
   const [show99acres,     setShow99acres]     = useState(false);
   const [showHousing,     setShowHousing]     = useState(false);
   const [showMagicBricks, setShowMagicBricks] = useState(false);
+  const [showGoogleCalendar, setShowGoogleCalendar] = useState(false);
+  const [showGoogleAds, setShowGoogleAds] = useState(false);
 
   return (
     <div
@@ -293,6 +307,8 @@ function IntegrationSection() {
               integration.title === "99acres"     ? () => setShow99acres(true)
             : integration.title === "Housing.com" ? () => setShowHousing(true)
             : integration.title === "MagicBricks" ? () => setShowMagicBricks(true)
+            : integration.title === "Google Calendar" ? () => setShowGoogleCalendar(true)
+            : integration.title === "Google Ads" ? () => setShowGoogleAds(true)
             : undefined
             }
           />
@@ -302,6 +318,8 @@ function IntegrationSection() {
       {show99acres     && <Acres99ConnectorModal     onClose={() => setShow99acres(false)}     />}
       {showHousing     && <HousingConnectorModal     onClose={() => setShowHousing(false)}     />}
       {showMagicBricks && <MagicBricksConnectorModal onClose={() => setShowMagicBricks(false)} />}
+      {showGoogleCalendar && <GoogleCalendarConnectorModal onClose={() => setShowGoogleCalendar(false)} />}
+      {showGoogleAds && <GoogleAdsConnectorModal onClose={() => setShowGoogleAds(false)} />}
     </div>
   );
 }
