@@ -2083,6 +2083,8 @@ export function Workspace({
   onTableUpdated,
   onSelectionChanged,
   onActiveViewChange: onActiveViewChangeProp,
+  height,
+  flex,
 }) {
   if (!workspaceData) return null;
   const [internalTab, setInternalTab] = useState(activeTabProp || workspaceId || "deals");
@@ -2571,7 +2573,7 @@ export function Workspace({
 
   return (
     <>
-      <AppCard variant="compact" style={{ ...cardFrameStyle, padding: 0, marginTop: T.spacing[4], overflow: "hidden", display: "flex", flexDirection: "column", height: "calc(100dvh - 180px)" }}>
+      <AppCard variant="compact" style={{ ...cardFrameStyle, padding: 0, marginTop: T.spacing[4], overflow: "hidden", display: "flex", flexDirection: "column", height: height || (flex ? undefined : "calc(100dvh - 180px)"), flex: flex }}>
         <div style={{ padding: T.spacing[4], borderBottom: `1px solid ${C.border}` }}>
           <WorkspaceToolbar
             workspaceId={effectiveWorkspaceId}

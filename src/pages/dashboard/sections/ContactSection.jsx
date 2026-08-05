@@ -215,7 +215,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
   };
 
   return (
-    <div style={{ minHeight: "100%", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100dvh", width: "100%", background: C.backgroundPrimary, padding: T.spacing.page, boxSizing: "border-box" }}>
       {showCreateModal && (() => {
         const activeTable = localData.tables.find(t => t.id === activeTableId) || localData.tables[0];
         return (
@@ -228,7 +228,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
             }} />
         );
       })()}
-      <PageSection>
+      <PageSection style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
         <header
           style={{
             marginBottom: 18,
@@ -277,6 +277,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
           }}
           onTableCreated={handleTableCreated}
           onTableDeleted={handleTableDeleted}
+          flex={1}
         />
       </PageSection>
     </div>
