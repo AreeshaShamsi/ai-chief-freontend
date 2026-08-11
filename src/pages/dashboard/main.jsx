@@ -13,7 +13,7 @@ import KnowledgeBaseSection from "./sections/KnowledgeBaseSection";
 import { API_URL } from "../../config/main";
 import Loader from "../../components/Loader";
 import { C, T } from "../../components/utils";
-import { getActivity, getContact, getSummary, getUser, getKnowledgeBase, getDeals } from "../../api/dashboard";
+import { getActivity, getContact, getSummary, getUser, getKnowledgeBase, getDeals, getIntegration } from "../../api/dashboard";
 
 const pathToTab = {
     "/dashboard": "dashboard",
@@ -49,6 +49,7 @@ export default function DashboardMain() {
     const [contactData, setContactData] = useState(null);
     const [knowledgeBaseData, setKnowledgeBaseData] = useState(null);
     const [dealsData, setDealsData] = useState(null);
+    const [integrationsData, setIntegrationsData] = useState(null);
 
     const [loading, setLoading] = useState(false);
 
@@ -111,13 +112,23 @@ export default function DashboardMain() {
         return data;
     };
 
+    const fetchIntegrations = async () => {
+        const company_id = localStorage.getItem("company_id");
+        if (!company_id) return;
+        const res = await getIntegration(company_id);
+        const data = res
+        setIntegrationsData(data);
+        console.log(data);
+        return data;
+    };
+
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const company_id = localStorage.getItem("company_id");
-                
+
                 let needsLoading = false;
                 if ((tab === "dashboard" || tab === "campaigns") && !summaryData) needsLoading = true;
                 if (tab === "calls" && !activityData) needsLoading = true;
@@ -125,6 +136,7 @@ export default function DashboardMain() {
                 if (tab === "contact" && !contactData) needsLoading = true;
                 if (tab === "kb" && !knowledgeBaseData) needsLoading = true;
                 if (tab === "deals" && !dealsData) needsLoading = true;
+                if (tab === "integration" && !dealsData) needsLoading = true;
 
                 if (needsLoading) setLoading(true);
 
@@ -165,6 +177,12 @@ export default function DashboardMain() {
                         await fetchDeals();
                     }
                 }
+
+                if (tab === "integration") {
+                    if (!integrationsData) {
+                        await fetchIntegrations();
+                    }
+                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -191,7 +209,7 @@ export default function DashboardMain() {
                 {tab === "calls" && <CallLogSection data={activityData} />}
                 {tab === "kb" && <KnowledgeBaseSection data={knowledgeBaseData} />}
                 {tab === "contact" && <ContactSection data={contactData} />}
-                {tab === "integration" && <IntegrationSection />}
+                {tab === "integration" && <IntegrationSection data={integrationsData} />}
                 {tab === "settings" && <SettingsSection data={userData} />}
                 {tab === "tasks" && <TasksSection />}
             </main>

@@ -12,61 +12,9 @@ import MagicBricksConnectorModal from "../modals/MagicBricksConnectorModal";
 import GoogleCalendarConnectorModal from "../modals/GoogleCalendarConnectorModal";
 import GoogleAdsConnectorModal from "../modals/GoogleAdsConnectorModal";
 import googleCalLogo from "../../../assets/logos/google-calender.png";
+import useFacebookSdk from "../../../components/useFacebookSdk";
 
-const integrations = [
-  {
-    title: "Meta Ads",
-    text: "Auto-sync ad leads, manage DMs, and handle reviews and comments across all your Facebook Pages and Instagram.",
-    action: "Manage",
-    logoSrc: facebookLogo,
-    iconBg: "transparent",
-    logoWidth: 22,
-  },
-  {
-    title: "Google Ads",
-    text: "Connect your Google Ads account to track campaigns, sync leads automatically, and measure ROI directly from your CRM.",
-    action: "Connect",
-    logoSrc: googleAdsLogo,
-    iconBg: "transparent",
-    logoWidth: 22,
-  },
-  {
-    title: "Google Calendar",
-    text: "Connect your Google Calendar to seamlessly schedule meetings, sync availability, and manage appointments with leads directly from your CRM.",
-    action: "Connect",
-    logoSrc: googleCalLogo,
-    iconBg: "transparent",
-    logoWidth: 26,
-    logoHeight: 26,
-  },
-  {
-    title: "99acres",
-    text: "Sync property inquiries and leads directly from 99acres into your CRM for faster follow-ups and management.",
-    action: "Connect",
-    logoSrc: acres99Logo,
-    iconBg: "transparent",
-    logoWidth: 28,
-    logoHeight: 20,
-  },
-  {
-    title: "Housing.com",
-    text: "Automatically fetch leads and inquiries from your Housing.com listings directly into your sales pipeline.",
-    action: "Connect",
-    logoSrc: housingLogo,
-    iconBg: "transparent",
-    logoWidth: 90,
-    logoHeight: 22,
-  },
-  {
-    title: "MagicBricks",
-    text: "Centralize your property leads by integrating MagicBricks inquiries directly into your real estate CRM.",
-    action: "Connect",
-    logoSrc: magicbricksLogo,
-    iconBg: "transparent",
-    logoWidth: 90,
-    logoHeight: 22,
-  },
-];
+
 
 const actionStyles = {
   Connect: {
@@ -89,7 +37,7 @@ const actionStyles = {
   },
 };
 
-function IntegrationActionButton({ action, onClick }) {
+function IntegrationActionButton({ action, onClick, isDisabled = false }) {
   const tone = actionStyles[action] || actionStyles.Connect;
   const Icon = tone.icon;
 
@@ -97,6 +45,7 @@ function IntegrationActionButton({ action, onClick }) {
     <button
       type="button"
       onClick={onClick}
+      disabled={isDisabled}
       style={{
         width: "100%",
         height: 34,
@@ -120,7 +69,7 @@ function IntegrationActionButton({ action, onClick }) {
   );
 }
 
-function IntegrationCard({ integration, onConnect }) {
+function IntegrationCard({ integration, onConnect, isDisabled = false }) {
   const BrandIcon = integration.icon;
 
   return (
@@ -216,18 +165,139 @@ function IntegrationCard({ integration, onConnect }) {
       <IntegrationActionButton
         action={integration.action}
         onClick={onConnect}
+        isDisabled={isDisabled}
       />
 
     </AppCard>
   );
 }
 
-function IntegrationSection() {
-  const [show99acres,     setShow99acres]     = useState(false);
-  const [showHousing,     setShowHousing]     = useState(false);
+function IntegrationSection({ data }) {
+  if (!data) return null;
+  const API_BASE = "https://real-estate-backend-sable.vercel.app";
+
+  const SCOPE = "pages_show_list,pages_read_engagement,leads_retrieval, pages_manage_ads, pages_manage_metadata, business_management, ads_read";
+
+  const [show99acres, setShow99acres] = useState(false);
+  const [showHousing, setShowHousing] = useState(false);
   const [showMagicBricks, setShowMagicBricks] = useState(false);
   const [showGoogleCalendar, setShowGoogleCalendar] = useState(false);
   const [showGoogleAds, setShowGoogleAds] = useState(false);
+
+  const fbReady = useFacebookSdk();
+
+  const [pages, setPages] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const companyId = localStorage.getItem("company_id");
+
+  const integrations = [
+    {
+      title: "Meta Ads",
+      text: "Auto-sync ad leads, manage DMs, and handle reviews and comments across all your Facebook Pages and Instagram.",
+      action: "Connect",
+      logoSrc: facebookLogo,
+      iconBg: "transparent",
+      logoWidth: 22,
+    },
+    {
+      title: "Google Ads",
+      text: "Connect your Google Ads account to track campaigns, sync leads automatically, and measure ROI directly from your CRM.",
+      action: "Connect",
+      logoSrc: googleAdsLogo,
+      iconBg: "transparent",
+      logoWidth: 22,
+    },
+    {
+      title: "Google Calendar",
+      text: "Connect your Google Calendar to seamlessly schedule meetings, sync availability, and manage appointments with leads directly from your CRM.",
+      action: "Connect",
+      logoSrc: googleCalLogo,
+      iconBg: "transparent",
+      logoWidth: 26,
+      logoHeight: 26,
+    },
+    {
+      title: "99acres",
+      text: "Sync property inquiries and leads directly from 99acres into your CRM for faster follow-ups and management.",
+      action: "Connect",
+      logoSrc: acres99Logo,
+      iconBg: "transparent",
+      logoWidth: 28,
+      logoHeight: 20,
+    },
+    {
+      title: "Housing.com",
+      text: "Automatically fetch leads and inquiries from your Housing.com listings directly into your sales pipeline.",
+      action: "Connect",
+      logoSrc: housingLogo,
+      iconBg: "transparent",
+      logoWidth: 90,
+      logoHeight: 22,
+    },
+    {
+      title: "MagicBricks",
+      text: "Centralize your property leads by integrating MagicBricks inquiries directly into your real estate CRM.",
+      action: "Connect",
+      logoSrc: magicbricksLogo,
+      iconBg: "transparent",
+      logoWidth: 90,
+      logoHeight: 22,
+    },
+  ];
+
+  const connectedProviders = data.map((item) => item.provider);
+
+  const updatedIntegrations = integrations.map((integration) => ({
+    ...integration,
+    action: connectedProviders.includes(
+      integration.title.toLowerCase().split(" ")[0] // not ideal for all providers
+    )
+      ? "Manage"
+      : "Connect",
+  }));
+  function handleLogin() {
+    setError(null);
+    window.FB.login(
+
+      (response) => {
+        console.log(response);
+        if (response.authResponse) {
+          sendTokenToBackend(response.authResponse.accessToken);
+        } else {
+          setError("Facebook login was cancelled or not fully authorized.");
+        }
+      },
+      {
+        scope: SCOPE,
+        auth_type: "rerequest"
+      }
+    );
+  }
+
+  async function sendTokenToBackend(accessToken) {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/webhook/meta/auth/facebook/${companyId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accessToken }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Facebook connect failed");
+
+      setConnected(true);
+      setPages(data.pages || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div
@@ -299,24 +369,26 @@ function IntegrationSection() {
           alignItems: "stretch",
         }}
       >
-        {integrations.map((integration) => (
+        {updatedIntegrations.map((integration) => (
           <IntegrationCard
             key={integration.title}
             integration={integration}
+            isDisabled={integration.title === "Meta Ads" ? !fbReady : false}
             onConnect={
-              integration.title === "99acres"     ? () => setShow99acres(true)
-            : integration.title === "Housing.com" ? () => setShowHousing(true)
-            : integration.title === "MagicBricks" ? () => setShowMagicBricks(true)
-            : integration.title === "Google Calendar" ? () => setShowGoogleCalendar(true)
-            : integration.title === "Google Ads" ? () => setShowGoogleAds(true)
-            : undefined
+              integration.title === "99acres" ? () => setShow99acres(true)
+                : integration.title === "Housing.com" ? () => setShowHousing(true)
+                  : integration.title === "MagicBricks" ? () => setShowMagicBricks(true)
+                    : integration.title === "Google Calendar" ? () => setShowGoogleCalendar(true)
+                      : integration.title === "Google Ads" ? () => setShowGoogleAds(true)
+                        : integration.title === "Meta Ads" ? handleLogin
+                          : () => { }
             }
           />
         ))}
       </div>
 
-      {show99acres     && <Acres99ConnectorModal     onClose={() => setShow99acres(false)}     />}
-      {showHousing     && <HousingConnectorModal     onClose={() => setShowHousing(false)}     />}
+      {show99acres && <Acres99ConnectorModal onClose={() => setShow99acres(false)} />}
+      {showHousing && <HousingConnectorModal onClose={() => setShowHousing(false)} />}
       {showMagicBricks && <MagicBricksConnectorModal onClose={() => setShowMagicBricks(false)} />}
       {showGoogleCalendar && <GoogleCalendarConnectorModal onClose={() => setShowGoogleCalendar(false)} />}
       {showGoogleAds && <GoogleAdsConnectorModal onClose={() => setShowGoogleAds(false)} />}

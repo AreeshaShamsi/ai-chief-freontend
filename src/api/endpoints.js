@@ -7,6 +7,7 @@ export const ENDPOINTS = {
         ACTIVITY: (id) => `/dashboard/activity?company_id=${id}`,
         KNOWLEDGE_BASE: `/dashboard/knowledge-base`,
         DEALS: `/dashboard/deals`,
+        INTEGRATION: (id) => `/integration/${id}`,
     },
 
 
@@ -43,6 +44,11 @@ export const ENDPOINTS = {
 
     CAMPAIGN: {
         CREATE_BULK: `/campaign/bulk`,
+    },
+
+
+    INTEGRATION: {
+        GET: (id) => `/integration/${id}`,
     },
 
 

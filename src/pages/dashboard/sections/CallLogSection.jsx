@@ -17,12 +17,12 @@ import SegmentedControl from "../../../components/design-system/SegmentedControl
 // Reusable CallLogDetailPanel Component
 // ==========================================
 export function CallLogDetailPanel({
-  callOutcome = "Connected And Had A Productive Conversation. Decision Maker Identified.",
+  callOutcome = "-",
   nextAction = {
-    title: "Confirm Site Visit",
-    date: "Dec 23th, Saturday 11 AM",
+    title: "-",
+    date: "-",
   },
-  aiSummary = "The prospect is interested in expanding their operations in Europe and is looking for a scalable solution. They have a budget of $50k-$100k and are evaluating two other competitors. Main pain point is integration with existing legacy systems.",
+  aiSummary = "-",
   transcript = [],
   isNoAnswer = false,
 }) {
@@ -153,7 +153,7 @@ export function CallLogDetailPanel({
                 const sUpper = (message.sender || "").toUpperCase();
                 const isAI = sUpper.includes("AI") || sUpper === "ASSISTANT" || sUpper === "BOT";
                 const displayTag = isAI ? "AI" : "USER";
-                
+
                 return (
                   <div key={`${message.sender}-${index}`} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                     <AppIconCircle
@@ -424,14 +424,13 @@ function CallLogSection({
     )
   ) || filteredCalls[0] || calls[0];
 
+  console.log(metrics);
   const statistics = [
     { title: "Calls", value: metrics.total_calls_today || 94, icon: LuPhone },
-    { title: "Pick Up Rate", value: `${metrics.pickup_rate_percent || 74}%`, icon: LuPhone },
+    { title: "Pick Up Rate", value: `${metrics.pickup_rate_percent}%`, icon: LuPhone },
     {
       title: "Avg Duration",
-      value: metrics.avg_call_duration_seconds
-        ? formatDuration(metrics.avg_call_duration_seconds)
-        : "2:34",
+      value: formatDuration(metrics.avg_call_duration_seconds),
       icon: LuPhone,
     },
   ];

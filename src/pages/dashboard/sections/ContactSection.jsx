@@ -79,7 +79,7 @@ const generateAllContactsTable = (tables) => {
     const nameFieldId = table.fields.find(f => f.name.toLowerCase().includes("name") && !f.name.toLowerCase().includes("business"))?.id;
     const businessFieldId = table.fields.find(f => f.name.toLowerCase().includes("business"))?.id;
     const tagsFieldId = table.fields.find(f => f.type === "Multiple Select" || f.name.toLowerCase().includes("tag"))?.id;
-    
+
     table.rows.forEach(row => {
       allContactsRows.push({
         id: `${table.id}-${row.id}`,

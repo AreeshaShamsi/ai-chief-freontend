@@ -74,8 +74,18 @@ function CallCard({ call, isSelected, onSelect }) {
       {/* Row 4: Clock Icon + Date & Time */}
       <div style={{ fontSize: T.font.size.caption, color: C.muted, display: "flex", alignItems: "center", gap: 5 }}>
         <LuClock3 size={11} color={C.muted} />
-        <span>{call.calls[0].date_time_of_call || "Today 10:15 AM"}</span>
-      </div>
+        <span>
+          {call.calls[0].date_time_of_call
+            ? new Date(call.calls[0].date_time_of_call).toLocaleString("en-IN", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })
+            : "Today 10:15 AM"}
+        </span>      </div>
 
       {/* Row 5: Large Duration + Small Label */}
       <div style={{ display: "flex", alignItems: "baseline", gap: 6, margin: "2px 0" }}>

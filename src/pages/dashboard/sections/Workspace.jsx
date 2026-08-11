@@ -1219,7 +1219,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
         <div style={{ marginTop: 11 }}>
           <SearchBox value={viewSearch} onChange={setViewSearch} placeholder="Find A View" width="100%" />
         </div>
-        <div style={{ display: "grid", gap: 5, marginTop: 12, overflowY: "auto", flex: 1, minHeight: 0 }}>
+        <div style={{ display: "grid", gap: 5, marginTop: 12, overflowY: "auto", minHeight: 0 }}>
           {filteredViews.map((viewItem) => (
             <GridNameRowItem
               key={viewItem.id}
@@ -1233,6 +1233,7 @@ function WorkspaceViewsPanel({ isHidden, viewsList, workspaceIdentifier, onOpenI
             />
           ))}
         </div>
+
         <input
           ref={fileInputRef}
           type="file"

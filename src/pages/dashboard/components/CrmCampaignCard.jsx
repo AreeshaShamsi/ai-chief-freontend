@@ -64,9 +64,9 @@ function CrmCampaignCard({ cp, stat = {} }) {
     (cp.script_type === "real_estate_enquiry"
       ? "Property Enquiry Call"
       : "Property Requirement Gathering");
-  const sourceName = cp.crm_name || cp.crm || cp.source || "LeadSquared";
+  const sourceName = cp.crm_name || cp.crm || cp.source || cp.campaign_name || "LeadSquared";
   const liveSince = cp.live_since || cp.started_at || cp.created_at || "Dec 15";
-  const subtitle = `Connected to ${sourceName}  Live since ${liveSince}`;
+  const subtitle = `Connected to ${sourceName}  Live `;
 
   const metrics = [
     {
@@ -116,7 +116,7 @@ function CrmCampaignCard({ cp, stat = {} }) {
             style={{
               fontSize: T.font.size.caption,
               color: C.muted,
-              marginTop: 2,
+              marginTop: 6,
               lineHeight: "11px"
             }}
           >

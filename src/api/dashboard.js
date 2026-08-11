@@ -23,3 +23,7 @@ export const getKnowledgeBase = (params) => {
 export const getDeals = (params) => {
     return api.get(ENDPOINTS.DASHBOARD.DEALS, params);
 };
+
+export const getIntegration = (id) => {
+    return api.get(ENDPOINTS.DASHBOARD.INTEGRATION(id));
+};
