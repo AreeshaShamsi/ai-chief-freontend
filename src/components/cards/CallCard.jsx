@@ -5,9 +5,10 @@ import { AppCard, AppPill, C, T, Text } from "../utils";
 
 function CallCard({ call, isSelected, onSelect }) {
   console.log("call", call);
-  const isHot = call.calls?.[0]?.output?.lead_status === "hot";
-  const isCold = call.calls?.[0]?.output?.lead_status === "cold";
-  const isNoAnswer = call.calls?.[0]?.output?.lead_status === "no answer";
+  const leadStatus = call.calls?.[0]?.output?.lead_status?.toLowerCase();
+  const isHot = leadStatus === "hot";
+  const isCold = leadStatus === "cold";
+  const isNoAnswer = leadStatus === "no answer";
   const getCallType = (callType) => {
     switch (callType) {
       case "real_estate_internal":
@@ -67,7 +68,7 @@ function CallCard({ call, isSelected, onSelect }) {
       {/* Row 3: Call Type Chip */}
       <div>
         <AppPill size="xs" variant="primary" style={{ background: C.surface, color: C.text, border: `1px solid ${C.border}` }}>
-          {getCallType(call.calls[0].call_type)}
+          {getCallType(call.calls?.[0]?.call_type)}
         </AppPill>
       </div>
 

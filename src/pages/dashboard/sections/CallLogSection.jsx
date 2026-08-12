@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   LuCalendar,
@@ -8,6 +8,7 @@ import {
   LuPhone,
   LuPlus,
   LuUser,
+  LuSearch,
 } from "react-icons/lu";
 import { AppButton, AppCard, AppIconCircle, C, T, Text } from "../../../components/utils";
 import { CallCard } from "../../../components/cards";
@@ -25,6 +26,8 @@ export function CallLogDetailPanel({
   aiSummary = "-",
   transcript = [],
   isNoAnswer = false,
+  isColdLead = false,
+  onRetryCall = () => {},
 }) {
   return (
     <div
@@ -124,6 +127,35 @@ export function CallLogDetailPanel({
               {aiSummary}
             </p>
           </div>
+
+          {/* Action Buttons */}
+          {isColdLead && (
+            <div style={{ marginTop: 12 }}>
+              <AppButton
+                onClick={onRetryCall}
+                compact
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  color: "white",
+                  background: C.accent,
+                  border: "none",
+                  height: 38,
+                  padding: "0 16px",
+                  borderRadius: T.radius.sm,
+                  fontSize: T.font.size.bodySmall,
+                  fontWeight: T.font.weight.medium,
+                  boxShadow: T.shadow.none,
+                  width: "100%",
+                  justifyContent: "center",
+                }}
+              >
+                <LuPhone size={16} color="white" />
+                Retry call
+              </AppButton>
+            </div>
+          )}
         </div>
 
         {/* Right Column (65%): Inner rounded bordered transcript container */}
@@ -211,6 +243,8 @@ CallLogDetailPanel.propTypes = {
   aiSummary: PropTypes.string,
   transcript: PropTypes.array,
   isNoAnswer: PropTypes.bool,
+  isColdLead: PropTypes.bool,
+  onRetryCall: PropTypes.func,
 };
 
 // ==========================================
@@ -401,6 +435,9 @@ function CallLogSection({
   if (!data) return null;
   const [activeFilterTab, setActiveFilterTab] = useState("initial");
   const [selectedCallId, setSelectedCallId] = useState(fallbackCalls[0].id);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
 
   // If props are passed directly for a standalone detail panel view
   if (callOutcome !== undefined) {
@@ -441,8 +478,25 @@ function CallLogSection({
     //{ id: "followup", label: "Follow-Up" },
   ];
 
-  const details = selectedCall?.calls[0].output || {};
+  const details = selectedCall?.calls?.[0]?.output || {};
   const isNoAnswer = selectedCall?.status === "no answer";
+
+  const callsToFilter = filteredCalls.length ? filteredCalls : calls;
+  const searchedCalls = callsToFilter.filter((c) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div
@@ -500,25 +554,115 @@ function CallLogSection({
             alignItems: "start",
           }}
         >
-          {/* Left Column: Call Cards List */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-              maxHeight: 520,
-              overflowY: "auto",
-              paddingRight: 4,
-            }}
-          >
-            {(filteredCalls.length ? filteredCalls : calls).map((call) => (
+          {/* Left Column: Call Cards List & Search */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div ref={searchRef} style={{ position: "relative", width: "100%" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  background: C.surface,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: T.radius.sm,
+                  padding: "8px 12px",
+                }}
+              >
+                <LuSearch size={16} color={C.muted} style={{ marginRight: 8 }} />
+                <input
+                  type="text"
+                  placeholder="Search leads by name..."
+                  value={searchQuery}
+                  onFocus={() => setShowSuggestions(true)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    outline: "none",
+                    color: C.text,
+                    fontSize: T.font.size.bodySmall,
+                    width: "100%",
+                  }}
+                />
+              </div>
+              {showSuggestions && searchQuery && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    right: 0,
+                    marginTop: 4,
+                    background: C.card,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: T.radius.sm,
+                    boxShadow: T.shadow.md,
+                    zIndex: 10,
+                    maxHeight: 200,
+                    overflowY: "auto",
+                  }}
+                >
+                  {searchedCalls.length > 0 ? (
+                    searchedCalls.map((c) => (
+                      <div
+                        key={c.id || c.calls?.[0]?.retry_id}
+                        onClick={() => {
+                          setSearchQuery(c.name);
+                          const retryId = c.calls?.[0]?.retry_id;
+                          if (retryId) setSelectedCallId(retryId);
+                          setShowSuggestions(false);
+                        }}
+                        style={{
+                          padding: "10px 12px",
+                          cursor: "pointer",
+                          borderBottom: `1px solid ${C.borderLt}`,
+                          fontSize: T.font.size.bodySmall,
+                          color: C.text,
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = C.surface)}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = C.card)}
+                      >
+                        {c.name}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ padding: "10px 12px", color: C.muted, fontSize: T.font.size.bodySmall }}>
+                      No leads found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+                maxHeight: 474,
+                overflowY: "auto",
+                paddingRight: 4,
+              }}
+            >
+            {searchedCalls.map((call) => (
               <CallCard
-                key={call.calls[0].retry_id}
+                key={call.calls?.[0]?.retry_id || call.id}
                 call={call}
-                isSelected={selectedCall?.calls[0].retry_id === call.calls[0].retry_id}
-                onSelect={() => setSelectedCallId(call.calls[0].retry_id)}
+                isSelected={selectedCall?.calls?.[0]?.retry_id === call.calls?.[0]?.retry_id}
+                onSelect={() => {
+                  const retryId = call.calls?.[0]?.retry_id;
+                  if (retryId) setSelectedCallId(retryId);
+                }}
               />
             ))}
+            {searchedCalls.length === 0 && (
+              <div style={{ color: C.muted, fontSize: T.font.size.bodySmall, textAlign: "center", marginTop: 20 }}>
+                No calls match your search.
+              </div>
+            )}
+          </div>
           </div>
 
           {/* Right Area: Single Outer Rounded Parent Container enclosing Left Panel & Transcript Panel */}
@@ -528,6 +672,8 @@ function CallLogSection({
             aiSummary={details.ai_generated_call_summary}
             transcript={details.messages}
             isNoAnswer={isNoAnswer}
+            isColdLead={selectedCall?.calls?.[0]?.output?.lead_status?.toLowerCase() === "cold"}
+            onRetryCall={() => alert(`Added ${selectedCall?.name || "lead"} to the calling list!`)}
           />
         </div>
       </PageSection>
