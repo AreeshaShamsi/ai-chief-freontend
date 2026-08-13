@@ -3,8 +3,7 @@ import PropTypes from "prop-types";
 import { FiPlus } from "react-icons/fi";
 import { AppButton, C, T, Text } from "../../../components/utils";
 import Workspace from "./Workspace";
-import CreateCampaignSelectionModal from "../modals/CreateCampaignSelectionModal";
-import { createBulkCampaign } from "../../../api/campaign";
+
 
 export const contactColumns = [
   { id: "contactName", name: "Contact Name", type: "Single Line Text", value: "Contact Name" },
@@ -202,9 +201,7 @@ function ContactSection({ data, activeTab = "contacts", onTabChange, onCreateCam
     };
 
     console.log(payload);
-
-    const response = await createBulkCampaign(payload);
-    setShowCreateModal(false)
+    setShowCreateModal(false);
   };
 
   return (

@@ -2,14 +2,15 @@ import LoginPage from './pages/login/main.jsx'
 import DashboardMain from './pages/dashboard/main.jsx'
 import AppLayout from './layouts/AppLayout.jsx'
 import './App.css'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={<Navigate to="/dashboard" replace />} />
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardMain />} />
           <Route path="/campaigns" element={<DashboardMain />} />

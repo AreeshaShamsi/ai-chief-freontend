@@ -73,10 +73,23 @@ PageSection.propTypes = {
   style: PropTypes.object,
 };
 
+const defaultKbWorkspaceData = {
+  id: "kb-workspace-1",
+  tables: [
+    {
+      id: "table-kb-1",
+      name: "Property Inventory",
+      editable: true,
+      fields: knowledgeBaseColumns,
+      rows: knowledgeBaseRows,
+    },
+  ],
+};
+
 function KnowledgeBaseSection({ data, activeTab = "inventory", onTabChange }) {
-  if (!data) return null;
+  const workspaceData = data?.workspace_data || (data?.tables ? data : defaultKbWorkspaceData);
+  const faqs = data?.faqs || [];
   const [currentTab, setCurrentTab] = useState(activeTab === "kb" ? "inventory" : activeTab);
-  console.log(data);
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
     if (onTabChange) {
@@ -115,8 +128,8 @@ function KnowledgeBaseSection({ data, activeTab = "inventory", onTabChange }) {
         </header>
         <Workspace
           workspaceId="kb"
-          workspaceData={data.workspace_data}
-          faqs={data.faqs}
+          workspaceData={workspaceData}
+          faqs={faqs}
           activeTab={currentTab}
           onTabChange={handleTabChange}
         />

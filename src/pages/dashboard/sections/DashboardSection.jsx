@@ -324,21 +324,31 @@ function ActiveCampaignsCard({ campaigns: campaignItems = campaigns, onViewAll }
 
 function DashboardSection({ data, onLeadClick, openCampaign }) {
   if (!data) return null;
+  const billing = data.billing || {
+    minutes_left: 350,
+    total_minutes_used: 100,
+    total_minutes_purchased: 450,
+    balance_value: 2450,
+  };
+  const leadsSummary = data.leads_summary || { hot: 12, warm: 24, cold: 8 };
+  const hotLeads = data.hot_leads || [];
+  const callsToday = data.calls_today ?? 42;
+
   const topMetrics = [
     {
       key: "minutes",
-      label: `${data.billing.minutes_left} min remaining`,
-      subtitle: `${data.billing.total_minutes_used ?? 0} min used, ${data.billing.total_minutes_purchased
+      label: `${billing.minutes_left} min remaining`,
+      subtitle: `${billing.total_minutes_used ?? 0} min used, ${billing.total_minutes_purchased
         ? (
           100 -
-          (100 * (data.billing.total_minutes_used ?? 0)) /
-          data.billing.total_minutes_purchased
+          (100 * (billing.total_minutes_used ?? 0)) /
+          billing.total_minutes_purchased
         ).toFixed(1)
         : 0
-        }% remaining of ${data.billing.total_minutes_purchased ?? 0} purchased`,
+        }% remaining of ${billing.total_minutes_purchased ?? 0} purchased`,
       icon: <FiMic size={14} />,
       progress:
-        (data.billing.total_minutes_used / data.billing.total_minutes_purchased) * 100,
+        (billing.total_minutes_used / (billing.total_minutes_purchased || 1)) * 100,
     },
     {
       key: "rate",
@@ -354,7 +364,7 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
     {
       key: "balance",
       label: "Balance value",
-      value: `₹${data.billing.balance_value}`,
+      value: `₹${billing.balance_value}`,
       icon: (
         <span
           style={{ fontSize: 14, fontWeight: 800, color: C.accentStrong }}
@@ -369,7 +379,7 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
   const middleMetrics = [
     {
       label: "Call today",
-      value: `${data.calls_today}`,
+      value: `${callsToday}`,
       icon: <FiPhoneCall size={14} />,
       badgeTone: "green",
     },
@@ -377,16 +387,16 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
       label: "Hot leads",
       subtitle: "action needed",
       value: `${(
-        ((data.leads_summary.hot || 0) /
-          ((data.leads_summary.hot || 0) +
-            (data.leads_summary.warm || 0) +
-            (data.leads_summary.cold || 0) || 1)) *
+        ((leadsSummary.hot || 0) /
+          ((leadsSummary.hot || 0) +
+            (leadsSummary.warm || 0) +
+            (leadsSummary.cold || 0) || 1)) *
         100
       ).toFixed(0)
         }%`,
       icon: <FaFire size={13} />,
       iconColor: C.hot,
-      badge: `${data.hot_leads.length}`,
+      badge: `${hotLeads.length}`,
       badgeTone: "green",
     },
   ];
@@ -395,14 +405,14 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
     {
       label: "Qualified",
       subtitle: "ready for sales",
-      value: `${data.leads_summary.hot}`,
+      value: `${leadsSummary.hot}`,
       icon: <FiCheck size={15} />,
       iconColor: C.greenText,
     },
     {
       label: "Warm leads",
       subtitle: "needs follow up",
-      value: `${data.leads_summary.warm}`,
+      value: `${leadsSummary.warm}`,
       icon: <FiZap size={15} />,
       iconColor: C.warm,
       badgeTone: "red",
@@ -410,13 +420,13 @@ function DashboardSection({ data, onLeadClick, openCampaign }) {
     {
       label: "Junk",
       subtitle: "not interested",
-      value: `${data.leads_summary.cold}`,
+      value: `${leadsSummary.cold}`,
       icon: <FiX size={15} />,
       iconColor: C.muted,
       background: C.sectionBg,
     },
   ];
-  const first_name = localStorage.getItem("first_name");
+  const first_name = localStorage.getItem("first_name") || "Himanshu";
   return (
     <div style={{ minHeight: "100%", width: "100%", minWidth: 0, background: C.pageBg }}>
       <div style={pageStyle}>

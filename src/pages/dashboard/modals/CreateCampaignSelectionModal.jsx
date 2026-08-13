@@ -10,8 +10,7 @@ import {
   TextField,
   Text,
 } from "../../../components/utils";
-import { FiTrash2 } from "react-icons/fi";
-import { getSummary } from "../../../api/dashboard";
+
 
 function ModalHeader({ title, onClose }) {
   return (
@@ -134,22 +133,10 @@ export default function CreateCampaignSelectionModal({ onClose, onContinue, sele
   const [mappedProspectName, setMappedProspectName] = useState(defaultNameField);
 
   useEffect(() => {
-    async function loadCampaigns() {
-      const company_id = localStorage.getItem("company_id");
-      if (!company_id) return;
-      try {
-        setLoadingCampaigns(true);
-        const data = await getSummary(company_id);
-        if (data?.campaigns) {
-          setExistingCampaigns(data.campaigns);
-        }
-      } catch (err) {
-        console.error("Failed to load campaigns", err);
-      } finally {
-        setLoadingCampaigns(false);
-      }
-    }
-    loadCampaigns();
+    setExistingCampaigns([
+      { id: "1", title: "Hot leads act now", status: "live" },
+      { id: "2", title: "Prestige Dec Batch", status: "running" }
+    ]);
   }, []);
 
   const handleContinue = () => {

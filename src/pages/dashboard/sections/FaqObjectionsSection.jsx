@@ -11,7 +11,6 @@ import {
   Text,
 } from "../../../components/utils";
 import FaqModal from "../modals/FaqModal";
-import { addFAQ, updateFAQ, deleteFAQ } from "../../../api/faq";
 
 export const initialFaqItems = [
   {
@@ -200,8 +199,6 @@ function FaqObjectionsSection({ data, onAddFaq: externalOnAddFaq }) {
         answer: aText,
       };
       setFaqs((prev) => [...prev, newFaq]);
-      const payload = { company_id: localStorage.getItem("company_id"), question: qText, answer: aText };
-      await addFAQ(payload);
     } else if (modalState.mode === "edit" && faqData.id) {
       setFaqs((prev) =>
         prev.map((item) =>
@@ -210,15 +207,11 @@ function FaqObjectionsSection({ data, onAddFaq: externalOnAddFaq }) {
             : item
         )
       );
-      const payload = { company_id: localStorage.getItem("company_id"), question: faqData.question, answer: faqData.answer };
-
-      await updateFAQ(faqData.id, payload);
     }
   };
 
   const handleDeleteFaq = async (faqId) => {
     setFaqs((prev) => prev.filter((item) => item.id !== faqId));
-    await deleteFAQ(faqId);
   };
 
   return (

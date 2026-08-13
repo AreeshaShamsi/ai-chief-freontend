@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../../config/main";
 import { C, T, Text } from "../../components/utils";
 import LoginCard from "./components/LoginCard";
 import LogoSection from "./components/LogoSection";
@@ -60,31 +59,14 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/user/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_name: username,
-          password: pass,
-        }),
-      });
+      localStorage.setItem("first_name", username.split(".")[0] || "Himanshu");
+      localStorage.setItem("user_name", username);
+      localStorage.setItem("company_id", "default");
+      localStorage.setItem("company_name", "AI Chief Real Estate");
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      localStorage.setItem("first_name", data.data.first_name);
-      localStorage.setItem("user_name", data.data.user_name);
-      localStorage.setItem("company_id", data.data.company_id);
-      localStorage.setItem("company_name", data.data.company_name);
-
-      localStorage.setItem("user_id", data.data.id);
-      localStorage.setItem("role", data.data.role);
-      localStorage.setItem("access", data.data.access);
+      localStorage.setItem("user_id", "1");
+      localStorage.setItem("role", "admin");
+      localStorage.setItem("access", "full");
 
       navigate("/dashboard");
     } catch (error) {

@@ -276,22 +276,11 @@ function IntegrationSection({ data }) {
     );
   }
 
-  async function sendTokenToBackend(accessToken) {
+  async function sendTokenToBackend() {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${API_BASE}/api/webhook/meta/auth/facebook/${companyId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ accessToken }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Facebook connect failed");
-
       setConnected(true);
-      setPages(data.pages || []);
+      setPages([]);
     } catch (err) {
       setError(err.message);
     } finally {

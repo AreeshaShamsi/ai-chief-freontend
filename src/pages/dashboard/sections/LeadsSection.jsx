@@ -152,10 +152,71 @@ function LeadCategorySection() {
   );
 }
 
+const defaultDealsWorkspace = {
+  id: "deals-workspace-1",
+  tables: [
+    {
+      id: "table-deals-1",
+      name: "Deals Pipeline",
+      editable: true,
+      fields: [
+        { id: "dealName", name: "Deal Name", type: "Single Line Text", value: "Deal Name" },
+        { id: "callType", name: "Call Type", type: "Single Select", value: "Call Type", options: ["Inbound", "Outbound", "Follow Up"] },
+        { id: "score", name: "Score", type: "Multiple Select", value: "Score", options: ["Hot", "Warm", "Cold"], editorKind: "tags" },
+        { id: "callOutcome", name: "Call Outcome", type: "Single Line Text", value: "Call Outcome" },
+        { id: "budget", name: "Budget", type: "Currency", value: "Budget" },
+        { id: "timeline", name: "Timeline", type: "Date", value: "Timeline" },
+        { id: "assignedAgent", name: "Assigned Agent", type: "User / Assigned Agent", value: "Assigned Agent", options: ["Ramesh Yadav", "Himanshu S.", "Admin"] },
+        { id: "status", name: "Status", type: "Single Select", value: "Status", options: ["Open", "Won", "Lost"], editorKind: "tags" },
+        { id: "nextAction", name: "Next Action", type: "Single Line Text", value: "Next Action" },
+        { id: "createdTime", name: "Created Time", type: "Date Time", value: "14/08/2026 5:00pm" },
+        { id: "lastModifiedTime", name: "Last Modified Time", type: "Date Time", value: "14/08/2026 5:00pm" },
+        { id: "createdBy", name: "Created By", type: "User / Assigned Agent", value: "User", options: ["User", "Admin"] },
+        { id: "lastModifiedBy", name: "Last Modified By", type: "User / Assigned Agent", value: "Admin", options: ["Admin", "User"] },
+      ],
+      rows: [
+        {
+          id: "deal-1",
+          dealName: "3BHK Villa Sarjapur",
+          callType: "Inbound",
+          score: "Hot",
+          callOutcome: "Site Visit Scheduled",
+          budget: "₹1.2 Cr",
+          timeline: "2 Weeks",
+          assignedAgent: "Himanshu S.",
+          status: "Open",
+          nextAction: "Confirm Site Visit",
+          createdTime: "14/08/2026 5:00pm",
+          lastModifiedTime: "14/08/2026 5:00pm",
+          createdBy: "User",
+          lastModifiedBy: "Admin",
+        },
+        {
+          id: "deal-2",
+          dealName: "4BHK Apartment Whitefield",
+          callType: "Follow Up",
+          score: "Warm",
+          callOutcome: "Price Discussion",
+          budget: "₹2.5 Cr",
+          timeline: "1 Month",
+          assignedAgent: "Ramesh Yadav",
+          status: "Open",
+          nextAction: "Send Cost Sheet",
+          createdTime: "14/08/2026 5:00pm",
+          lastModifiedTime: "14/08/2026 5:00pm",
+          createdBy: "User",
+          lastModifiedBy: "Admin",
+        },
+      ],
+    },
+  ],
+};
+
 function LeadsSection({ data }) {
-  if (!data) return null;
+  const initialDeals = data?.deals_data || (data?.tables ? data : defaultDealsWorkspace);
+  const initialTasks = data?.tasks_data;
   const [activeTab, setActiveTab] = useState("deals");
-  const [dealsData, setDealsData] = useState(data.deals_data);
+  const [dealsData, setDealsData] = useState(initialDeals);
   const isTasks = activeTab === "tasks";
 
   const handleTableCreated = (table) => {
@@ -197,7 +258,7 @@ function LeadsSection({ data }) {
         <LeadCategorySection />
         <Workspace
           workspaceId={isTasks ? "tasks" : "deals"}
-          workspaceData={isTasks ? data.tasks_data : dealsData}
+          workspaceData={isTasks ? (initialTasks || dealsData) : dealsData}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           onTableCreated={handleTableCreated}

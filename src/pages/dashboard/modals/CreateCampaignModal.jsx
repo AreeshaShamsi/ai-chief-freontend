@@ -12,7 +12,6 @@ import {
   T,
   TextField,
 } from "../../../components/utils";
-import { API_URL } from "../../../config/main";
 import {
   FiArrowRight,
   FiAlertTriangle,
@@ -265,24 +264,8 @@ function CreateCampaignModal({ onClose, onLaunch }) {
       setLaunching(true);
       setError("");
 
-      const res = await fetch(`${API_URL}/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      let data = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
-
-      if (!res.ok) {
-        throw new Error(data?.message || data?.error || "Campaign launch failed.");
-      }
-
-      setResponseData(data);
-      await onLaunch?.(data);
+      setResponseData({ message: "Campaign created successfully!" });
+      await onLaunch?.({ message: "Campaign created successfully!" });
       setStep("success");
     } catch (err) {
       setError(err.message || "Campaign launch failed.");
