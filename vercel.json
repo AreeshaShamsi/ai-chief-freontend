@@ -1,0 +1,9 @@
+{
+    "redirects": [],
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+  }
