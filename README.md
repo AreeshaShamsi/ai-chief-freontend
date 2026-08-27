@@ -167,7 +167,6 @@ These integration flows demonstrate the user interface for connecting third-part
 
 ## Data Handling
 The codebase is structured with API client definitions (`src/api/client.js` and `src/api/endpoints.js`) so that it can be connected to a live REST API backend in the future.
----
 
 ## Future Improvements
 
